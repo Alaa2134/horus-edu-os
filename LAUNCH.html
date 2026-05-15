@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HORUS OS — Launch Center</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Cairo:wght@300;400;600;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --gold:#c9a227; --gold2:#e8c547;
+  --cyan:#00d4ff; --bg:#04070f; --bg2:#080e1c;
+  --surface:#0f1520; --surface2:#161f30;
+  --text:#e8dcc8; --text2:#8892a4;
+  --green:#10b981; --red:#ef4444;
+  --p:#6366f1;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  background:var(--bg);color:var(--text);
+  font-family:'Cairo',sans-serif;
+  min-height:100vh;overflow-x:hidden;
+}
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;
+  background:
+    radial-gradient(ellipse at 20% 20%,rgba(201,162,39,.06) 0%,transparent 50%),
+    radial-gradient(ellipse at 80% 80%,rgba(0,212,255,.04) 0%,transparent 50%);
+}
+canvas#bg{position:fixed;inset:0;z-index:0;pointer-events:none}
+
+.wrap{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:2rem 1.5rem 4rem}
+
+/* HEADER */
+header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:1.5rem 0 2.5rem;
+  border-bottom:1px solid rgba(201,162,39,.15);
+  margin-bottom:2.5rem;
+  flex-wrap:wrap;gap:1rem;
+}
+.hdr-left{display:flex;align-items:center;gap:1rem}
+.hdr-logo svg{width:52px;height:52px;filter:drop-shadow(0 0 12px rgba(201,162,39,.5))}
+.hdr-title{font-family:'Cinzel',serif;font-size:1.5rem;color:var(--gold);letter-spacing:.05em}
+.hdr-title small{display:block;font-size:.6rem;font-family:'Cairo',sans-serif;color:var(--text2);letter-spacing:.15em;margin-top:.1rem}
+.hdr-right{display:flex;gap:.6rem;align-items:center;flex-wrap:wrap}
+.badge{padding:.3rem .85rem;border-radius:2px;font-size:.72rem;font-weight:700;letter-spacing:.06em}
+.badge-gold{background:rgba(201,162,39,.1);border:1px solid rgba(201,162,39,.3);color:var(--gold)}
+.badge-cyan{background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.2);color:var(--cyan)}
+.badge-green{background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);color:var(--green)}
+
+/* SECTION TITLE */
+.sec-title{
+  font-family:'Cinzel',serif;font-size:.8rem;
+  color:var(--text2);letter-spacing:.15em;text-transform:uppercase;
+  margin-bottom:1rem;
+  display:flex;align-items:center;gap:.75rem;
+}
+.sec-title::after{content:'';flex:1;height:1px;background:rgba(201,162,39,.1)}
+
+/* MAIN LAUNCH CARDS */
+.launch-grid{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
+  gap:1rem;margin-bottom:2.5rem;
+}
+.launch-card{
+  background:var(--surface);
+  border:1px solid rgba(201,162,39,.12);
+  border-radius:5px;overflow:hidden;
+  cursor:pointer;transition:.25s;
+  text-decoration:none;
+  display:flex;flex-direction:column;
+}
+.launch-card:hover{
+  border-color:rgba(201,162,39,.4);
+  transform:translateY(-3px);
+  box-shadow:0 16px 40px rgba(0,0,0,.5);
+}
+.launch-card-top{
+  height:120px;display:flex;align-items:center;justify-content:center;
+  position:relative;overflow:hidden;
+  font-size:3.5rem;
+}
+.launch-card-glow{
+  position:absolute;inset:0;
+  background:radial-gradient(circle at 50% 50%,rgba(201,162,39,.12),transparent 70%);
+}
+.launch-card-body{padding:1.1rem 1.25rem}
+.launch-card-name{
+  font-family:'Cinzel',serif;font-size:1rem;
+  color:var(--gold);margin-bottom:.3rem;letter-spacing:.04em;
+}
+.launch-card-desc{color:var(--text2);font-size:.82rem;line-height:1.55;margin-bottom:.75rem}
+.launch-card-footer{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:.75rem 1.25rem;
+  border-top:1px solid rgba(255,255,255,.04);
+  background:rgba(0,0,0,.2);
+  margin-top:auto;
+}
+.launch-btn{
+  background:linear-gradient(135deg,var(--gold),#a07820);
+  color:#000;padding:.35rem .9rem;border-radius:3px;
+  font-size:.75rem;font-weight:700;letter-spacing:.04em;
+  font-family:'Cairo',sans-serif;
+}
+.launch-path{
+  font-family:'JetBrains Mono',monospace;
+  font-size:.65rem;color:var(--text2);
+}
+
+/* APPS GRID */
+.apps-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
+  gap:.75rem;margin-bottom:2.5rem;
+}
+.app-card{
+  background:var(--surface);
+  border:1px solid rgba(255,255,255,.06);
+  border-radius:4px;padding:1rem;
+  cursor:pointer;transition:.2s;
+  text-decoration:none;
+}
+.app-card:hover{border-color:rgba(201,162,39,.3);background:var(--surface2)}
+.app-icon{font-size:1.8rem;margin-bottom:.5rem}
+.app-name{color:var(--text);font-weight:700;font-size:.88rem;margin-bottom:.2rem}
+.app-desc{color:var(--text2);font-size:.75rem;line-height:1.5}
+.app-tag{
+  margin-top:.5rem;display:inline-block;
+  font-family:'JetBrains Mono',monospace;font-size:.62rem;
+  color:var(--gold);opacity:.7;
+}
+
+/* STATUS ROW */
+.status-row{
+  display:flex;gap:.75rem;margin-bottom:2.5rem;flex-wrap:wrap;
+}
+.stat-box{
+  background:var(--surface);border:1px solid rgba(255,255,255,.06);
+  border-radius:4px;padding:.85rem 1.1rem;flex:1;min-width:130px;
+}
+.stat-num{
+  font-family:'Cinzel',serif;font-size:1.5rem;
+  color:var(--gold);font-weight:700;line-height:1;
+}
+.stat-lbl{font-size:.7rem;color:var(--text2);margin-top:.2rem;letter-spacing:.05em}
+
+/* QUICK ACTIONS */
+.quick-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));
+  gap:.75rem;margin-bottom:2.5rem;
+}
+.quick-btn{
+  background:var(--surface);
+  border:1px solid rgba(255,255,255,.07);
+  border-radius:4px;padding:.85rem 1.1rem;
+  cursor:pointer;transition:.2s;
+  display:flex;align-items:center;gap:.75rem;
+  text-decoration:none;
+}
+.quick-btn:hover{border-color:rgba(201,162,39,.25);background:var(--surface2)}
+.quick-icon{
+  width:36px;height:36px;border-radius:3px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1rem;
+}
+.quick-title{color:var(--text);font-weight:700;font-size:.85rem}
+.quick-sub{color:var(--text2);font-size:.72rem}
+
+/* FOOTER */
+footer{
+  border-top:1px solid rgba(201,162,39,.1);
+  padding-top:1.5rem;margin-top:1rem;
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.75rem;
+}
+.footer-glyphs{color:rgba(201,162,39,.3);letter-spacing:.2rem;font-size:1rem}
+.footer-copy{color:var(--text2);font-size:.78rem}
+
+/* PULSE DOT */
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.6;transform:scale(.85)}}
+.pulse{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 2s infinite;margin-left:.4rem;vertical-align:middle}
+</style>
+</head>
+<body>
+<canvas id="bg"></canvas>
+
+<div class="wrap">
+
+  <!-- HEADER -->
+  <header>
+    <div class="hdr-left">
+      <div class="hdr-logo">
+        <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <ellipse cx="40" cy="38" rx="24" ry="14" stroke="#c9a227" stroke-width="2.5"/>
+          <circle cx="40" cy="38" r="7" fill="#c9a227" opacity=".9"/>
+          <circle cx="40" cy="38" r="3" fill="#04070f"/>
+          <path d="M40 52 Q50 60 46 70 Q40 75 34 70 Q30 60 40 52Z" stroke="#c9a227" stroke-width="2" fill="rgba(201,162,39,.2)"/>
+          <path d="M40 52 Q26 57 22 67" stroke="#c9a227" stroke-width="1.8" fill="none"/>
+          <path d="M16 38 Q20 46 28 46" stroke="#c9a227" stroke-width="1.8" fill="none"/>
+          <path d="M64 38 Q60 30 52 28" stroke="#c9a227" stroke-width="1.8" fill="none"/>
+        </svg>
+      </div>
+      <div>
+        <div class="hdr-title">HORUS OS<small>LAUNCH CENTER — مركز التشغيل</small></div>
+      </div>
+    </div>
+    <div class="hdr-right">
+      <span class="badge badge-gold">v1.0.0</span>
+      <span class="badge badge-cyan">Ubuntu 22.04</span>
+      <span class="badge badge-green">Ready<span class="pulse"></span></span>
+    </div>
+  </header>
+
+  <!-- STATS -->
+  <div class="status-row">
+    <div class="stat-box"><div class="stat-num">5</div><div class="stat-lbl">Custom Apps</div></div>
+    <div class="stat-box"><div class="stat-num">70+</div><div class="stat-lbl">Source Files</div></div>
+    <div class="stat-box"><div class="stat-num">10K+</div><div class="stat-lbl">Lines of Code</div></div>
+    <div class="stat-box"><div class="stat-num">18</div><div class="stat-lbl">Presentation Slides</div></div>
+    <div class="stat-box"><div class="stat-num">83</div><div class="stat-lbl">Packages Bundled</div></div>
+    <div class="stat-box"><div class="stat-num" id="clock" style="font-size:1.1rem">--:--</div><div class="stat-lbl">Local Time</div></div>
+  </div>
+
+  <!-- MAIN LAUNCHES -->
+  <div class="sec-title">الملفات الرئيسية — Open These Now</div>
+  <div class="launch-grid">
+
+    <a class="launch-card" href="presentation/slides.html" target="_blank">
+      <div class="launch-card-top" style="background:linear-gradient(135deg,#0a0a0f,#14101f)">
+        <div class="launch-card-glow" style="background:radial-gradient(circle,rgba(201,162,39,.15),transparent 70%)"></div>
+        <svg width="60" height="60" viewBox="0 0 80 80" fill="none" style="filter:drop-shadow(0 0 15px rgba(201,162,39,.6))">
+          <ellipse cx="40" cy="38" rx="24" ry="14" stroke="#c9a227" stroke-width="2.5"/>
+          <circle cx="40" cy="38" r="8" fill="#c9a227" opacity=".9"/>
+          <circle cx="40" cy="38" r="3.5" fill="#04070f"/>
+          <path d="M40 52 Q50 60 46 70 Q40 75 34 70 Q30 60 40 52Z" stroke="#c9a227" stroke-width="2" fill="rgba(201,162,39,.2)"/>
+          <path d="M40 52 Q26 57 22 67" stroke="#c9a227" stroke-width="1.8" fill="none"/>
+        </svg>
+      </div>
+      <div class="launch-card-body">
+        <div class="launch-card-name">🎞 البريزنتيشن — Slides</div>
+        <div class="launch-card-desc">18 سلايد كاملة بتصميم فرعوني. ← → للتنقل · F للـ fullscreen · يفتح في المتصفح مباشرة.</div>
+      </div>
+      <div class="launch-card-footer">
+        <span class="launch-path">presentation/slides.html</span>
+        <span class="launch-btn">▶ افتح</span>
+      </div>
+    </a>
+
+    <a class="launch-card" href="../horus-edu-website/index.html" target="_blank">
+      <div class="launch-card-top" style="background:linear-gradient(135deg,#04070f,#0d1528)">
+        <div class="launch-card-glow"></div>
+        <span style="font-size:3.5rem">🌐</span>
+      </div>
+      <div class="launch-card-body">
+        <div class="launch-card-name">🌐 الموقع الرسمي — Website</div>
+        <div class="launch-card-desc">الموقع الرسمي بتصميم فرعوني كامل. تحميل، تطبيقات، AI demo، مواصفات. عربي/إنجليزي.</div>
+      </div>
+      <div class="launch-card-footer">
+        <span class="launch-path">horus-edu-website/index.html</span>
+        <span class="launch-btn">▶ افتح</span>
+      </div>
+    </a>
+
+    <a class="launch-card" href="apps/horus-demo-mode/index.html" target="_blank">
+      <div class="launch-card-top" style="background:linear-gradient(135deg,#06101f,#0a1830)">
+        <div class="launch-card-glow" style="background:radial-gradient(circle,rgba(0,212,255,.12),transparent 70%)"></div>
+        <span style="font-size:3.5rem">🎬</span>
+      </div>
+      <div class="launch-card-body">
+        <div class="launch-card-name">🎬 Demo Mode — كشك المسابقة</div>
+        <div class="launch-card-desc">وضع العرض الكامل للمسابقة. Full-screen kiosk مع إحصائيات النظام الحية وقصة المشروع.</div>
+      </div>
+      <div class="launch-card-footer">
+        <span class="launch-path">apps/horus-demo-mode/index.html</span>
+        <span class="launch-btn">▶ افتح</span>
+      </div>
+    </a>
+
+    <a class="launch-card" href="apps/horus-about/index.html" target="_blank">
+      <div class="launch-card-top" style="background:linear-gradient(135deg,#0f0a00,#201500)">
+        <div class="launch-card-glow" style="background:radial-gradient(circle,rgba(201,162,39,.15),transparent 70%)"></div>
+        <span style="font-size:3.5rem">ℹ️</span>
+      </div>
+      <div class="launch-card-body">
+        <div class="launch-card-name">ℹ️ About HORUS OS</div>
+        <div class="launch-card-desc">صفحة About الداخلية للنظام — معلومات المشروع، المطور، الـ version، الـ license.</div>
+      </div>
+      <div class="launch-card-footer">
+        <span class="launch-path">apps/horus-about/index.html</span>
+        <span class="launch-btn">▶ افتح</span>
+      </div>
+    </a>
+
+  </div>
+
+  <!-- APPS THAT NEED PYTHON -->
+  <div class="sec-title">تطبيقات Python — تشغيل على Linux/WSL2</div>
+  <div class="apps-grid">
+    <div class="app-card" onclick="showPythonNote('control-center','8420')">
+      <div class="app-icon">📊</div>
+      <div class="app-name">Control Center</div>
+      <div class="app-desc">لوحة CPU/RAM/Network الحية — FastAPI + React</div>
+      <div class="app-tag">:8420 · python backend</div>
+    </div>
+    <div class="app-card" onclick="showPythonNote('ai-assistant','8421')">
+      <div class="app-icon">🤖</div>
+      <div class="app-name">AI Assistant</div>
+      <div class="app-desc">مساعد ذكاء اصطناعي محلي — Ollama + Mistral</div>
+      <div class="app-tag">:8421 · python backend</div>
+    </div>
+    <div class="app-card" onclick="showPythonNote('security-center','8422')">
+      <div class="app-icon">🛡</div>
+      <div class="app-name">Security Center</div>
+      <div class="app-desc">Firewall + SSH + network monitor</div>
+      <div class="app-tag">:8422 · python backend</div>
+    </div>
+  </div>
+
+  <!-- QUICK ACTIONS -->
+  <div class="sec-title">روابط سريعة</div>
+  <div class="quick-grid">
+    <a class="quick-btn" href="presentation/slides.html" target="_blank">
+      <div class="quick-icon" style="background:rgba(201,162,39,.1);border:1px solid rgba(201,162,39,.2)">🎞</div>
+      <div><div class="quick-title">البريزنتيشن</div><div class="quick-sub">18 سلايد · ← → للتنقل</div></div>
+    </a>
+    <a class="quick-btn" href="../horus-edu-website/index.html" target="_blank">
+      <div class="quick-icon" style="background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.15)">🌐</div>
+      <div><div class="quick-title">الموقع الرسمي</div><div class="quick-sub">تصميم فرعوني · عربي/إنجليزي</div></div>
+    </a>
+    <a class="quick-btn" href="../horus-edu-website/downloads/horus-edu-os.vmx" download>
+      <div class="quick-icon" style="background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.2)">🖥</div>
+      <div><div class="quick-title">VMware Config</div><div class="quick-sub">horus-edu-os.vmx · تحميل مباشر</div></div>
+    </a>
+    <a class="quick-btn" href="../horus-edu-website/downloads/INSTALL-GUIDE.txt" download>
+      <div class="quick-icon" style="background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.15)">📋</div>
+      <div><div class="quick-title">دليل التثبيت</div><div class="quick-sub">INSTALL-GUIDE.txt · تحميل</div></div>
+    </a>
+    <a class="quick-btn" href="GITHUB-SETUP.md" target="_blank">
+      <div class="quick-icon" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08)">📖</div>
+      <div><div class="quick-title">GitHub Setup</div><div class="quick-sub">كيف ترفع وتبني الـ ISO</div></div>
+    </a>
+    <a class="quick-btn" href="docs/installation.md" target="_blank">
+      <div class="quick-icon" style="background:rgba(201,162,39,.06);border:1px solid rgba(201,162,39,.12)">📚</div>
+      <div><div class="quick-title">الدوكيوميشن</div><div class="quick-sub">docs/ · installation + architecture</div></div>
+    </a>
+  </div>
+
+  <!-- PROJECT STRUCTURE -->
+  <div class="sec-title">هيكل المشروع</div>
+  <div style="background:var(--surface);border:1px solid rgba(201,162,39,.1);border-radius:4px;padding:1.25rem;margin-bottom:2rem;font-family:'JetBrains Mono',monospace;font-size:.78rem;line-height:1.9;color:var(--text2)">
+    <span style="color:var(--gold)">os horus/</span><br>
+    ├── <span style="color:var(--cyan)">LAUNCH.html</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#3d4a5c">← أنت هنا</span><br>
+    ├── <span style="color:var(--gold)">presentation/</span><br>
+    │&nbsp;&nbsp; └── <a href="presentation/slides.html" target="_blank" style="color:var(--cyan);text-decoration:none">slides.html</a> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#3d4a5c">← 18 سلايد · افتح الآن</span><br>
+    ├── <span style="color:var(--gold)">apps/</span><br>
+    │&nbsp;&nbsp; ├── <a href="apps/horus-demo-mode/index.html" target="_blank" style="color:var(--cyan);text-decoration:none">horus-demo-mode/</a> &nbsp;&nbsp;&nbsp;<span style="color:#3d4a5c">← كشك المسابقة</span><br>
+    │&nbsp;&nbsp; ├── <a href="apps/horus-about/index.html" target="_blank" style="color:var(--cyan);text-decoration:none">horus-about/</a> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#3d4a5c">← About page</span><br>
+    │&nbsp;&nbsp; ├── horus-control-center/ &nbsp;<span style="color:#3d4a5c">← Python :8420</span><br>
+    │&nbsp;&nbsp; ├── horus-ai-assistant/ &nbsp;&nbsp;&nbsp;<span style="color:#3d4a5c">← Python :8421</span><br>
+    │&nbsp;&nbsp; └── horus-security-center/ <span style="color:#3d4a5c">← Python :8422</span><br>
+    ├── <span style="color:var(--gold)">scripts/</span><br>
+    │&nbsp;&nbsp; ├── build-iso.sh &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#3d4a5c">← يبني الـ ISO (Ubuntu فقط)</span><br>
+    │&nbsp;&nbsp; └── wsl-quickstart.ps1 &nbsp;&nbsp;<span style="color:#3d4a5c">← تشغيل على Windows الآن</span><br>
+    ├── <span style="color:var(--gold)">.github/workflows/</span><br>
+    │&nbsp;&nbsp; └── build-release.yml &nbsp;&nbsp;&nbsp;<span style="color:#3d4a5c">← GitHub Actions auto-build</span><br>
+    └── <span style="color:#6366f1">horus-edu-website/</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#3d4a5c">← الموقع الرسمي</span>
+  </div>
+
+  <!-- PYTHON NOTE POPUP -->
+  <div id="python-note" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;align-items:center;justify-content:center">
+    <div style="background:var(--bg2);border:1px solid rgba(201,162,39,.3);border-radius:6px;padding:2rem;max-width:520px;width:90%;position:relative">
+      <div style="font-family:'Cinzel',serif;color:var(--gold);font-size:1rem;margin-bottom:.75rem" id="pn-title">تشغيل التطبيق</div>
+      <p style="color:var(--text2);font-size:.88rem;margin-bottom:1rem">هذا التطبيق يحتاج Python backend. شغّله بالطريقة المناسبة:</p>
+      <div style="background:#04070f;border:1px solid rgba(201,162,39,.15);border-radius:4px;padding:1rem;font-family:'JetBrains Mono',monospace;font-size:.78rem;line-height:1.8;color:var(--text)" id="pn-code"></div>
+      <div style="display:flex;gap:.75rem;margin-top:1.25rem;flex-wrap:wrap">
+        <button onclick="closeNote()" style="background:linear-gradient(135deg,var(--gold),#a07820);color:#000;border:none;padding:.5rem 1.5rem;border-radius:3px;cursor:pointer;font-weight:700;font-family:'Cairo',sans-serif">حسناً</button>
+        <button onclick="document.getElementById('wsl-note').style.display='flex'" style="background:rgba(99,102,241,.15);color:#818cf8;border:1px solid rgba(99,102,241,.3);padding:.5rem 1.5rem;border-radius:3px;cursor:pointer;font-weight:700;font-family:'Cairo',sans-serif">تشغيل WSL2 بدلاً</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- WSL NOTE -->
+  <div id="wsl-note" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1001;align-items:center;justify-content:center">
+    <div style="background:var(--bg2);border:1px solid rgba(99,102,241,.3);border-radius:6px;padding:2rem;max-width:520px;width:90%">
+      <div style="font-family:'Cinzel',serif;color:#818cf8;font-size:1rem;margin-bottom:.75rem">🪟 تشغيل على Windows — WSL2</div>
+      <p style="color:var(--text2);font-size:.88rem;margin-bottom:1rem">افتح PowerShell كـ Administrator وشغّل:</p>
+      <div style="background:#04070f;border:1px solid rgba(99,102,241,.2);border-radius:4px;padding:1rem;font-family:'JetBrains Mono',monospace;font-size:.8rem;color:#a5b4fc">
+        cd "c:\Users\ELSAKA\os horus"<br>
+        .\scripts\wsl-quickstart.ps1
+      </div>
+      <p style="color:var(--text2);font-size:.8rem;margin-top:.75rem">سيفتح التطبيقات على localhost:8420 / 8421 / 8422 تلقائياً</p>
+      <button onclick="document.getElementById('wsl-note').style.display='none';closeNote()" style="background:rgba(99,102,241,.2);color:#818cf8;border:1px solid rgba(99,102,241,.3);padding:.5rem 1.5rem;border-radius:3px;cursor:pointer;font-weight:700;font-family:'Cairo',sans-serif;margin-top:1rem">حسناً</button>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-copy">Alaa Saber · alaa00saber@gmail.com · HORUS OS v1.0.0 · 2026</div>
+    <div class="footer-glyphs">𓂀 𓂋 𓃭 𓆓</div>
+  </footer>
+
+</div><!-- /wrap -->
+
+<script>
+// ── CANVAS PARTICLES ──
+(function(){
+  const c=document.getElementById('bg'),ctx=c.getContext('2d');
+  let W,H,pts=[];
+  const resize=()=>{W=c.width=innerWidth;H=c.height=innerHeight;init()};
+  const rand=(a,b)=>a+Math.random()*(b-a);
+  const init=()=>{pts=[];const n=Math.floor(W*H/20000);for(let i=0;i<n;i++)pts.push({x:rand(0,W),y:rand(0,H),vx:rand(-.2,.2),vy:rand(-.2,.2),r:rand(.8,2)})};
+  const draw=()=>{
+    ctx.clearRect(0,0,W,H);
+    for(let i=0;i<pts.length;i++){
+      const p=pts[i];p.x+=p.vx;p.y+=p.vy;
+      if(p.x<0||p.x>W)p.vx*=-1;if(p.y<0||p.y>H)p.vy*=-1;
+      ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle='rgba(201,162,39,.3)';ctx.fill();
+      for(let j=i+1;j<pts.length;j++){
+        const q=pts[j],d=Math.hypot(p.x-q.x,p.y-q.y);
+        if(d<110){ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(q.x,q.y);
+          ctx.strokeStyle='rgba(201,162,39,'+(0.1*(1-d/110))+')';ctx.lineWidth=.6;ctx.stroke();}
+      }
+    }
+    requestAnimationFrame(draw);
+  };
+  window.addEventListener('resize',resize);resize();draw();
+})();
+
+// ── CLOCK ──
+function tick(){
+  const d=new Date();
+  const pad=n=>String(n).padStart(2,'0');
+  document.getElementById('clock').textContent=pad(d.getHours())+':'+pad(d.getMinutes())+':'+pad(d.getSeconds());
+}
+setInterval(tick,1000);tick();
+
+// ── PYTHON NOTE ──
+const CMDS = {
+  'control-center':{
+    title:'📊 Control Center — port :8420',
+    code:`<span style="color:#4a5a70"># على Linux أو WSL2:</span>\ncd "apps/horus-control-center/backend"\npip3 install fastapi uvicorn psutil aiofiles\npython3 -m uvicorn main:app --host 0.0.0.0 --port 8420\n\n<span style="color:#4a5a70"># ثم افتح:</span>\n<span style="color:#00d4ff">http://localhost:8420</span>`
+  },
+  'ai-assistant':{
+    title:'🤖 AI Assistant — port :8421',
+    code:`<span style="color:#4a5a70"># على Linux أو WSL2:</span>\ncd "apps/horus-ai-assistant"\npip3 install fastapi uvicorn openai httpx\npython3 -m uvicorn main:app --host 0.0.0.0 --port 8421\n\n<span style="color:#4a5a70"># ثم افتح:</span>\n<span style="color:#00d4ff">http://localhost:8421</span>`
+  },
+  'security-center':{
+    title:'🛡 Security Center — port :8422',
+    code:`<span style="color:#4a5a70"># على Linux أو WSL2:</span>\ncd "apps/horus-security-center"\npip3 install fastapi uvicorn psutil\npython3 -m uvicorn main:app --host 0.0.0.0 --port 8422\n\n<span style="color:#4a5a70"># ثم افتح:</span>\n<span style="color:#00d4ff">http://localhost:8422</span>`
+  }
+};
+function showPythonNote(app,port){
+  const c=CMDS[app];
+  document.getElementById('pn-title').textContent=c.title;
+  document.getElementById('pn-code').innerHTML=c.code;
+  document.getElementById('python-note').style.display='flex';
+}
+function closeNote(){
+  document.getElementById('python-note').style.display='none';
+}
+document.getElementById('python-note').addEventListener('click',function(e){if(e.target===this)closeNote()});
+</script>
+</body>
+</html>
