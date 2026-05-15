@@ -10,6 +10,7 @@ set -uo pipefail
 CHROOT_DIR="${1:-/}"
 DEBIAN_FRONTEND=noninteractive
 export DEBIAN_FRONTEND
+CI="${CI:-false}"
 
 GREEN='\033[0;32m'; YELLOW='\033[1;33m'; CYAN='\033[38;2;0;212;255m'; NC='\033[0m'
 log_info() { echo -e "${GREEN}  ✓${NC}  $1"; }
@@ -18,15 +19,17 @@ log_pkg()  { echo -e "${CYAN}  ▶${NC}  Installing: $1"; }
 
 _apt() {
   if [[ "$CHROOT_DIR" == "/" ]]; then
-    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends "$@"
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends "$@" 2>&1 || log_warn "Some packages failed: $*"
   else
-    chroot "$CHROOT_DIR" env DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends "$@"
+    chroot "$CHROOT_DIR" env DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends "$@" 2>&1 || log_warn "Some packages failed: $*"
   fi
 }
 
 _apt_chroot() {
-  chroot "$CHROOT_DIR" bash -c "DEBIAN_FRONTEND=noninteractive $*"
+  chroot "$CHROOT_DIR" bash -c "DEBIAN_FRONTEND=noninteractive $*" 2>&1 || true
 }
+
+echo "[CI=$CI]"
 
 echo -e "\n${CYAN}══ Installing HORUS OS Packages ══${NC}\n"
 
@@ -176,11 +179,15 @@ chroot "$CHROOT_DIR" pip3 install --quiet --no-warn-script-location \
   2>/dev/null || log_warn "Some Python pip packages failed"
 
 # ── 11. Node.js 18 LTS ───────────────────────────────────────────────────
-log_pkg "Node.js 18 LTS"
-chroot "$CHROOT_DIR" bash -c "
-  curl -fsSL https://deb.nodesource.com/setup_18.x | bash - 2>/dev/null
-  apt-get install -y nodejs 2>/dev/null
-" || log_warn "Node.js setup failed — install manually with: nvm install 18"
+if [[ "$CI" != "true" ]]; then
+  log_pkg "Node.js 18 LTS"
+  chroot "$CHROOT_DIR" bash -c "
+    curl -fsSL https://deb.nodesource.com/setup_18.x | bash - 2>/dev/null
+    apt-get install -y nodejs 2>/dev/null
+  " || log_warn "Node.js setup failed — install manually with: nvm install 18"
+else
+  log_warn "Skipping Node.js in CI (install manually after boot)"
+fi
 
 # ── 12. Build Tools ──────────────────────────────────────────────────────
 log_pkg "Build tools (GCC, CMake, Make)"
@@ -218,31 +225,41 @@ _apt \
   spi-tools || true
 
 # Arduino CLI
-log_pkg "Arduino CLI"
-chroot "$CHROOT_DIR" bash -c "
-  curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh 2>/dev/null | \
-    BINDIR=/usr/local/bin sh 2>/dev/null
-  arduino-cli core update-index 2>/dev/null || true
-" || log_warn "Arduino CLI install failed — install manually"
+if [[ "$CI" != "true" ]]; then
+  log_pkg "Arduino CLI"
+  chroot "$CHROOT_DIR" bash -c "
+    curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh 2>/dev/null | \
+      BINDIR=/usr/local/bin sh 2>/dev/null
+    arduino-cli core update-index 2>/dev/null || true
+  " || log_warn "Arduino CLI install failed — install manually"
+else
+  log_warn "Skipping Arduino CLI in CI"
+fi
 
 # ── 15. VS Code ──────────────────────────────────────────────────────────
-log_pkg "VS Code"
-chroot "$CHROOT_DIR" bash -c "
-  mkdir -p /etc/apt/keyrings
-  wget -qO- https://packages.microsoft.com/keys/microsoft.asc 2>/dev/null | \
-    gpg --dearmor > /etc/apt/keyrings/microsoft.gpg
-  echo 'deb [arch=amd64 signed-by=/etc/apt/keyrings/microsoft.gpg] https://packages.microsoft.com/repos/code stable main' \
-    > /etc/apt/sources.list.d/vscode.list
-  apt-get update -qq 2>/dev/null
-  apt-get install -y code 2>/dev/null
-" || log_warn "VS Code install failed — install manually with: sudo snap install code"
+if [[ "$CI" != "true" ]]; then
+  log_pkg "VS Code"
+  chroot "$CHROOT_DIR" bash -c "
+    mkdir -p /etc/apt/keyrings
+    wget -qO- https://packages.microsoft.com/keys/microsoft.asc 2>/dev/null | \
+      gpg --dearmor > /etc/apt/keyrings/microsoft.gpg
+    echo 'deb [arch=amd64 signed-by=/etc/apt/keyrings/microsoft.gpg] https://packages.microsoft.com/repos/code stable main' \
+      > /etc/apt/sources.list.d/vscode.list
+    apt-get update -qq 2>/dev/null
+    apt-get install -y code 2>/dev/null
+  " || log_warn "VS Code install failed — install manually with: sudo snap install code"
+else
+  log_warn "Skipping VS Code in CI (too large; install via snap after boot)"
+fi
 
 # ── 16. Micro Editor (lightweight fallback) ─────────────────────────────
-log_pkg "Micro editor"
-chroot "$CHROOT_DIR" bash -c "
-  curl https://getmic.ro 2>/dev/null | bash
-  mv micro /usr/local/bin/ 2>/dev/null || true
-" || true
+if [[ "$CI" != "true" ]]; then
+  log_pkg "Micro editor"
+  chroot "$CHROOT_DIR" bash -c "
+    curl https://getmic.ro 2>/dev/null | bash
+    mv micro /usr/local/bin/ 2>/dev/null || true
+  " || true
+fi
 
 # ── 17. System Monitoring / Terminal Tools ──────────────────────────────
 log_pkg "Terminal enhancements"

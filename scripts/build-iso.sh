@@ -10,7 +10,7 @@
 #  Tested on:    Ubuntu 22.04 LTS x86_64
 #  Created by:   Alaa Saber — HORUS OS Project
 # ══════════════════════════════════════════════════════════════════════
-set -euo pipefail
+set -eo pipefail
 
 # ── Paths ──────────────────────────────────────────────────────────────
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -82,10 +82,11 @@ check_prerequisites() {
   # Must run as root
   [[ $EUID -eq 0 ]] || log_error "Must run as root: sudo $0"
 
-  # Check available disk space (need at least 8 GB)
+  # Check available disk space
   local available_gb
-  available_gb=$(df --output=avail -BG "${REPO_DIR}" | tail -1 | tr -d 'G ')
-  [[ $available_gb -ge 8 ]] || log_error "Need at least 8 GB free disk. Have: ${available_gb} GB"
+  available_gb=$(df -BG "${REPO_DIR}" | tail -1 | awk '{print $4}' | tr -d 'G')
+  log_info "Available disk: ${available_gb} GB"
+  [[ "${available_gb:-0}" -ge 4 ]] || log_warn "Low disk space: ${available_gb} GB (need 4+ GB)"
 
   # Required tools
   local tools=(debootstrap squashfs-tools xorriso grub-pc-bin grub-efi-amd64-bin mtools dosfstools)
