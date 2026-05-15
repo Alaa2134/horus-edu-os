@@ -61,6 +61,7 @@ jobs:
       - name: Build ISO
         run: |
           sudo bash scripts/build-iso.sh --arch amd64
+          sudo chown -R "$USER:$USER" dist/
         env:
           DEBIAN_FRONTEND: noninteractive
           CI: true
