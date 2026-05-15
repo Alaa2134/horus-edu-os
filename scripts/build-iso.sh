@@ -494,18 +494,31 @@ EOF
   touch "${ISO_DIR}/.disk/base_installable"
 
   # ── BIOS El Torito boot image ──────────────────────────────────────────
-  # grub-pc-bin ships cdboot.img (512-byte CD boot record) but NOT eltorito.img.
-  # We build the El Torito image by generating a GRUB core with grub-mkstandalone
-  # (i386-pc format) and prepending cdboot.img to make it CD-bootable.
+  # grub-mkstandalone embeds ALL modules into one core image and hits the
+  # 480 KB (0x78000) BIOS memory limit.  grub-mkimage builds a minimal core
+  # with only iso9660+normal; every other module (linux, gfxterm, …) is
+  # loaded at runtime from (cd)/boot/grub/i386-pc/ on the ISO itself.
   step_start "Building GRUB BIOS El Torito boot image"
-  grub-mkstandalone \
-    --format=i386-pc \
-    --output="${BUILD_DIR}/grub_bios_core.img" \
-    --locales="" --fonts="" \
-    "boot/grub/grub.cfg=${ISO_DIR}/boot/grub/grub.cfg"
-  cat /usr/lib/grub/i386-pc/cdboot.img "${BUILD_DIR}/grub_bios_core.img" \
+
+  # Copy all i386-pc modules into the ISO so GRUB can load them after boot
+  mkdir -p "${ISO_DIR}/boot/grub/i386-pc"
+  cp /usr/lib/grub/i386-pc/*.mod "${ISO_DIR}/boot/grub/i386-pc/" 2>/dev/null || true
+  cp /usr/lib/grub/i386-pc/*.lst "${ISO_DIR}/boot/grub/i386-pc/" 2>/dev/null || true
+
+  # Build a minimal GRUB core image — only iso9660 and normal are needed;
+  # the prefix (cd)/boot/grub tells GRUB where to find the rest on the ISO
+  grub-mkimage \
+    -d /usr/lib/grub/i386-pc \
+    -o "${BUILD_DIR}/grub_core.img" \
+    -O i386-pc \
+    -p '(cd)/boot/grub' \
+    iso9660 normal
+
+  # Prepend the 512-byte El Torito CD-ROM bootstrap (cdboot.img) to make
+  # the image bootable from an El Torito-aware BIOS / VM
+  cat /usr/lib/grub/i386-pc/cdboot.img "${BUILD_DIR}/grub_core.img" \
     > "${ISO_DIR}/boot/grub/bios.img"
-  log_info "BIOS boot  : ${ISO_DIR}/boot/grub/bios.img"
+  log_info "BIOS boot  : bios.img ($(stat -c%s "${ISO_DIR}/boot/grub/bios.img") bytes)"
 
   # ── EFI boot image ─────────────────────────────────────────────────────
   # mtools (mmd/mcopy) fails on many CI runners — use loop mount instead.
