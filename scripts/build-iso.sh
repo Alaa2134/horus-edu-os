@@ -515,25 +515,52 @@ EOF
   step_start "Running xorriso to create hybrid ISO"
   mkdir -p "$OUTPUT_DIR"
   local iso_name="horus-os-${HORUS_VERSION}-${ARCH}.iso"
+  # ISO 9660 volume IDs must not contain dots — replace with underscores
+  local volid="HORUS_OS_$(echo "$HORUS_VERSION" | tr '.' '_')"
+
+  # Verify GRUB BIOS images exist (installed via grub-pc-bin)
+  local grub_bios="/usr/lib/grub/i386-pc/eltorito.img"
+  local grub_mbr="/usr/lib/grub/i386-pc/boot_hybrid.img"
+  [[ -f "$grub_bios" ]] || log_error "GRUB BIOS eltorito.img not found — install grub-pc-bin"
+  log_info "GRUB bios : $grub_bios"
+
+  # Optional --grub2-mbr (enables hybrid MBR so USB/BIOS boot works)
+  local mbr_args=()
+  if [[ -f "$grub_mbr" ]]; then
+    mbr_args=(--grub2-mbr "$grub_mbr")
+    log_info "GRUB MBR  : $grub_mbr"
+  else
+    log_warn "boot_hybrid.img not found — ISO will lack hybrid MBR (BIOS USB boot may fail)"
+  fi
+
+  # Optional EFI support — only enable if efi.img exists and is non-empty
+  local efi_args=()
+  if [[ -f "${ISO_DIR}/EFI/boot/efi.img" && -s "${ISO_DIR}/EFI/boot/efi.img" ]]; then
+    efi_args=(
+      -eltorito-alt-boot
+      -e EFI/boot/efi.img
+      -no-emul-boot
+      -append_partition 2 0xef "${ISO_DIR}/EFI/boot/efi.img"
+    )
+    log_info "EFI image : present — UEFI boot enabled"
+  else
+    log_warn "EFI image missing or empty — ISO will be BIOS-only (still bootable in VMs)"
+  fi
 
   xorriso -as mkisofs \
     -iso-level 3 \
     -full-iso9660-filenames \
-    -volid "HORUS_OS_${HORUS_VERSION}" \
+    -volid "$volid" \
     -eltorito-boot boot/grub/bios.img \
     -no-emul-boot -boot-load-size 4 -boot-info-table \
     --eltorito-catalog boot/grub/boot.cat \
     --grub2-boot-info \
-    --grub2-mbr /usr/lib/grub/i386-pc/boot_hybrid.img \
-    -eltorito-alt-boot \
-    -e EFI/boot/efi.img \
-    -no-emul-boot \
-    -append_partition 2 0xef "${ISO_DIR}/EFI/boot/efi.img" \
+    "${mbr_args[@]}" \
+    "${efi_args[@]}" \
     -output "${OUTPUT_DIR}/${iso_name}" \
     -graft-points \
       "${ISO_DIR}" \
-      /boot/grub/bios.img=/usr/lib/grub/i386-pc/eltorito.img \
-    2>&1 | tail -10
+      /boot/grub/bios.img="$grub_bios"
 
   log_info "ISO created: ${OUTPUT_DIR}/${iso_name}"
 
