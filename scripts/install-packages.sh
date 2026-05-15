@@ -19,10 +19,11 @@ log_pkg()  { echo -e "${CYAN}  ▶${NC}  Installing: $1"; }
 
 _apt() {
   if [[ "$CHROOT_DIR" == "/" ]]; then
-    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends "$@" 2>&1 || log_warn "Some packages failed: $*"
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends "$@" || log_warn "Some packages failed (non-fatal)"
   else
-    chroot "$CHROOT_DIR" env DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends "$@" 2>&1 || log_warn "Some packages failed: $*"
+    chroot "$CHROOT_DIR" env DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends "$@" || log_warn "Some packages failed (non-fatal)"
   fi
+  return 0
 }
 
 _apt_chroot() {
@@ -33,16 +34,21 @@ echo "[CI=$CI]"
 
 echo -e "\n${CYAN}══ Installing HORUS OS Packages ══${NC}\n"
 
+# ── 0. CRITICAL: Kernel — must install first and alone ──────────────────
+log_pkg "Linux kernel (CRITICAL)"
+chroot "$CHROOT_DIR" env DEBIAN_FRONTEND=noninteractive \
+  apt-get install -y linux-image-generic
+log_info "Kernel installed: $(ls ${CHROOT_DIR}/boot/vmlinuz-* 2>/dev/null | tail -1 | xargs basename)"
+
 # ── 1. Core System ──────────────────────────────────────────────────────
 log_pkg "Core system packages"
 _apt \
-  linux-image-generic linux-headers-generic \
-  ubuntu-minimal ubuntu-standard \
+  ubuntu-minimal \
   systemd-sysv dbus dbus-x11 \
   sudo bash-completion \
-  locales tzdata keyboard-configuration \
+  locales tzdata \
   ca-certificates \
-  udev
+  udev || log_warn "Some core packages failed"
 
 # ── 2. Desktop Environment (XFCE4) ─────────────────────────────────────
 log_pkg "XFCE4 desktop environment"

@@ -404,8 +404,21 @@ build_iso() {
 
   # Kernel and initramfs
   step_start "Copying kernel and initramfs"
-  cp "$(ls ${CHROOT_DIR}/boot/vmlinuz-* | tail -1)" "${ISO_DIR}/casper/vmlinuz"
-  cp "$(ls ${CHROOT_DIR}/boot/initrd.img-* | tail -1)" "${ISO_DIR}/casper/initrd"
+  VMLINUZ=$(find "${CHROOT_DIR}/boot" -name "vmlinuz-*" -type f 2>/dev/null | sort -V | tail -1)
+  INITRD=$(find "${CHROOT_DIR}/boot"  -name "initrd.img-*" -type f 2>/dev/null | sort -V | tail -1)
+  # If still missing, try installing kernel now
+  if [[ -z "$VMLINUZ" ]]; then
+    log_warn "No kernel found — installing linux-image-generic now"
+    chroot "$CHROOT_DIR" env DEBIAN_FRONTEND=noninteractive apt-get install -y linux-image-generic 2>&1 || true
+    VMLINUZ=$(find "${CHROOT_DIR}/boot" -name "vmlinuz-*" -type f 2>/dev/null | sort -V | tail -1)
+    INITRD=$(find "${CHROOT_DIR}/boot"  -name "initrd.img-*" -type f 2>/dev/null | sort -V | tail -1)
+  fi
+  [[ -n "$VMLINUZ" ]] || log_error "No kernel found after install — aborting"
+  [[ -n "$INITRD"  ]] || log_error "No initrd found after install — aborting"
+  log_info "Kernel : $(basename "$VMLINUZ")"
+  log_info "Initrd : $(basename "$INITRD")"
+  cp "$VMLINUZ" "${ISO_DIR}/casper/vmlinuz"
+  cp "$INITRD"  "${ISO_DIR}/casper/initrd"
 
   # Squashfs filesystem
   step_start "Creating squashfs (this takes 15–30 minutes)"
