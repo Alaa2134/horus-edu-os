@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  HORUS OS XFCE4 Panel Configuration
+  Applies a dark, minimal panel matching the HORUS aesthetic.
+  Deploy to: ~/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-panel.xml
+-->
+<channel name="xfce4-panel" version="1.0">
+  <property name="configver" type="int" value="2"/>
+  <property name="panels" type="array">
+    <value type="int" value="1"/>
+    <value type="int" value="2"/>
+  </property>
+
+  <!-- ── Panel 1: Top bar ─────────────────────────────────────────────── -->
+  <property name="panel-1" type="empty">
+    <property name="position"          type="string" value="p=6;x=0;y=0"/>
+    <property name="length"            type="uint"   value="100"/>
+    <property name="position-locked"   type="bool"   value="true"/>
+    <property name="size"              type="uint"   value="28"/>
+    <property name="background-style"  type="uint"   value="1"/>
+    <property name="background-color"  type="string" value="#0d0d14ee"/>
+    <property name="enter-opacity"     type="uint"   value="100"/>
+    <property name="leave-opacity"     type="uint"   value="95"/>
+    <property name="nrows"             type="uint"   value="1"/>
+    <property name="icon-size"         type="uint"   value="16"/>
+    <property name="plugin-ids" type="array">
+      <value type="int" value="1"/>
+      <value type="int" value="2"/>
+      <value type="int" value="3"/>
+      <value type="int" value="4"/>
+      <value type="int" value="5"/>
+      <value type="int" value="6"/>
+      <value type="int" value="7"/>
+      <value type="int" value="8"/>
+      <value type="int" value="9"/>
+    </property>
+  </property>
+
+  <!-- ── Panel 2: Bottom dock ──────────────────────────────────────────── -->
+  <property name="panel-2" type="empty">
+    <property name="position"          type="string" value="p=10;x=0;y=0"/>
+    <property name="length"            type="uint"   value="60"/>
+    <property name="length-adjust"     type="bool"   value="true"/>
+    <property name="position-locked"   type="bool"   value="true"/>
+    <property name="size"              type="uint"   value="48"/>
+    <property name="background-style"  type="uint"   value="1"/>
+    <property name="background-color"  type="string" value="#12121acc"/>
+    <property name="enter-opacity"     type="uint"   value="100"/>
+    <property name="leave-opacity"     type="uint"   value="90"/>
+    <property name="nrows"             type="uint"   value="1"/>
+    <property name="icon-size"         type="uint"   value="32"/>
+    <property name="plugin-ids" type="array">
+      <value type="int" value="11"/>
+      <value type="int" value="12"/>
+      <value type="int" value="13"/>
+      <value type="int" value="14"/>
+      <value type="int" value="15"/>
+      <value type="int" value="16"/>
+    </property>
+  </property>
+
+  <!-- ── Plugin definitions ────────────────────────────────────────────── -->
+  <property name="plugins" type="empty">
+
+    <!-- Top bar: App menu (HORUS logo) -->
+    <property name="plugin-1" type="string" value="applicationsmenu">
+      <property name="show-button-title" type="bool"   value="false"/>
+      <property name="show-tooltip"      type="bool"   value="true"/>
+      <property name="tooltip"           type="string" value="HORUS OS Menu"/>
+      <property name="icon-name"         type="string" value="horus-logo"/>
+    </property>
+
+    <!-- Top bar: Window buttons -->
+    <property name="plugin-2" type="string" value="tasklist">
+      <property name="show-labels"       type="bool" value="true"/>
+      <property name="grouping"          type="uint" value="1"/>
+      <property name="window-scrolling"  type="bool" value="true"/>
+      <property name="sort-order"        type="uint" value="0"/>
+      <property name="include-all-workspaces" type="bool" value="false"/>
+    </property>
+
+    <!-- Top bar: Separator -->
+    <property name="plugin-3" type="string" value="separator">
+      <property name="style"   type="uint" value="0"/>
+      <property name="expand"  type="bool" value="true"/>
+    </property>
+
+    <!-- Top bar: Workspace switcher -->
+    <property name="plugin-4" type="string" value="pager">
+      <property name="rows"          type="uint" value="1"/>
+      <property name="show-miniature" type="bool" value="false"/>
+    </property>
+
+    <!-- Top bar: System tray -->
+    <property name="plugin-5" type="string" value="systray">
+      <property name="size-max"              type="uint" value="22"/>
+      <property name="square-icons"          type="bool" value="true"/>
+      <property name="show-frame"            type="bool" value="false"/>
+    </property>
+
+    <!-- Top bar: Power manager plugin -->
+    <property name="plugin-6" type="string" value="power-manager-plugin">
+      <property name="show-panel-label" type="int" value="1"/>
+    </property>
+
+    <!-- Top bar: Clock -->
+    <property name="plugin-7" type="string" value="clock">
+      <property name="mode"       type="uint"   value="2"/>
+      <property name="digital-format" type="string" value="%H:%M  %a %d %b"/>
+      <property name="tooltip-format"  type="string" value="%A %d %B %Y — %H:%M:%S"/>
+    </property>
+
+    <!-- Top bar: Notification area -->
+    <property name="plugin-8" type="string" value="notification-plugin"/>
+
+    <!-- Top bar: Action buttons (logout/shutdown) -->
+    <property name="plugin-9" type="string" value="actions">
+      <property name="items" type="array">
+        <value type="string" value="+logout-dialog"/>
+        <value type="string" value="+lock-screen"/>
+      </property>
+    </property>
+
+    <!-- Dock: File Manager -->
+    <property name="plugin-11" type="string" value="launcher">
+      <property name="items" type="array">
+        <value type="string" value="thunar.desktop"/>
+      </property>
+    </property>
+
+    <!-- Dock: Chromium (for HORUS apps) -->
+    <property name="plugin-12" type="string" value="launcher">
+      <property name="items" type="array">
+        <value type="string" value="chromium-browser.desktop"/>
+      </property>
+    </property>
+
+    <!-- Dock: Terminal -->
+    <property name="plugin-13" type="string" value="launcher">
+      <property name="items" type="array">
+        <value type="string" value="xfce4-terminal.desktop"/>
+      </property>
+    </property>
+
+    <!-- Dock: HORUS Control Center -->
+    <property name="plugin-14" type="string" value="launcher">
+      <property name="items" type="array">
+        <value type="string" value="horus-control-center.desktop"/>
+      </property>
+    </property>
+
+    <!-- Dock: HORUS AI Assistant -->
+    <property name="plugin-15" type="string" value="launcher">
+      <property name="items" type="array">
+        <value type="string" value="horus-ai.desktop"/>
+      </property>
+    </property>
+
+    <!-- Dock: HORUS Demo Mode -->
+    <property name="plugin-16" type="string" value="launcher">
+      <property name="items" type="array">
+        <value type="string" value="horus-demo.desktop"/>
+      </property>
+    </property>
+
+  </property>
+</channel>

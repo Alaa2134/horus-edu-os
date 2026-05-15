@@ -1,0 +1,198 @@
+{
+  "name": "HORUS OS Color System",
+  "version": "1.0.0",
+  "description": "Complete color palette for HORUS OS — cyber-Egyptian dark theme",
+
+  "colors": {
+    "gold": {
+      "hex": "#c9a227",
+      "rgb": [201, 162, 39],
+      "hsl": "43, 67%, 47%",
+      "usage": "Primary brand color — headings, CTA, selected items, logo",
+      "variants": {
+        "light": "#f5d060",
+        "dark": "#a07820",
+        "muted": "#c9a22780"
+      }
+    },
+    "blue": {
+      "hex": "#1a73e8",
+      "rgb": [26, 115, 232],
+      "hsl": "214, 80%, 51%",
+      "usage": "Secondary brand — links, icons, secondary actions"
+    },
+    "cyan": {
+      "hex": "#00d4ff",
+      "rgb": [0, 212, 255],
+      "hsl": "190, 100%, 50%",
+      "usage": "Accent color — circuit traces, glows, highlights, data visualization"
+    },
+    "background": {
+      "hex": "#0a0a0f",
+      "rgb": [10, 10, 15],
+      "hsl": "240, 20%, 5%",
+      "usage": "Main window and page background"
+    },
+    "surface": {
+      "hex": "#12121a",
+      "rgb": [18, 18, 26],
+      "hsl": "240, 18%, 9%",
+      "usage": "Card and panel backgrounds"
+    },
+    "surface2": {
+      "hex": "#1a1a27",
+      "rgb": [26, 26, 39],
+      "hsl": "240, 20%, 13%",
+      "usage": "Elevated surfaces, hover states"
+    },
+    "surface3": {
+      "hex": "#22223a",
+      "rgb": [34, 34, 58],
+      "hsl": "240, 26%, 18%",
+      "usage": "Active states, selected items"
+    },
+    "border": {
+      "hex": "#c9a22730",
+      "rgba": "rgba(201, 162, 39, 0.19)",
+      "usage": "Card borders, dividers"
+    },
+    "borderSubtle": {
+      "hex": "#ffffff10",
+      "rgba": "rgba(255, 255, 255, 0.06)",
+      "usage": "Subtle glass borders"
+    },
+    "text": {
+      "hex": "#e8e8f0",
+      "rgb": [232, 232, 240],
+      "usage": "Primary text"
+    },
+    "textSecondary": {
+      "hex": "#aaaacc",
+      "rgb": [170, 170, 204],
+      "usage": "Secondary text, labels"
+    },
+    "textMuted": {
+      "hex": "#666688",
+      "rgb": [102, 102, 136],
+      "usage": "Disabled and placeholder text"
+    },
+    "success": {
+      "hex": "#00e676",
+      "rgb": [0, 230, 118],
+      "usage": "Success states, online indicators"
+    },
+    "warning": {
+      "hex": "#ff9800",
+      "rgb": [255, 152, 0],
+      "usage": "Warning states, high usage"
+    },
+    "error": {
+      "hex": "#f44336",
+      "rgb": [244, 67, 54],
+      "usage": "Error states, critical alerts"
+    },
+    "info": {
+      "hex": "#29b6f6",
+      "rgb": [41, 182, 246],
+      "usage": "Informational states"
+    }
+  },
+
+  "effects": {
+    "goldGlow": "0 0 20px rgba(201, 162, 39, 0.4), 0 0 40px rgba(201, 162, 39, 0.2)",
+    "cyanGlow": "0 0 20px rgba(0, 212, 255, 0.4), 0 0 40px rgba(0, 212, 255, 0.2)",
+    "blueGlow": "0 0 20px rgba(26, 115, 232, 0.4)",
+    "cardShadow": "0 8px 32px rgba(0, 0, 0, 0.4)",
+    "glass": "background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(12px); border: 1px solid rgba(201, 162, 39, 0.2)",
+    "glassStrong": "background: rgba(255, 255, 255, 0.08); backdrop-filter: blur(20px)"
+  },
+
+  "gradients": {
+    "background": "linear-gradient(135deg, #0a0a0f 0%, #12121a 50%, #0d0d1a 100%)",
+    "card": "linear-gradient(135deg, rgba(201,162,39,0.05) 0%, rgba(26,115,232,0.03) 100%)",
+    "goldHorizontal": "linear-gradient(90deg, #a07820 0%, #c9a227 30%, #f5d060 50%, #c9a227 70%, #a07820 100%)",
+    "titleText": "linear-gradient(135deg, #c9a227 0%, #f5d060 40%, #00d4ff 100%)",
+    "bootBackground": "linear-gradient(180deg, #0a0a0f 0%, #0d0d1a 50%, #0a0a0f 100%)",
+    "progressBar": "linear-gradient(90deg, #c9a227, #f5d060, #c9a227)",
+    "heroOverlay": "linear-gradient(to bottom, rgba(10,10,15,0.3) 0%, rgba(10,10,15,0.7) 60%, #0a0a0f 100%)"
+  },
+
+  "typography": {
+    "display": {
+      "family": "Cinzel",
+      "fallback": "Georgia, 'Times New Roman', serif",
+      "weights": [400, 700, 900],
+      "usage": "Logo, hero titles, section headers",
+      "install": "https://fonts.google.com/specimen/Cinzel"
+    },
+    "ui": {
+      "family": "Inter",
+      "fallback": "-apple-system, BlinkMacSystemFont, sans-serif",
+      "weights": [300, 400, 500, 600, 700],
+      "usage": "All UI text, labels, body, buttons",
+      "install": "https://fonts.google.com/specimen/Inter"
+    },
+    "mono": {
+      "family": "JetBrains Mono",
+      "fallback": "'Fira Code', 'Courier New', monospace",
+      "weights": [400, 700],
+      "usage": "Terminal, code, system values, GRUB, Plymouth text",
+      "install": "https://www.jetbrains.com/lp/mono/"
+    },
+    "arabic": {
+      "family": "Noto Naskh Arabic",
+      "fallback": "Scheherazade New, Arial, sans-serif",
+      "weights": [400, 700],
+      "usage": "All Arabic text, RTL layouts",
+      "install": "https://fonts.google.com/noto/specimen/Noto+Naskh+Arabic"
+    }
+  },
+
+  "spacing": {
+    "xs": "4px",
+    "sm": "8px",
+    "md": "16px",
+    "lg": "24px",
+    "xl": "32px",
+    "2xl": "48px",
+    "3xl": "64px"
+  },
+
+  "radius": {
+    "sm": "6px",
+    "md": "12px",
+    "lg": "16px",
+    "xl": "24px",
+    "full": "9999px"
+  },
+
+  "breakpoints": {
+    "sm": "640px",
+    "md": "768px",
+    "lg": "1024px",
+    "xl": "1280px",
+    "2xl": "1920px"
+  },
+
+  "tailwindExtension": {
+    "colors": {
+      "horus": {
+        "gold": "#c9a227",
+        "goldLight": "#f5d060",
+        "goldDark": "#a07820",
+        "blue": "#1a73e8",
+        "cyan": "#00d4ff",
+        "bg": "#0a0a0f",
+        "surface": "#12121a",
+        "surface2": "#1a1a27",
+        "surface3": "#22223a",
+        "text": "#e8e8f0",
+        "textSecondary": "#aaaacc",
+        "textMuted": "#666688",
+        "success": "#00e676",
+        "warning": "#ff9800",
+        "error": "#f44336"
+      }
+    }
+  }
+}

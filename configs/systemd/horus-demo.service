@@ -1,0 +1,28 @@
+[Unit]
+Description=HORUS Demo Mode — Competition Kiosk Display
+Documentation=https://github.com/alaasaber/horus-os
+After=graphical-session.target horus-control-center.service
+Requires=graphical-session.target
+
+[Service]
+Type=simple
+User=horus-user
+Group=horus-user
+WorkingDirectory=/opt/horus/horus-demo-mode
+# Serve the built React app via Python's HTTP server as a simple static server
+ExecStart=/usr/bin/python3 -m http.server 8423 --directory /opt/horus/horus-demo-mode/dist
+Restart=on-failure
+RestartSec=5s
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=horus-demo
+
+Environment=DISPLAY=:0
+MemoryMax=128M
+CPUQuota=15%
+
+NoNewPrivileges=yes
+PrivateTmp=yes
+
+[Install]
+WantedBy=graphical.target

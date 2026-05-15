@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(start \"\" \"c:\\\\Users\\\\ELSAKA\\\\horus-edu-website\\\\index.html\")",
+      "Bash(start \"\" \"http://localhost:3000\")",
+      "Bash(python -m http.server 3000)",
+      "Bash(dir /s /b)",
+      "Bash(not exist *)",
+      "PowerShell(New-Item -ItemType Directory -Force -Path \"c:\\\\Users\\\\ELSAKA\\\\os horus\\\\.github\\\\workflows\")"
+    ]
+  }
+}

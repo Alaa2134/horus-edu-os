@@ -1,0 +1,204 @@
+// ══════════════════════════════════════════════════════════════════════
+//  HORUS OS — Plymouth Boot Splash Animation Script
+//  Style: dark cyber-Egyptian, gold/cyan, fade-in animation
+//  Module: script
+//  Created by: Alaa Saber
+// ══════════════════════════════════════════════════════════════════════
+
+// ── Background ────────────────────────────────────────────────────────
+Window.SetBackgroundTopColor(0.039, 0.039, 0.059);    // #0a0a0f top
+Window.SetBackgroundBottomColor(0.071, 0.071, 0.102); // #12121a bottom
+
+screen_width  = Window.GetWidth();
+screen_height = Window.GetHeight();
+cx = screen_width  / 2;
+cy = screen_height / 2;
+
+// ── Fade state ────────────────────────────────────────────────────────
+global.fade_alpha       = 0;
+global.fade_step        = 0.025;   // fades in over ~40 refresh ticks
+global.pulse_time       = 0;
+global.pulse_dir        = 1;
+
+// ── Logo ──────────────────────────────────────────────────────────────
+logo_image = Image("horus-logo.png");
+if (logo_image)
+{
+    logo_w = logo_image.GetWidth();
+    logo_h = logo_image.GetHeight();
+    logo_sprite = Sprite(logo_image);
+    logo_sprite.SetX(cx - logo_w / 2);
+    logo_sprite.SetY(cy - logo_h / 2 - 80);
+    logo_sprite.SetOpacity(0);
+    logo_sprite.SetZ(10);
+}
+
+// ── Title text (rendered via Image.Text) ─────────────────────────────
+title_image = Image.Text(
+    "HORUS OS",
+    0.788, 0.635, 0.153,    // #c9a227 gold
+    1,                       // bold
+    "JetBrains Mono",        // font family
+    32                       // size
+);
+title_sprite = Sprite(title_image);
+title_sprite.SetX(cx - title_image.GetWidth() / 2);
+title_sprite.SetY(cy + 60);
+title_sprite.SetOpacity(0);
+title_sprite.SetZ(11);
+
+// ── Subtitle text ─────────────────────────────────────────────────────
+subtitle_image = Image.Text(
+    "Embedded Intelligence Platform",
+    0.667, 0.667, 0.800,    // #aaaacc silver
+    0,                       // normal weight
+    "JetBrains Mono",
+    13
+);
+subtitle_sprite = Sprite(subtitle_image);
+subtitle_sprite.SetX(cx - subtitle_image.GetWidth() / 2);
+subtitle_sprite.SetY(cy + 100);
+subtitle_sprite.SetOpacity(0);
+subtitle_sprite.SetZ(11);
+
+// ── Creator credit ────────────────────────────────────────────────────
+creator_image = Image.Text(
+    "Created by Alaa Saber",
+    0.400, 0.400, 0.533,    // #666688 muted
+    0,
+    "JetBrains Mono",
+    11
+);
+creator_sprite = Sprite(creator_image);
+creator_sprite.SetX(cx - creator_image.GetWidth() / 2);
+creator_sprite.SetY(cy + 125);
+creator_sprite.SetOpacity(0);
+creator_sprite.SetZ(11);
+
+// ── Progress bar container ────────────────────────────────────────────
+progress_box = Rectangle(0, 0, 400, 6);  // fallback; overridden by image
+progress_box_image = Image("progress_box.png");
+progress_bar_base_image = Image("progress_bar.png");
+
+progress_box_sprite = Sprite();
+progress_bar_sprite  = Sprite();
+
+global.progress_bar_width = 400;
+
+if (progress_box_image)
+{
+    progress_box_sprite.SetImage(progress_box_image);
+    global.progress_bar_width = progress_box_image.GetWidth();
+}
+else
+{
+    // Draw a simple dark box using a scaled solid image
+    box_img = Image(global.progress_bar_width, 6);
+    progress_box_sprite.SetImage(box_img);
+}
+
+progress_box_sprite.SetX(cx - global.progress_bar_width / 2);
+progress_box_sprite.SetY(screen_height - 80);
+progress_box_sprite.SetOpacity(0);
+progress_box_sprite.SetZ(12);
+
+progress_bar_sprite.SetX(cx - global.progress_bar_width / 2);
+progress_bar_sprite.SetY(screen_height - 80);
+progress_bar_sprite.SetOpacity(0);
+progress_bar_sprite.SetZ(13);
+
+// ── Horizontal scan line (decorative) ────────────────────────────────
+scan_image = Image.Text("", 0, 0, 0, 0, "", 1);  // empty placeholder
+// We'll use a scaled cyan line via a 1px image trick
+global.scan_y     = cy - 5;
+global.scan_alpha = 0.0;
+global.scan_dir   = 1;
+
+// ── Boot progress callback ────────────────────────────────────────────
+fun boot_progress_callback(duration, progress)
+{
+    if (!progress_bar_base_image) { return; }
+
+    local.bar_w = (int)(progress * global.progress_bar_width);
+    if (bar_w < 1) { bar_w = 1; }
+
+    local.bar_image = progress_bar_base_image.Scale(
+        bar_w,
+        progress_bar_base_image.GetHeight()
+    );
+    progress_bar_sprite.SetImage(bar_image);
+
+    // Sync opacity with overall fade
+    progress_box_sprite.SetOpacity(global.fade_alpha * 0.7);
+    progress_bar_sprite.SetOpacity(global.fade_alpha * 0.9);
+}
+
+Plymouth.SetBootProgressFunction(boot_progress_callback);
+
+// ── Refresh (animation loop) ──────────────────────────────────────────
+fun refresh_callback()
+{
+    // Fade-in all elements
+    if (global.fade_alpha < 1.0)
+    {
+        global.fade_alpha += global.fade_step;
+        if (global.fade_alpha > 1.0) { global.fade_alpha = 1.0; }
+
+        local.a = global.fade_alpha;
+
+        if (logo_sprite)     { logo_sprite.SetOpacity(a); }
+        title_sprite.SetOpacity(a);
+        subtitle_sprite.SetOpacity(a * 0.85);
+        creator_sprite.SetOpacity(a * 0.6);
+        progress_box_sprite.SetOpacity(a * 0.7);
+        progress_bar_sprite.SetOpacity(a * 0.9);
+    }
+
+    // Subtle pulse on logo after fully visible
+    if (global.fade_alpha >= 1.0 && logo_sprite)
+    {
+        global.pulse_time += 0.04 * global.pulse_dir;
+        if (global.pulse_time >= 1.0) { global.pulse_dir = -1; }
+        if (global.pulse_time <= 0.6) { global.pulse_dir =  1; }
+
+        // Gentle opacity pulse between 0.85 and 1.0
+        local.pulse_val = 0.85 + (global.pulse_time * 0.15);
+        logo_sprite.SetOpacity(pulse_val);
+    }
+}
+
+Plymouth.SetRefreshFunction(refresh_callback);
+
+// ── Password dialog (if disk is encrypted) ───────────────────────────
+fun display_password_callback(prompt, bullets)
+{
+    local.prompt_image = Image.Text(
+        prompt + ": " + String.Repeat("●", bullets),
+        0.788, 0.635, 0.153,  // gold
+        0, "JetBrains Mono", 14
+    );
+    local.prompt_sprite = Sprite(prompt_image);
+    prompt_sprite.SetX(cx - prompt_image.GetWidth() / 2);
+    prompt_sprite.SetY(cy + 160);
+    prompt_sprite.SetOpacity(1);
+    prompt_sprite.SetZ(20);
+}
+
+Plymouth.SetDisplayPasswordFunction(display_password_callback);
+
+// ── Message callback (systemd messages during boot) ───────────────────
+fun message_callback(text)
+{
+    local.msg = Image.Text(
+        text,
+        0.400, 0.400, 0.533,  // muted
+        0, "JetBrains Mono", 10
+    );
+    local.msg_sprite = Sprite(msg);
+    msg_sprite.SetX(screen_width - msg.GetWidth() - 20);
+    msg_sprite.SetY(screen_height - 30);
+    msg_sprite.SetOpacity(0.5);
+    msg_sprite.SetZ(15);
+}
+
+Plymouth.SetMessageFunction(message_callback);

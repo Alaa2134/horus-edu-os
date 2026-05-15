@@ -1,0 +1,76 @@
+{
+  "_meta": {
+    "name": "HORUS OS Knowledge Base",
+    "version": "1.0.0",
+    "last_updated": "2026-05-13"
+  },
+  "about_horus": "HORUS OS is a custom Linux-based operating system designed for embedded laptops, AI education, hardware control, and student innovation. It was created by Alaa Saber as a university competition project. Built on Ubuntu 22.04 LTS minimal with XFCE4 desktop, it features full custom branding, 5 purpose-built applications, an AI assistant, and a pre-configured embedded development environment.",
+  "creator": "Alaa Saber",
+  "slogan_en": "Intelligence Awakened",
+  "slogan_ar": "ذكاء مدمج للمستقبل",
+  "version": "1.0.0",
+  "base_os": "Ubuntu 22.04 LTS (Jammy Jellyfish)",
+  "desktop": "XFCE4 with Horus Dark GTK theme",
+  "kernel": "Linux 5.15+ (Ubuntu generic)",
+  "apps": [
+    "HORUS Control Center — Real-time system monitoring (FastAPI + React)",
+    "HORUS AI Assistant — This AI (Python + Ollama/OpenAI + React)",
+    "HORUS Demo Mode — Competition kiosk app (React SPA)",
+    "HORUS Security Center — Security dashboard (Python + React)",
+    "HORUS About — System information page"
+  ],
+  "dev_tools": [
+    "Python 3.11",
+    "Node.js 18 LTS",
+    "GCC/G++ 12",
+    "Git 2.x",
+    "CMake 3.22+",
+    "Arduino CLI",
+    "minicom, screen (serial)",
+    "i2c-tools",
+    "lm-sensors",
+    "VS Code"
+  ],
+  "colors": {
+    "gold": "#c9a227",
+    "cyan": "#00d4ff",
+    "blue": "#1a73e8",
+    "background": "#0a0a0f"
+  },
+  "useful_commands": {
+    "system_info": "fastfetch",
+    "sensor_scan": "sudo sensors-detect && sensors",
+    "i2c_scan": "sudo i2cdetect -y 1",
+    "serial_monitor": "minicom -D /dev/ttyUSB0 -b 115200",
+    "arduino_list": "arduino-cli board list",
+    "control_center": "horus-control",
+    "ai_assistant": "horus-ai",
+    "demo_mode": "horus-demo",
+    "security_center": "horus-security",
+    "horus_help": "horus-help",
+    "network_wifi": "nmcli device wifi list",
+    "wifi_connect": "nmcli device wifi connect 'SSID' password 'PASSWORD'",
+    "python_repl": "python3",
+    "pip_install": "pip3 install package-name",
+    "git_clone": "git clone https://github.com/user/repo",
+    "process_list": "htop or btop",
+    "disk_usage": "df -h",
+    "memory_info": "free -h",
+    "cpu_temp": "sensors 2>/dev/null || echo 'Run: sudo sensors-detect'",
+    "update_system": "sudo apt update && sudo apt upgrade -y"
+  },
+  "embedded_reference": {
+    "gpio_example": "from gpiod import Chip\nchip = Chip('gpiochip0')\nline = chip.get_line(4)\nline.request(consumer='test', type=gpiod.LINE_REQ_DIR_OUT)\nline.set_value(1)",
+    "i2c_python": "import smbus2\nbus = smbus2.SMBus(1)\ndata = bus.read_byte(0x48)  # read from address 0x48",
+    "serial_python": "import serial\nser = serial.Serial('/dev/ttyUSB0', 115200)\nser.write(b'Hello Arduino\\n')\nresponse = ser.readline()",
+    "arduino_compile": "arduino-cli compile --fqbn arduino:avr:uno MySketch/",
+    "arduino_upload": "arduino-cli upload -p /dev/ttyUSB0 --fqbn arduino:avr:uno MySketch/"
+  },
+  "faq": {
+    "is_horus_a_distro": "HORUS OS is a custom Linux-based operating system, not a Linux distribution in the traditional sense. It is built from Ubuntu 22.04 LTS minimal with comprehensive customizations at every layer — boot, display, desktop, applications, and toolchain.",
+    "why_not_scratch": "Building a kernel from scratch takes years for a single developer. HORUS OS is correctly positioned as a custom Linux-based OS. The customization at every layer — from boot to applications — creates a genuine independent system identity.",
+    "competition_pitch": "HORUS OS demonstrates that a student can architect, build, and deploy a complete operating system platform. It solves the real problem of fragmented embedded development environments by providing a unified, branded system purpose-built for embedded intelligence.",
+    "what_can_it_do": "HORUS OS can run on any x86_64 laptop, control embedded hardware via GPIO/I2C/SPI/serial, run Python and Arduino projects, monitor system health in real-time, provide AI-assisted development help, and present as a professional competition demonstration.",
+    "install_ollama": "Install Ollama for local AI: curl -fsSL https://ollama.com/install.sh | sh && ollama pull mistral && ollama serve"
+  }
+}

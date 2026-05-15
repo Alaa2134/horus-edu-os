@@ -1,0 +1,49 @@
+# Build artifacts
+build/
+dist/
+*.iso
+*.img
+*.vmdk
+*.squashfs
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+venv/
+env/
+*.egg-info/
+.eggs/
+
+# Node
+node_modules/
+npm-debug.log
+yarn-error.log
+.pnp/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor
+.vscode/settings.json
+.idea/
+*.swp
+*.swo
+*~
+
+# Chroot / debootstrap
+build/chroot/
+build/iso/
+
+# Logs
+*.log
+logs/
+
+# Secrets
+.env
+*.pem
+*.key

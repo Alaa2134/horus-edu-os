@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HORUS Control Center</title>
+    <meta name="description" content="HORUS OS — Real-time system monitoring and control" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+      html, body { height: 100%; }
+      body {
+        background: #0a0a0f;
+        color: #e8e8f0;
+        font-family: 'Inter', -apple-system, sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
+      #root { min-height: 100vh; }
+      /* Loading state */
+      .loader {
+        position: fixed; inset: 0;
+        background: #0a0a0f;
+        display: flex; flex-direction: column;
+        align-items: center; justify-content: center;
+        z-index: 9999;
+        transition: opacity 0.4s ease;
+      }
+      .loader h1 {
+        font-family: 'Cinzel', serif;
+        font-size: 2rem;
+        color: #c9a227;
+        letter-spacing: 0.3em;
+        margin-bottom: 8px;
+      }
+      .loader p {
+        color: #00d4ff;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.75rem;
+        letter-spacing: 0.2em;
+      }
+      .loader-bar {
+        width: 200px; height: 3px;
+        background: #1a1a27;
+        border-radius: 2px;
+        margin-top: 20px;
+        overflow: hidden;
+      }
+      .loader-bar::after {
+        content: '';
+        display: block;
+        width: 40%;
+        height: 100%;
+        background: linear-gradient(90deg, #c9a227, #f5d060);
+        border-radius: 2px;
+        animation: loadSlide 1.2s ease-in-out infinite;
+      }
+      @keyframes loadSlide {
+        0%   { transform: translateX(-100%); }
+        100% { transform: translateX(350%); }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root">
+      <div class="loader" id="initial-loader">
+        <h1>HORUS</h1>
+        <p>CONTROL CENTER</p>
+        <div class="loader-bar"></div>
+      </div>
+    </div>
+    <script type="module" src="/src/main.tsx"></script>
+    <script>
+      // Remove loader once React mounts
+      window.__removeLoader = () => {
+        const l = document.getElementById('initial-loader');
+        if (l) { l.style.opacity = '0'; setTimeout(() => l.remove(), 400); }
+      };
+    </script>
+  </body>
+</html>

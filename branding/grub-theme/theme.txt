@@ -1,0 +1,131 @@
+# ══════════════════════════════════════════════════════════════════════
+#  HORUS OS — GRUB2 Visual Theme
+#  Style: Dark cyber-Egyptian, gold text, glass-style menu
+#  Created by: Alaa Saber
+# ══════════════════════════════════════════════════════════════════════
+
+# Global theme settings
+title-text: ""
+desktop-color: "#0a0a0f"
+terminal-font: "JetBrains Mono Regular 14"
+terminal-left: "5%"
+terminal-top: "5%"
+terminal-width: "90%"
+terminal-height: "90%"
+terminal-border: "0"
+terminal-box: ""
+
+# ── HORUS OS Title Label ───────────────────────────────────────────────
++ label {
+    top  = 8%
+    left = 0
+    width = 100%
+    align = "center"
+    text = "HORUS OS"
+    font = "JetBrains Mono Bold 48"
+    color = "#c9a227"
+}
+
+# ── Subtitle Label ─────────────────────────────────────────────────────
++ label {
+    top  = 16%
+    left = 0
+    width = 100%
+    align = "center"
+    text = "Embedded Intelligence Platform"
+    font = "JetBrains Mono Regular 18"
+    color = "#00d4ff"
+}
+
+# ── Creator credit ─────────────────────────────────────────────────────
++ label {
+    top  = 20%
+    left = 0
+    width = 100%
+    align = "center"
+    text = "Created by Alaa Saber  ·  v1.0.0"
+    font = "JetBrains Mono Regular 12"
+    color = "#555577"
+}
+
+# ── Decorative separator line ──────────────────────────────────────────
++ label {
+    top  = 23%
+    left = 25%
+    width = 50%
+    align = "center"
+    text = "─────────────────────────────────────────"
+    font = "JetBrains Mono Regular 10"
+    color = "#c9a22750"
+}
+
+# ── Boot Menu ─────────────────────────────────────────────────────────
++ boot_menu {
+    left   = 20%
+    top    = 27%
+    width  = 60%
+    height = 45%
+
+    # Item styling
+    item_font             = "JetBrains Mono Regular 16"
+    item_color            = "#aaaacc"
+    selected_item_color   = "#c9a227"
+
+    # Item dimensions
+    item_height   = 44
+    item_padding  = 18
+    item_spacing  = 4
+
+    # Selected item highlight
+    selected_item_pixmap_style = ""
+
+    # No scrollbar for clean look
+    scrollbar = false
+}
+
+# ── Timeout Progress Bar ───────────────────────────────────────────────
++ progress_bar {
+    id       = "__timeout__"
+    left     = 32%
+    top      = 87%
+    width    = 36%
+    height   = 4
+    show_text = false
+    fg_color  = "#c9a227"
+    bg_color  = "#1a1a27"
+    border_color = "#c9a22740"
+}
+
+# ── Timeout Label ──────────────────────────────────────────────────────
++ label {
+    id    = "__timeout__"
+    top   = 89.5%
+    left  = 0
+    width = 100%
+    align = "center"
+    text  = "Booting in %d second(s)"
+    font  = "JetBrains Mono Regular 11"
+    color = "#555577"
+}
+
+# ── Bottom info line ───────────────────────────────────────────────────
++ label {
+    top   = 95%
+    left  = 0
+    width = 100%
+    align = "center"
+    text  = "↑↓ Navigate  ·  Enter Select  ·  e Edit  ·  c Command"
+    font  = "JetBrains Mono Regular 10"
+    color = "#333355"
+}
+
+# ── Arabic tagline (right side) ────────────────────────────────────────
++ label {
+    top   = 95%
+    left  = 75%
+    width = 24%
+    align = "right"
+    text  = "نظام حورس"
+    font  = "JetBrains Mono Regular 11"
+    color = "#c9a22760"
+}

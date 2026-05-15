@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About HORUS OS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Noto+Naskh+Arabic:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0a0a0f;
+      --surface: #12121a;
+      --border: #1e1e2e;
+      --gold: #c9a227;
+      --cyan: #00d4ff;
+      --blue: #1a73e8;
+      --text: #e8e8f0;
+      --muted: #8888a8;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+    }
+    .container { max-width: 760px; margin: 0 auto; padding: 40px 24px; }
+
+    /* Eye of Horus SVG header */
+    .logo-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 40px;
+    }
+    .logo-wrap img, .logo-wrap svg {
+      width: 100px; height: 100px;
+    }
+    h1 {
+      font-family: 'Cinzel', serif;
+      color: var(--gold);
+      font-size: 2.2rem;
+      letter-spacing: 0.15em;
+      margin-top: 16px;
+      text-shadow: 0 0 30px rgba(201,162,39,0.4);
+    }
+    .slogan { color: var(--cyan); font-size: 1rem; margin-top: 6px; letter-spacing: 0.05em; }
+    .slogan-ar {
+      font-family: 'Noto Naskh Arabic', serif;
+      direction: rtl;
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin-top: 4px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 22px 24px;
+      margin-bottom: 16px;
+    }
+    .card-title {
+      font-family: 'Cinzel', serif;
+      color: var(--gold);
+      font-size: 0.85rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(30,30,46,0.5);
+      font-size: 0.85rem;
+    }
+    .info-row:last-child { border-bottom: none; }
+    .info-key { color: var(--muted); font-size: 0.8rem; }
+    .info-val { color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; }
+    .info-val.gold { color: var(--gold); }
+    .info-val.cyan { color: var(--cyan); }
+
+    .apps-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .app-item {
+      background: rgba(201,162,39,0.05);
+      border: 1px solid rgba(201,162,39,0.15);
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-size: 0.8rem;
+    }
+    .app-name { color: var(--gold); font-weight: 600; margin-bottom: 3px; }
+    .app-port { color: var(--cyan); font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; }
+    .app-desc { color: var(--muted); font-size: 0.75rem; margin-top: 4px; }
+
+    .palette {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 4px;
+    }
+    .swatch {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+    .swatch-dot {
+      width: 24px; height: 24px; border-radius: 6px;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .creator-card {
+      background: linear-gradient(135deg, rgba(201,162,39,0.08), rgba(0,212,255,0.05));
+      border: 1px solid rgba(201,162,39,0.2);
+      border-radius: 14px;
+      padding: 22px 24px;
+      text-align: center;
+      margin-bottom: 16px;
+    }
+    .creator-avatar {
+      width: 64px; height: 64px; border-radius: 50%;
+      background: linear-gradient(135deg, #c9a227, #00d4ff);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.8rem; margin: 0 auto 12px;
+    }
+    .creator-name { font-family: 'Cinzel', serif; color: var(--gold); font-size: 1.1rem; }
+    .creator-email { color: var(--cyan); font-size: 0.8rem; font-family: 'JetBrains Mono', monospace; margin-top: 4px; }
+    .creator-role { color: var(--muted); font-size: 0.78rem; margin-top: 8px; line-height: 1.5; }
+
+    footer {
+      text-align: center;
+      padding: 24px 0 40px;
+      color: var(--muted);
+      font-size: 0.72rem;
+      font-family: 'JetBrains Mono', monospace;
+      line-height: 1.8;
+    }
+    footer span { color: var(--gold); }
+
+    /* Dynamic values */
+    .dyn { color: var(--cyan); }
+
+    @media (max-width: 520px) {
+      .apps-grid { grid-template-columns: 1fr; }
+      h1 { font-size: 1.6rem; }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Logo + Title -->
+  <div class="logo-wrap">
+    <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <radialGradient id="bg" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#12121a"/>
+          <stop offset="100%" stop-color="#0a0a0f"/>
+        </radialGradient>
+        <filter id="glow">
+          <feGaussianBlur stdDeviation="3" result="blur"/>
+          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+        <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#f5d060"/>
+          <stop offset="100%" stop-color="#c9a227"/>
+        </linearGradient>
+      </defs>
+      <circle cx="100" cy="100" r="100" fill="url(#bg)"/>
+      <circle cx="100" cy="100" r="96" fill="none" stroke="#c9a22730" stroke-width="1"/>
+      <!-- Eye shape -->
+      <path d="M40,100 Q100,55 160,100 Q100,145 40,100 Z" fill="none" stroke="url(#goldGrad)" stroke-width="3" filter="url(#glow)"/>
+      <!-- Iris -->
+      <circle cx="100" cy="100" r="22" fill="none" stroke="url(#goldGrad)" stroke-width="2.5" filter="url(#glow)"/>
+      <!-- Pupil -->
+      <circle cx="100" cy="100" r="10" fill="#c9a227" opacity="0.9" filter="url(#glow)"/>
+      <!-- Eyebrow -->
+      <path d="M55,72 Q100,55 145,72" fill="none" stroke="#c9a227" stroke-width="2" opacity="0.7"/>
+      <!-- Horus mark left -->
+      <line x1="55" y1="108" x2="40" y2="130" stroke="#00d4ff" stroke-width="2" opacity="0.8"/>
+      <!-- Horus mark right -->
+      <line x1="145" y1="108" x2="155" y2="130" stroke="#00d4ff" stroke-width="2" opacity="0.8"/>
+      <!-- Circuit traces -->
+      <line x1="122" y1="100" x2="165" y2="100" stroke="#00d4ff" stroke-width="1.5" stroke-dasharray="4,3" opacity="0.6"/>
+      <line x1="35" y1="100" x2="78" y2="100" stroke="#00d4ff" stroke-width="1.5" stroke-dasharray="4,3" opacity="0.6"/>
+      <circle cx="165" cy="100" r="3" fill="#00d4ff" opacity="0.8"/>
+      <circle cx="35" cy="100" r="3" fill="#00d4ff" opacity="0.8"/>
+    </svg>
+    <h1>HORUS OS</h1>
+    <div class="slogan">Intelligence Awakened</div>
+    <div class="slogan-ar">نظام حورس — ذكاء مدمج للمستقبل</div>
+  </div>
+
+  <!-- OS Info -->
+  <div class="card">
+    <div class="card-title">System Information</div>
+    <div class="info-row">
+      <span class="info-key">OS Name</span>
+      <span class="info-val gold">HORUS OS</span>
+    </div>
+    <div class="info-row">
+      <span class="info-key">Version</span>
+      <span class="info-val">1.0.0 — Embedded Intelligence</span>
+    </div>
+    <div class="info-row">
+      <span class="info-key">Base System</span>
+      <span class="info-val">Ubuntu 22.04 LTS (Jammy Jellyfish)</span>
+    </div>
+    <div class="info-row">
+      <span class="info-key">Kernel</span>
+      <span class="info-val dyn" id="kernel">Linux</span>
+    </div>
+    <div class="info-row">
+      <span class="info-key">Desktop</span>
+      <span class="info-val">XFCE4 + Picom + Horus Dark Theme</span>
+    </div>
+    <div class="info-row">
+      <span class="info-key">Display Manager</span>
+      <span class="info-val">LightDM (GTK Greeter)</span>
+    </div>
+    <div class="info-row">
+      <span class="info-key">Architecture</span>
+      <span class="info-val">x86_64 / ARM64 (Raspberry Pi 4)</span>
+    </div>
+    <div class="info-row">
+      <span class="info-key">Build Date</span>
+      <span class="info-val">2026-05-13</span>
+    </div>
+  </div>
+
+  <!-- Creator -->
+  <div class="creator-card">
+    <div class="creator-avatar">👨‍💻</div>
+    <div class="creator-name">Alaa Saber</div>
+    <div class="creator-email">alaa00saber@gmail.com</div>
+    <div class="creator-role">
+      Designer, Developer &amp; Architect of HORUS OS<br/>
+      Built from scratch for the University Embedded Systems Competition
+    </div>
+  </div>
+
+  <!-- Custom Apps -->
+  <div class="card">
+    <div class="card-title">Custom Applications</div>
+    <div class="apps-grid">
+      <div class="app-item">
+        <div class="app-name">⚡ Control Center</div>
+        <div class="app-port">:8420</div>
+        <div class="app-desc">Real-time CPU, RAM, disk, network, and temperature monitoring</div>
+      </div>
+      <div class="app-item">
+        <div class="app-name">𓂀 AI Assistant</div>
+        <div class="app-port">:8421</div>
+        <div class="app-desc">Offline AI with hardware awareness (Ollama / Mistral 7B)</div>
+      </div>
+      <div class="app-item">
+        <div class="app-name">🛡 Security Center</div>
+        <div class="app-port">:8422</div>
+        <div class="app-desc">Firewall, SSH, encryption, and system log dashboard</div>
+      </div>
+      <div class="app-item">
+        <div class="app-name">🏆 Demo Mode</div>
+        <div class="app-port">Kiosk</div>
+        <div class="app-desc">Full-screen competition presentation with live stats</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Technologies -->
+  <div class="card">
+    <div class="card-title">Technology Stack</div>
+    <div class="info-row">
+      <span class="info-key">Backends</span>
+      <span class="info-val">Python 3.11 · FastAPI · Uvicorn</span>
+    </div>
+    <div class="info-row">
+      <span class="info-key">Frontends</span>
+      <span class="info-val">React 18 · TypeScript · Tailwind CSS · Vite</span>
+    </div>
+    <div class="info-row">
+      <span class="info-key">AI Engine</span>
+      <span class="info-val">Ollama + Mistral 7B (offline) → OpenAI API</span>
+    </div>
+    <div class="info-row">
+      <span class="info-key">Embedded Tools</span>
+      <span class="info-val">Arduino CLI · PlatformIO · libgpiod · i2c-tools</span>
+    </div>
+    <div class="info-row">
+      <span class="info-key">Build System</span>
+      <span class="info-val">debootstrap → squashfs → xorriso ISO</span>
+    </div>
+    <div class="info-row">
+      <span class="info-key">Init System</span>
+      <span class="info-val">systemd</span>
+    </div>
+  </div>
+
+  <!-- Branding -->
+  <div class="card">
+    <div class="card-title">Brand Colors</div>
+    <div class="palette">
+      <div class="swatch"><div class="swatch-dot" style="background:#c9a227"></div>#c9a227 Gold</div>
+      <div class="swatch"><div class="swatch-dot" style="background:#00d4ff"></div>#00d4ff Cyan</div>
+      <div class="swatch"><div class="swatch-dot" style="background:#1a73e8"></div>#1a73e8 Blue</div>
+      <div class="swatch"><div class="swatch-dot" style="background:#0a0a0f; border-color:#333"></div>#0a0a0f Black</div>
+    </div>
+    <div class="info-row" style="margin-top:14px">
+      <span class="info-key">Display Font</span>
+      <span class="info-val" style="font-family:'Cinzel',serif">Cinzel (Egyptian)</span>
+    </div>
+    <div class="info-row">
+      <span class="info-key">UI Font</span>
+      <span class="info-val">Inter (modern UI)</span>
+    </div>
+    <div class="info-row">
+      <span class="info-key">Terminal Font</span>
+      <span class="info-val" style="font-family:'JetBrains Mono',monospace">JetBrains Mono</span>
+    </div>
+    <div class="info-row">
+      <span class="info-key">Arabic Font</span>
+      <span class="info-val" style="font-family:'Noto Naskh Arabic',serif;direction:rtl">Noto Naskh Arabic</span>
+    </div>
+  </div>
+
+  <!-- Licenses -->
+  <div class="card">
+    <div class="card-title">Open Source Components</div>
+    <div class="info-row">
+      <span class="info-key">Base OS</span>
+      <span class="info-val">Ubuntu 22.04 LTS — GPL/LGPL</span>
+    </div>
+    <div class="info-row">
+      <span class="info-key">FastAPI</span>
+      <span class="info-val">MIT License</span>
+    </div>
+    <div class="info-row">
+      <span class="info-key">React</span>
+      <span class="info-val">MIT License</span>
+    </div>
+    <div class="info-row">
+      <span class="info-key">Tailwind CSS</span>
+      <span class="info-val">MIT License</span>
+    </div>
+    <div class="info-row">
+      <span class="info-key">Ollama</span>
+      <span class="info-val">MIT License</span>
+    </div>
+  </div>
+
+  <footer>
+    <div>HORUS OS v1.0.0 — Intelligence Awakened</div>
+    <div>Created by <span>Alaa Saber</span> · <span>alaa00saber@gmail.com</span></div>
+    <div style="margin-top:6px;color:#3a3a4a">
+      Built on Ubuntu 22.04 LTS · XFCE4 · Python · React · Ollama
+    </div>
+    <div style="margin-top:16px;font-size:1.2rem;letter-spacing:0.3em;color:#c9a22740">𓂀</div>
+  </footer>
+
+</div>
+
+<script>
+  // Pull live system info from Control Center if available
+  fetch('http://localhost:8420/api/system')
+    .then(r => r.json())
+    .then(d => {
+      const k = document.getElementById('kernel')
+      if (k && d.kernel_version) k.textContent = d.kernel_version
+    })
+    .catch(() => {})
+</script>
+</body>
+</html>

@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  HORUS OS Official Logo
+  Eye of Horus + Circuit Board Fusion
+  Created by Alaa Saber
+  Version 1.0.0
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="500" height="500">
+  <defs>
+    <!-- Background gradient -->
+    <radialGradient id="bgGrad" cx="50%" cy="45%" r="55%">
+      <stop offset="0%" stop-color="#14141e"/>
+      <stop offset="100%" stop-color="#0a0a0f"/>
+    </radialGradient>
+
+    <!-- Gold gradient for eye elements -->
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f5d060"/>
+      <stop offset="40%" stop-color="#c9a227"/>
+      <stop offset="100%" stop-color="#a07820"/>
+    </linearGradient>
+
+    <!-- Gold radial for pupil -->
+    <radialGradient id="pupilGrad" cx="45%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#f5d060"/>
+      <stop offset="60%" stop-color="#c9a227"/>
+      <stop offset="100%" stop-color="#8a6510"/>
+    </radialGradient>
+
+    <!-- Cyan gradient for circuit traces -->
+    <linearGradient id="cyanFade" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#00d4ff" stop-opacity="0"/>
+      <stop offset="50%" stop-color="#00d4ff"/>
+      <stop offset="100%" stop-color="#00d4ff" stop-opacity="0"/>
+    </linearGradient>
+
+    <!-- Gold horizontal glow fade -->
+    <linearGradient id="goldFadeH" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#c9a227" stop-opacity="0"/>
+      <stop offset="30%" stop-color="#c9a227"/>
+      <stop offset="70%" stop-color="#c9a227"/>
+      <stop offset="100%" stop-color="#c9a227" stop-opacity="0"/>
+    </linearGradient>
+
+    <!-- Gold glow filter -->
+    <filter id="goldGlow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="5" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- Subtle glow filter -->
+    <filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- Cyan glow filter -->
+    <filter id="cyanGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- Text glow -->
+    <filter id="textGlow" x="-15%" y="-50%" width="130%" height="200%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="5" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- Iris fill gradient -->
+    <radialGradient id="irisGrad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#c9a227" stop-opacity="0.25"/>
+      <stop offset="70%" stop-color="#c9a227" stop-opacity="0.08"/>
+      <stop offset="100%" stop-color="#c9a227" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- ── Background ── -->
+  <rect width="500" height="500" fill="url(#bgGrad)" rx="24"/>
+
+  <!-- ── PCB Corner Brackets ── -->
+  <g opacity="0.4" stroke="#c9a227" stroke-width="1.8" fill="none">
+    <polyline points="28,58 28,28 58,28"/>
+    <polyline points="442,28 472,28 472,58"/>
+    <polyline points="28,442 28,472 58,472"/>
+    <polyline points="472,442 472,472 442,472"/>
+  </g>
+  <g opacity="0.3" fill="#c9a227">
+    <circle cx="28" cy="28" r="2.5"/>
+    <circle cx="472" cy="28" r="2.5"/>
+    <circle cx="28" cy="472" r="2.5"/>
+    <circle cx="472" cy="472" r="2.5"/>
+  </g>
+
+  <!-- ── Circuit Traces (background layer) ── -->
+  <!-- Left horizontal trace -->
+  <line x1="10" y1="205" x2="90" y2="205" stroke="#00d4ff" stroke-width="1.5" opacity="0.2"/>
+  <line x1="10" y1="220" x2="70" y2="220" stroke="#00d4ff" stroke-width="1" opacity="0.12"/>
+  <!-- Right horizontal trace -->
+  <line x1="410" y1="205" x2="490" y2="205" stroke="#00d4ff" stroke-width="1.5" opacity="0.2"/>
+  <line x1="430" y1="220" x2="490" y2="220" stroke="#00d4ff" stroke-width="1" opacity="0.12"/>
+  <!-- Top vertical trace -->
+  <line x1="250" y1="10" x2="250" y2="90" stroke="#00d4ff" stroke-width="1.5" opacity="0.2"/>
+  <line x1="238" y1="10" x2="238" y2="72" stroke="#00d4ff" stroke-width="1" opacity="0.12"/>
+  <!-- Diagonal micro traces -->
+  <line x1="88" y1="145" x2="115" y2="158" stroke="#c9a227" stroke-width="1" opacity="0.15"/>
+  <line x1="412" y1="145" x2="385" y2="158" stroke="#c9a227" stroke-width="1" opacity="0.15"/>
+
+  <!-- PCB junction dots -->
+  <circle cx="90" cy="205" r="3.5" fill="#00d4ff" opacity="0.55" filter="url(#cyanGlow)"/>
+  <circle cx="410" cy="205" r="3.5" fill="#00d4ff" opacity="0.55" filter="url(#cyanGlow)"/>
+  <circle cx="250" cy="90" r="3.5" fill="#00d4ff" opacity="0.55" filter="url(#cyanGlow)"/>
+  <circle cx="90" cy="205" r="6" fill="#00d4ff" opacity="0.12"/>
+  <circle cx="410" cy="205" r="6" fill="#00d4ff" opacity="0.12"/>
+
+  <!-- ── Eye of Horus — Main Shape ── -->
+  <!-- Outer eye shadow/glow layer -->
+  <path d="M95,205 C148,112 352,112 405,205 C352,298 148,298 95,205 Z"
+        fill="rgba(201,162,39,0.06)" stroke="none"/>
+
+  <!-- Eye outline -->
+  <path d="M95,205 C148,112 352,112 405,205 C352,298 148,298 95,205 Z"
+        fill="none"
+        stroke="url(#goldGrad)"
+        stroke-width="3.5"
+        filter="url(#goldGlow)"/>
+
+  <!-- Inner eye glow fill -->
+  <path d="M95,205 C148,112 352,112 405,205 C352,298 148,298 95,205 Z"
+        fill="url(#irisGrad)"
+        stroke="none"/>
+
+  <!-- ── Iris (outer ring) ── -->
+  <circle cx="250" cy="205" r="56"
+          fill="url(#irisGrad)"
+          stroke="url(#goldGrad)"
+          stroke-width="3"
+          filter="url(#softGlow)"/>
+
+  <!-- Iris inner ring -->
+  <circle cx="250" cy="205" r="38"
+          fill="none"
+          stroke="#c9a227"
+          stroke-width="1.5"
+          opacity="0.55"/>
+
+  <!-- Cyan iris ring -->
+  <circle cx="250" cy="205" r="44"
+          fill="none"
+          stroke="#00d4ff"
+          stroke-width="1"
+          opacity="0.45"
+          filter="url(#cyanGlow)"/>
+
+  <!-- ── Pupil ── -->
+  <circle cx="250" cy="205" r="20"
+          fill="url(#pupilGrad)"
+          filter="url(#goldGlow)"/>
+  <circle cx="250" cy="205" r="10"
+          fill="#f5d060"
+          opacity="0.9"/>
+  <!-- Pupil catchlight -->
+  <circle cx="243" cy="198" r="5"
+          fill="white"
+          opacity="0.18"/>
+
+  <!-- Pupil center dot -->
+  <circle cx="250" cy="205" r="4"
+          fill="#0a0a0f"
+          opacity="0.7"/>
+
+  <!-- ── Eyebrow / Upper Arch ── -->
+  <path d="M150,155 Q250,108 350,155"
+        fill="none"
+        stroke="url(#goldGrad)"
+        stroke-width="3.2"
+        stroke-linecap="round"
+        filter="url(#goldGlow)"/>
+
+  <!-- ── Left eye corner hook ── -->
+  <path d="M100,200 Q80,205 78,218"
+        fill="none"
+        stroke="#c9a227"
+        stroke-width="2.2"
+        stroke-linecap="round"
+        opacity="0.75"
+        filter="url(#softGlow)"/>
+
+  <!-- ── Right eye corner hook ── -->
+  <path d="M400,200 Q420,205 422,218"
+        fill="none"
+        stroke="#c9a227"
+        stroke-width="2.2"
+        stroke-linecap="round"
+        opacity="0.75"
+        filter="url(#softGlow)"/>
+
+  <!-- ── Horus Eye — Distinctive Lower Markings ── -->
+  <!-- Curved teardrop mark (right, below eye) -->
+  <path d="M310,262 Q336,282 330,310 Q322,332 306,322 Q290,308 298,278 Z"
+        fill="rgba(201,162,39,0.08)"
+        stroke="url(#goldGrad)"
+        stroke-width="2.8"
+        filter="url(#softGlow)"/>
+
+  <!-- Vertical stroke dropping from teardrop -->
+  <line x1="315" y1="322" x2="315" y2="355"
+        stroke="#c9a227"
+        stroke-width="2.8"
+        stroke-linecap="round"
+        filter="url(#softGlow)"/>
+
+  <!-- Horizontal base bar (Egyptian symbol) -->
+  <line x1="288" y1="355" x2="346" y2="355"
+        stroke="url(#goldGrad)"
+        stroke-width="2.8"
+        stroke-linecap="round"
+        filter="url(#softGlow)"/>
+
+  <!-- ── Horizontal scan line through eye ── -->
+  <line x1="95" y1="205" x2="405" y2="205"
+        stroke="url(#cyanFade)"
+        stroke-width="0.8"
+        opacity="0.4"/>
+
+  <!-- ── Title Text ── -->
+  <g filter="url(#textGlow)">
+    <text x="250" y="425"
+          font-family="Cinzel, Georgia, serif"
+          font-size="38"
+          font-weight="700"
+          fill="url(#goldGrad)"
+          text-anchor="middle"
+          letter-spacing="10">HORUS OS</text>
+  </g>
+
+  <!-- Gold decorative line under title -->
+  <line x1="160" y1="434" x2="340" y2="434"
+        stroke="url(#goldFadeH)"
+        stroke-width="1"/>
+
+  <!-- Subtitle -->
+  <text x="250" y="455"
+        font-family="'JetBrains Mono', monospace"
+        font-size="10.5"
+        font-weight="400"
+        fill="#00d4ff"
+        text-anchor="middle"
+        letter-spacing="5"
+        opacity="0.82">EMBEDDED INTELLIGENCE</text>
+
+  <!-- Creator credit (small) -->
+  <text x="250" y="486"
+        font-family="Arial, sans-serif"
+        font-size="8.5"
+        fill="#555577"
+        text-anchor="middle"
+        letter-spacing="2">v1.0.0  ·  CREATED BY ALAA SABER</text>
+</svg>

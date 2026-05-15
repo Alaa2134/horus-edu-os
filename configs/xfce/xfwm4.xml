@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  HORUS OS XFWM4 Window Manager Configuration
+  Matches the dark glassmorphism aesthetic.
+  Deploy to: ~/.config/xfce4/xfconf/xfce-perchannel-xml/xfwm4.xml
+-->
+<channel name="xfwm4" version="1.0">
+
+  <!-- Window theme -->
+  <property name="general" type="empty">
+    <property name="theme"               type="string" value="Horus-Dark"/>
+    <property name="title_font"          type="string" value="Inter Semi-Bold 10"/>
+    <property name="title_alignment"     type="string" value="center"/>
+
+    <!-- Window decorations -->
+    <property name="button_layout"       type="string" value="C|HMX"/>
+    <property name="button_offset"       type="int"    value="0"/>
+    <property name="button_spacing"      type="int"    value="0"/>
+    <property name="title_shadow_active" type="string" value="frame"/>
+    <property name="title_shadow_inactive" type="string" value="false"/>
+
+    <!-- Compositor (Picom handles this, but keep XFWM compositor off) -->
+    <property name="use_compositing"     type="bool"   value="false"/>
+
+    <!-- Snapping and tiling -->
+    <property name="snap_windows"        type="bool"   value="true"/>
+    <property name="snap_width"          type="int"    value="10"/>
+    <property name="snap_to_border"      type="bool"   value="true"/>
+    <property name="snap_to_windows"     type="bool"   value="true"/>
+    <property name="tile_on_move"        type="bool"   value="true"/>
+    <property name="wrap_windows"        type="bool"   value="false"/>
+
+    <!-- Focus -->
+    <property name="click_to_focus"      type="bool"   value="true"/>
+    <property name="focus_new"           type="bool"   value="true"/>
+    <property name="raise_on_focus"      type="bool"   value="false"/>
+    <property name="focus_hint"          type="bool"   value="true"/>
+
+    <!-- Animation -->
+    <property name="activate_action"     type="string" value="bring"/>
+    <property name="placement_mode"      type="string" value="center"/>
+
+    <!-- Workspaces -->
+    <property name="workspace_count"     type="int"    value="2"/>
+  </property>
+</channel>

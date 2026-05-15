@@ -1,0 +1,31 @@
+[Unit]
+Description=HORUS AI Assistant — Embedded Intelligence Backend
+Documentation=https://github.com/alaasaber/horus-os
+After=network.target ollama.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=horus-user
+Group=horus-user
+WorkingDirectory=/opt/horus/horus-ai-assistant
+ExecStart=/usr/bin/python3 -m uvicorn main:app --host 0.0.0.0 --port 8421 --workers 1
+Restart=on-failure
+RestartSec=10s
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=horus-ai
+
+# Ollama endpoint — localhost by default
+Environment=OLLAMA_HOST=http://localhost:11434
+Environment=OPENAI_API_KEY=
+
+# Resource limits (Ollama runs heavy; this is just the FastAPI proxy)
+MemoryMax=512M
+CPUQuota=20%
+
+NoNewPrivileges=yes
+PrivateTmp=yes
+
+[Install]
+WantedBy=multi-user.target

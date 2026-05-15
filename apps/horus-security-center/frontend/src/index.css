@@ -1,0 +1,97 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --gold: #c9a227;
+  --cyan: #00d4ff;
+  --bg:   #0a0a0f;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  background: var(--bg);
+  color: #e8e8f0;
+  font-family: 'Inter', sans-serif;
+  margin: 0;
+}
+
+@layer components {
+  .glass-card {
+    @apply rounded-xl border border-horus-border bg-horus-surface/80 p-5;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 4px 24px rgba(201,162,39,0.08);
+  }
+
+  .glass-card-red {
+    @apply rounded-xl border border-red-900/40 bg-horus-surface/80 p-5;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 4px 24px rgba(255,68,68,0.10);
+  }
+
+  .glass-card-green {
+    @apply rounded-xl border border-green-900/40 bg-horus-surface/80 p-5;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 4px 24px rgba(0,255,136,0.10);
+  }
+
+  .sec-title {
+    @apply font-display text-horus-gold text-lg font-bold tracking-wider;
+  }
+
+  .badge-pass {
+    @apply inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-mono;
+    background: rgba(0,255,136,0.12);
+    color: #00ff88;
+    border: 1px solid rgba(0,255,136,0.25);
+  }
+
+  .badge-fail {
+    @apply inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-mono;
+    background: rgba(255,68,68,0.12);
+    color: #ff4444;
+    border: 1px solid rgba(255,68,68,0.25);
+  }
+
+  .badge-warn {
+    @apply inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-mono;
+    background: rgba(255,140,0,0.12);
+    color: #ff8c00;
+    border: 1px solid rgba(255,140,0,0.25);
+  }
+
+  .nav-item {
+    @apply flex items-center gap-3 px-4 py-2.5 rounded-lg text-horus-muted
+           cursor-pointer transition-all duration-200 text-sm font-ui;
+  }
+  .nav-item:hover { @apply text-horus-text bg-horus-border/50; }
+  .nav-item.active { @apply text-horus-gold bg-horus-gold/10; }
+
+  .btn-gold {
+    @apply px-4 py-2 rounded-lg font-mono text-sm font-medium
+           bg-horus-gold/20 text-horus-gold border border-horus-gold/40
+           hover:bg-horus-gold/30 transition-all;
+  }
+
+  .btn-red {
+    @apply px-4 py-2 rounded-lg font-mono text-sm font-medium
+           bg-red-900/20 text-red-400 border border-red-800/40
+           hover:bg-red-900/30 transition-all;
+  }
+
+  .btn-green {
+    @apply px-4 py-2 rounded-lg font-mono text-sm font-medium
+           bg-green-900/20 text-green-400 border border-green-800/40
+           hover:bg-green-900/30 transition-all;
+  }
+
+  .data-row {
+    @apply flex items-center justify-between py-2.5 border-b border-horus-border/40 text-sm;
+  }
+
+  .log-line {
+    @apply font-mono text-xs py-1 px-2 border-b border-horus-border/20;
+  }
+}

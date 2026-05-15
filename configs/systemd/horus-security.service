@@ -1,0 +1,24 @@
+[Unit]
+Description=HORUS Security Center — Firewall and Privacy Dashboard
+Documentation=https://github.com/alaasaber/horus-os
+After=network.target ufw.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+Group=root
+WorkingDirectory=/opt/horus/horus-security-center
+ExecStart=/usr/bin/python3 -m uvicorn main:app --host 127.0.0.1 --port 8422 --workers 1
+Restart=on-failure
+RestartSec=5s
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=horus-security
+
+# Security Center needs root for UFW/iptables queries
+MemoryMax=128M
+CPUQuota=10%
+
+[Install]
+WantedBy=multi-user.target

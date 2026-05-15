@@ -1,0 +1,8 @@
+[Plymouth Theme]
+Name=HORUS OS
+Description=Boot splash for HORUS OS — Embedded Intelligence Platform
+ModuleName=script
+
+[script]
+ImageDir=/usr/share/plymouth/themes/horus
+ScriptFile=/usr/share/plymouth/themes/horus/horus.script
