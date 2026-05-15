@@ -1,0 +1,1288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HORUS OS — Presentation</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --gold: #c9a227;
+  --gold2: #e8c547;
+  --cyan: #00d4ff;
+  --cyan2: #4de8ff;
+  --bg: #0a0a0f;
+  --bg2: #0f0f18;
+  --surface: #14141f;
+  --surface2: #1a1a28;
+  --text: #e8e8f0;
+  --text2: #9898b0;
+  --green: #00ff88;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  overflow: hidden;
+  height: 100vh;
+  width: 100vw;
+  user-select: none;
+}
+
+/* ── DECK ── */
+.deck { width: 100%; height: 100vh; position: relative; }
+
+.slide {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 3rem 5rem;
+  opacity: 0;
+  transform: translateX(60px);
+  transition: opacity .45s ease, transform .45s ease;
+  pointer-events: none;
+  overflow: hidden;
+}
+.slide.active {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: all;
+}
+.slide.prev {
+  opacity: 0;
+  transform: translateX(-60px);
+}
+
+/* Shared grid bg */
+.slide::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(201,162,39,.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(201,162,39,.025) 1px, transparent 1px);
+  background-size: 60px 60px;
+  pointer-events: none;
+}
+
+/* ── LOGO WATERMARK ── */
+.slide-logo {
+  position: absolute;
+  bottom: 1.5rem;
+  left: 2rem;
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  opacity: .35;
+}
+.slide-logo svg { width: 22px; height: 22px; }
+.slide-logo span {
+  font-family: 'Cinzel', serif;
+  font-size: .65rem;
+  color: var(--gold);
+  letter-spacing: .12em;
+}
+
+/* ── PROGRESS ── */
+#progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--gold), var(--cyan));
+  transition: width .4s ease;
+  z-index: 100;
+}
+
+#slide-counter {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 2rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .7rem;
+  color: var(--text2);
+  z-index: 100;
+  letter-spacing: .05em;
+}
+
+/* ── NAV ── */
+.nav-btn {
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(201,162,39,.08);
+  border: 1px solid rgba(201,162,39,.2);
+  color: var(--gold);
+  width: 42px; height: 42px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 1.1rem;
+  display: flex; align-items: center; justify-content: center;
+  transition: .2s;
+  z-index: 100;
+}
+.nav-btn:hover { background: rgba(201,162,39,.18); }
+#btn-prev { left: 1.2rem; }
+#btn-next { right: 1.2rem; }
+
+/* ── TYPOGRAPHY ── */
+.eyebrow {
+  font-family: 'Cinzel', serif;
+  font-size: .75rem;
+  color: var(--cyan);
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  margin-bottom: .75rem;
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+}
+.eyebrow::before, .eyebrow::after { content: '—'; opacity: .4; }
+
+h1 {
+  font-family: 'Cinzel', serif;
+  font-size: clamp(2.8rem, 6vw, 5rem);
+  font-weight: 900;
+  background: linear-gradient(135deg, var(--gold) 0%, var(--gold2) 50%, var(--cyan) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1.1;
+  text-align: center;
+  margin-bottom: .5rem;
+}
+
+h2 {
+  font-family: 'Cinzel', serif;
+  font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+  font-weight: 700;
+  color: var(--gold);
+  line-height: 1.2;
+  margin-bottom: 1.5rem;
+}
+
+h3 {
+  font-family: 'Cinzel', serif;
+  font-size: 1.1rem;
+  color: var(--cyan);
+  margin-bottom: .6rem;
+  letter-spacing: .05em;
+}
+
+p, li {
+  font-size: clamp(.9rem, 1.6vw, 1.05rem);
+  line-height: 1.7;
+  color: var(--text2);
+}
+
+.lead {
+  font-size: clamp(1rem, 1.8vw, 1.2rem);
+  color: var(--text);
+  line-height: 1.65;
+}
+
+.gold { color: var(--gold); }
+.cyan { color: var(--cyan); }
+.green { color: var(--green); }
+.white { color: var(--text); }
+
+/* ── DIVIDER ── */
+.divider {
+  width: 120px; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  margin: 1rem auto;
+}
+
+.sep {
+  width: 60px; height: 2px;
+  background: linear-gradient(90deg, var(--gold), var(--cyan));
+  margin-bottom: 1.5rem;
+  border-radius: 1px;
+}
+
+/* ── BULLETS ── */
+.bullets {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: .65rem;
+  max-width: 700px;
+}
+.bullets li {
+  display: flex;
+  align-items: flex-start;
+  gap: .75rem;
+  color: var(--text);
+}
+.bullets li::before {
+  content: '▸';
+  color: var(--gold);
+  flex-shrink: 0;
+  margin-top: .05em;
+}
+.bullets li span { color: var(--text2); }
+
+/* ── TWO COLUMNS ── */
+.cols2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2.5rem;
+  width: 100%;
+  max-width: 1000px;
+}
+.col-box {
+  background: var(--surface);
+  border: 1px solid rgba(201,162,39,.15);
+  border-radius: 4px;
+  padding: 1.5rem;
+}
+.col-box.cyan-border { border-color: rgba(0,212,255,.2); }
+.col-box h3 { font-size: .85rem; margin-bottom: 1rem; }
+
+/* ── CODE BLOCK ── */
+pre, code {
+  font-family: 'JetBrains Mono', monospace;
+}
+.code-block {
+  background: #0d0d16;
+  border: 1px solid rgba(201,162,39,.15);
+  border-left: 3px solid var(--gold);
+  border-radius: 4px;
+  padding: 1.25rem 1.5rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .82rem;
+  color: var(--text);
+  line-height: 1.7;
+  width: 100%;
+  max-width: 800px;
+  overflow-x: auto;
+}
+.code-block .comment { color: #4a4a6a; }
+.code-block .cmd { color: var(--cyan); }
+.code-block .flag { color: var(--gold); }
+.code-block .out { color: var(--green); }
+.code-block .path { color: #c084fc; }
+
+/* ── TABLE ── */
+.data-table {
+  width: 100%;
+  max-width: 800px;
+  border-collapse: collapse;
+  font-size: .88rem;
+}
+.data-table th {
+  font-family: 'Cinzel', serif;
+  color: var(--gold);
+  font-size: .75rem;
+  letter-spacing: .1em;
+  text-align: left;
+  padding: .6rem 1rem;
+  border-bottom: 1px solid rgba(201,162,39,.3);
+}
+.data-table td {
+  padding: .55rem 1rem;
+  color: var(--text2);
+  border-bottom: 1px solid rgba(255,255,255,.04);
+}
+.data-table td:first-child { color: var(--text); font-weight: 500; }
+.data-table tr:hover td { background: rgba(201,162,39,.04); }
+
+/* ── ARCH DIAGRAM ── */
+.arch-layers {
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+  width: 100%;
+  max-width: 780px;
+}
+.arch-layer {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 1rem;
+  align-items: center;
+}
+.arch-label {
+  font-family: 'Cinzel', serif;
+  font-size: .72rem;
+  color: var(--text2);
+  letter-spacing: .1em;
+  text-align: right;
+}
+.arch-bar {
+  border-radius: 3px;
+  padding: .55rem 1rem;
+  font-size: .82rem;
+  font-family: 'JetBrains Mono', monospace;
+  border: 1px solid rgba(255,255,255,.06);
+  color: var(--text);
+  background: var(--surface);
+}
+
+/* ── STAT CARDS ── */
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  width: 100%;
+  max-width: 900px;
+}
+.stat-card {
+  background: var(--surface);
+  border: 1px solid rgba(201,162,39,.15);
+  border-radius: 4px;
+  padding: 1.25rem 1rem;
+  text-align: center;
+}
+.stat-num {
+  font-family: 'Cinzel', serif;
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: var(--gold);
+  line-height: 1;
+  margin-bottom: .3rem;
+}
+.stat-label {
+  font-size: .72rem;
+  color: var(--text2);
+  letter-spacing: .08em;
+}
+
+/* ── QUOTE ── */
+.quote-block {
+  border-left: 3px solid var(--gold);
+  padding: 1rem 1.5rem;
+  max-width: 780px;
+  background: rgba(201,162,39,.04);
+  border-radius: 0 4px 4px 0;
+}
+.quote-block p {
+  font-size: 1.15rem;
+  font-style: italic;
+  color: var(--text);
+  line-height: 1.7;
+}
+.quote-block .ar {
+  color: var(--text2);
+  margin-top: .5rem;
+  font-size: 1rem;
+}
+
+/* ── COVER specific ── */
+.cover-subtitle {
+  font-family: 'Cinzel', serif;
+  font-size: clamp(1rem, 2.5vw, 1.6rem);
+  color: var(--cyan);
+  letter-spacing: .3em;
+  text-transform: uppercase;
+  margin-bottom: .5rem;
+}
+.cover-arabic {
+  font-size: 1.1rem;
+  color: var(--text2);
+  letter-spacing: .05em;
+  margin-bottom: 2rem;
+  font-family: 'Cairo', sans-serif;
+}
+.cover-footer {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .75rem;
+  color: rgba(201,162,39,.5);
+  letter-spacing: .15em;
+  margin-top: 2rem;
+}
+
+/* ── BADGE CHIPS ── */
+.chips {
+  display: flex;
+  gap: .6rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: .75rem;
+}
+.chip {
+  padding: .3rem .9rem;
+  border-radius: 2px;
+  font-size: .72rem;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+.chip-gold { background: rgba(201,162,39,.1); border: 1px solid rgba(201,162,39,.3); color: var(--gold); }
+.chip-cyan { background: rgba(0,212,255,.08); border: 1px solid rgba(0,212,255,.25); color: var(--cyan); }
+.chip-green { background: rgba(0,255,136,.08); border: 1px solid rgba(0,255,136,.25); color: var(--green); }
+.chip-purple { background: rgba(192,132,252,.08); border: 1px solid rgba(192,132,252,.25); color: #c084fc; }
+
+/* ── ROADMAP TABLE ── */
+.roadmap-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  width: 100%;
+  max-width: 1000px;
+}
+.roadmap-card {
+  background: var(--surface);
+  border: 1px solid rgba(201,162,39,.12);
+  border-top: 2px solid var(--gold);
+  border-radius: 4px;
+  padding: 1.25rem 1rem;
+}
+.roadmap-ver {
+  font-family: 'Cinzel', serif;
+  font-size: 1.1rem;
+  color: var(--gold);
+  font-weight: 700;
+  margin-bottom: .25rem;
+}
+.roadmap-focus {
+  font-size: .72rem;
+  color: var(--cyan);
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  margin-bottom: .75rem;
+  padding-bottom: .5rem;
+  border-bottom: 1px solid rgba(255,255,255,.06);
+}
+.roadmap-items { list-style: none; }
+.roadmap-items li {
+  font-size: .8rem;
+  color: var(--text2);
+  padding: .2rem 0;
+  display: flex;
+  gap: .4rem;
+  align-items: flex-start;
+}
+.roadmap-items li::before { content: '·'; color: var(--gold); flex-shrink: 0; }
+
+/* ── LIVE DEMO ── */
+.demo-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: .6rem 0;
+  border-bottom: 1px solid rgba(255,255,255,.04);
+  max-width: 700px;
+  width: 100%;
+}
+.demo-num {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: rgba(201,162,39,.1);
+  border: 1px solid rgba(201,162,39,.3);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Cinzel', serif;
+  font-size: .8rem;
+  color: var(--gold);
+  flex-shrink: 0;
+}
+
+/* ── COVER GLOW ── */
+.horus-glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(201,162,39,.06) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+/* ── FEATURE CARD ── */
+.feat-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  width: 100%;
+  max-width: 1000px;
+}
+.feat-card {
+  background: var(--surface);
+  border: 1px solid rgba(201,162,39,.1);
+  border-radius: 4px;
+  padding: 1.25rem;
+  transition: .2s;
+}
+.feat-card:hover { border-color: rgba(201,162,39,.3); }
+.feat-icon { font-size: 1.6rem; margin-bottom: .6rem; }
+.feat-title {
+  font-family: 'Cinzel', serif;
+  font-size: .82rem;
+  color: var(--gold);
+  margin-bottom: .4rem;
+  letter-spacing: .05em;
+}
+.feat-desc { font-size: .8rem; color: var(--text2); line-height: 1.55; }
+
+/* ── KEYBOARD HINT ── */
+#key-hint {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .65rem;
+  color: rgba(152,152,176,.4);
+  letter-spacing: .1em;
+  z-index: 100;
+}
+
+/* ── SLIDE THUMBNAILS ── */
+#dot-nav {
+  position: fixed;
+  top: 1.2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 4px;
+  z-index: 100;
+}
+.dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: rgba(201,162,39,.2);
+  cursor: pointer;
+  transition: .2s;
+}
+.dot.active { background: var(--gold); width: 18px; border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<div id="progress-bar"></div>
+<div id="dot-nav"></div>
+<div id="slide-counter"></div>
+<div id="key-hint">← → ARROW KEYS · SPACE · F for fullscreen</div>
+
+<button class="nav-btn" id="btn-prev" onclick="changeSlide(-1)">←</button>
+<button class="nav-btn" id="btn-next" onclick="changeSlide(1)">→</button>
+
+<div class="deck" id="deck">
+
+<!-- ══════════════════════════════════════════════════════
+     SLIDE 1 — COVER
+════════════════════════════════════════════════════════ -->
+<div class="slide active" data-slide="1">
+  <div class="horus-glow"></div>
+  <!-- Big Eye of Horus SVG -->
+  <svg width="90" height="90" viewBox="0 0 80 80" fill="none" style="margin-bottom:1.5rem;filter:drop-shadow(0 0 20px rgba(201,162,39,.4))">
+    <ellipse cx="40" cy="38" rx="24" ry="14" stroke="#c9a227" stroke-width="2.5"/>
+    <circle cx="40" cy="38" r="8" fill="#c9a227" opacity=".9"/>
+    <circle cx="40" cy="38" r="3.5" fill="#0a0a0f"/>
+    <path d="M40 52 Q50 60 46 70 Q40 75 34 70 Q30 60 40 52Z" stroke="#c9a227" stroke-width="2" fill="rgba(201,162,39,0.2)"/>
+    <path d="M40 52 Q26 57 22 67" stroke="#c9a227" stroke-width="1.8" fill="none"/>
+    <path d="M16 38 Q20 46 28 46" stroke="#c9a227" stroke-width="1.8" fill="none"/>
+    <path d="M64 38 Q60 30 52 28" stroke="#c9a227" stroke-width="1.8" fill="none"/>
+  </svg>
+  <div class="cover-subtitle">Intelligence Awakened</div>
+  <h1>HORUS OS</h1>
+  <div class="divider"></div>
+  <div class="cover-arabic">نظام حورس — ذكاء مدمج للمستقبل</div>
+  <div class="chips">
+    <span class="chip chip-gold">Custom Linux OS</span>
+    <span class="chip chip-cyan">AI-Powered</span>
+    <span class="chip chip-green">Built From Scratch</span>
+    <span class="chip chip-purple">Competition 2026</span>
+  </div>
+  <div class="cover-footer">Alaa Saber · alaa00saber@gmail.com · University Competition · 2026</div>
+  <div class="slide-logo">
+    <svg width="22" height="22" viewBox="0 0 80 80" fill="none"><ellipse cx="40" cy="38" rx="24" ry="14" stroke="#c9a227" stroke-width="2.5"/><circle cx="40" cy="38" r="7" fill="#c9a227" opacity="0.9"/><circle cx="40" cy="38" r="3" fill="#0a0a0f"/><path d="M40 52 Q48 58 44 68 Q40 72 36 68 Q32 58 40 52Z" stroke="#c9a227" stroke-width="1.8" fill="rgba(201,162,39,0.15)"/></svg>
+    <span>HORUS OS</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     SLIDE 2 — THE PROBLEM
+════════════════════════════════════════════════════════ -->
+<div class="slide" data-slide="2">
+  <div class="eyebrow">The Challenge</div>
+  <h2>The Problem We Solved</h2>
+  <div class="sep"></div>
+  <ul class="bullets" style="max-width:680px">
+    <li>Embedded systems students work with <span class="gold">fragmented, incompatible tools</span></li>
+    <li>No unified, purpose-built OS for embedded learning exists</li>
+    <li>Generic distros require <span class="gold">hours of configuration</span> before first use</li>
+    <li>No integrated AI assistance for real hardware debugging work</li>
+    <li>No competition-ready, professional student OS in the market</li>
+    <li>Arabic-language engineering students have <span class="gold">zero native support</span></li>
+  </ul>
+  <div style="margin-top:1.5rem;background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.2);border-radius:4px;padding:1rem 1.5rem;max-width:680px;width:100%">
+    <p style="color:var(--cyan);font-style:italic;font-size:.95rem">"A student spends more time setting up tools than actually learning embedded systems."</p>
+  </div>
+  <div class="slide-logo"><svg width="22" height="22" viewBox="0 0 80 80" fill="none"><ellipse cx="40" cy="38" rx="24" ry="14" stroke="#c9a227" stroke-width="2.5"/><circle cx="40" cy="38" r="7" fill="#c9a227" opacity="0.9"/><circle cx="40" cy="38" r="3" fill="#0a0a0f"/></svg><span>HORUS OS</span></div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     SLIDE 3 — THE SOLUTION
+════════════════════════════════════════════════════════ -->
+<div class="slide" data-slide="3">
+  <div class="eyebrow">The Answer</div>
+  <h2>Introducing HORUS OS</h2>
+  <div class="sep"></div>
+  <div class="feat-grid">
+    <div class="feat-card">
+      <div class="feat-icon">💿</div>
+      <div class="feat-title">Complete OS</div>
+      <div class="feat-desc">Bootable ISO you can flash to any USB or run in VMware. Boot to desktop in 30 seconds.</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">🤖</div>
+      <div class="feat-title">Built-In AI</div>
+      <div class="feat-desc">Offline AI assistant running Ollama + Mistral 7B. Knows your hardware. No internet needed.</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">🔧</div>
+      <div class="feat-title">Ready to Work</div>
+      <div class="feat-desc">Python 3.11, Arduino CLI, PlatformIO, i2c-tools — pre-installed, pre-configured.</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">📊</div>
+      <div class="feat-title">Control Center</div>
+      <div class="feat-desc">Real-time CPU, RAM, temperature, network dashboard with live charts.</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">🛡</div>
+      <div class="feat-title">Security Center</div>
+      <div class="feat-desc">UFW firewall, SSH hardening, disk encryption, network monitoring — all pre-configured.</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">🌐</div>
+      <div class="feat-title">Bilingual</div>
+      <div class="feat-desc">Full Arabic + English support throughout. First OS built for Arab engineering students.</div>
+    </div>
+  </div>
+  <div class="slide-logo"><svg width="22" height="22" viewBox="0 0 80 80" fill="none"><ellipse cx="40" cy="38" rx="24" ry="14" stroke="#c9a227" stroke-width="2.5"/><circle cx="40" cy="38" r="7" fill="#c9a227" opacity="0.9"/><circle cx="40" cy="38" r="3" fill="#0a0a0f"/></svg><span>HORUS OS</span></div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     SLIDE 4 — WHAT IS IT
+════════════════════════════════════════════════════════ -->
+<div class="slide" data-slide="4">
+  <div class="eyebrow">Definition</div>
+  <h2>What Is HORUS OS?</h2>
+  <div class="sep"></div>
+  <div class="cols2">
+    <div class="col-box">
+      <h3>✅ What It IS</h3>
+      <ul class="bullets">
+        <li>A complete, installable operating system</li>
+        <li>Built on <span class="gold">Ubuntu 22.04 LTS</span> minimal base</li>
+        <li>Custom boot, desktop, and <span class="gold">5 original apps</span></li>
+        <li>Bootable ISO — flash to USB, run on real hardware</li>
+        <li>One student built it from scratch</li>
+      </ul>
+    </div>
+    <div class="col-box cyan-border">
+      <h3 style="color:var(--text2)">❌ What It Is NOT</h3>
+      <ul class="bullets">
+        <li><span style="color:var(--text2)">Not just a theme or wallpaper pack</span></li>
+        <li><span style="color:var(--text2)">Not an Ubuntu reskin</span></li>
+        <li><span style="color:var(--text2)">Not a VM-only or live demo only</span></li>
+        <li><span style="color:var(--text2)">Not based on an existing DE theme</span></li>
+        <li><span style="color:var(--text2)">Not a copied project</span></li>
+      </ul>
+    </div>
+  </div>
+  <div class="code-block" style="margin-top:1.5rem">
+    <span class="cmd">$ cat /etc/os-release</span><br>
+    <span class="out">NAME="HORUS OS"</span><br>
+    <span class="out">VERSION="1.0.0 (Ra)"</span><br>
+    <span class="out">ID=horus</span><br>
+    <span class="out">ID_LIKE=ubuntu</span><br>
+    <span class="out">HOME_URL="https://github.com/alaa00saber/horus-os"</span>
+  </div>
+  <div class="slide-logo"><svg width="22" height="22" viewBox="0 0 80 80" fill="none"><ellipse cx="40" cy="38" rx="24" ry="14" stroke="#c9a227" stroke-width="2.5"/><circle cx="40" cy="38" r="7" fill="#c9a227" opacity="0.9"/><circle cx="40" cy="38" r="3" fill="#0a0a0f"/></svg><span>HORUS OS</span></div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     SLIDE 5 — ARCHITECTURE
+════════════════════════════════════════════════════════ -->
+<div class="slide" data-slide="5">
+  <div class="eyebrow">System Design</div>
+  <h2>Architecture</h2>
+  <div class="sep"></div>
+  <div class="arch-layers">
+    <div class="arch-layer">
+      <div class="arch-label">APPLICATIONS</div>
+      <div class="arch-bar" style="background:rgba(201,162,39,.1);border-color:rgba(201,162,39,.3);color:var(--gold)">Control Center · AI Assistant · Demo Mode · Security Center · About</div>
+    </div>
+    <div class="arch-layer">
+      <div class="arch-label">DESKTOP</div>
+      <div class="arch-bar" style="background:rgba(0,212,255,.07);border-color:rgba(0,212,255,.2);color:var(--cyan)">XFCE4 + Horus Dark GTK Theme + Custom Panel + picom Compositor</div>
+    </div>
+    <div class="arch-layer">
+      <div class="arch-label">DISPLAY</div>
+      <div class="arch-bar">LightDM + Custom HORUS Greeter + Wallpaper Engine</div>
+    </div>
+    <div class="arch-layer">
+      <div class="arch-label">BOOT</div>
+      <div class="arch-bar">GRUB2 HORUS Theme → Plymouth Script Animation → systemd</div>
+    </div>
+    <div class="arch-layer">
+      <div class="arch-label">SYSTEM</div>
+      <div class="arch-bar" style="background:rgba(192,132,252,.06);border-color:rgba(192,132,252,.2);color:#c084fc">Ubuntu 22.04 LTS · AppArmor · UFW · systemd services</div>
+    </div>
+    <div class="arch-layer">
+      <div class="arch-label">HARDWARE</div>
+      <div class="arch-bar" style="background:rgba(0,255,136,.05);border-color:rgba(0,255,136,.15);color:var(--green)">x86_64 / ARM · GPIO · I2C · USB · Network · Storage</div>
+    </div>
+  </div>
+  <div class="slide-logo"><svg width="22" height="22" viewBox="0 0 80 80" fill="none"><ellipse cx="40" cy="38" rx="24" ry="14" stroke="#c9a227" stroke-width="2.5"/><circle cx="40" cy="38" r="7" fill="#c9a227" opacity="0.9"/><circle cx="40" cy="38" r="3" fill="#0a0a0f"/></svg><span>HORUS OS</span></div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     SLIDE 6 — BOOT EXPERIENCE
+════════════════════════════════════════════════════════ -->
+<div class="slide" data-slide="6">
+  <div class="eyebrow">First Impression</div>
+  <h2>From Power-On to Desktop</h2>
+  <div class="sep"></div>
+  <div class="cols2" style="max-width:900px">
+    <div>
+      <ul class="bullets">
+        <li><strong class="gold">GRUB2</strong> — Custom dark gold HORUS theme, 8s timeout, 5 boot options</li>
+        <li><strong class="gold">Plymouth</strong> — Written animation script: fade-in logo + gold progress bar + pulsing dots</li>
+        <li><strong class="gold">LightDM</strong> — Custom HORUS greeter, full-screen background, Arabic clock</li>
+        <li><strong class="gold">XFCE4 Desktop</strong> — Horus Dark GTK, custom panel, Arabic workspace names</li>
+        <li><strong class="gold">Auto-start</strong> — All 4 services start in background at login via systemd</li>
+      </ul>
+    </div>
+    <div class="code-block" style="max-width:100%;font-size:.75rem">
+      <span class="comment"># Plymouth animation script excerpt</span><br>
+      <span class="cmd">fun PaintProgress(progress)</span><br>
+      &nbsp;&nbsp;<span class="flag">bar.x = (Window.GetWidth() - BAR_W) / 2;</span><br>
+      &nbsp;&nbsp;<span class="flag">filled = Math.Int(progress * BAR_W);</span><br>
+      &nbsp;&nbsp;<span class="out"># Gold fill → cyan trail</span><br>
+      &nbsp;&nbsp;<span class="cmd">DrawBar(bar.x, bar.y, filled);</span><br>
+      end<br><br>
+      <span class="comment"># 3 pulsing dots animation</span><br>
+      <span class="cmd">fun PaintDots(t)</span><br>
+      &nbsp;&nbsp;<span class="flag">for (i=0; i&lt;3; i++)</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;<span class="out">opacity = Math.Sin(t*3 + i*1.2);</span><br>
+      end
+    </div>
+  </div>
+  <div class="slide-logo"><svg width="22" height="22" viewBox="0 0 80 80" fill="none"><ellipse cx="40" cy="38" rx="24" ry="14" stroke="#c9a227" stroke-width="2.5"/><circle cx="40" cy="38" r="7" fill="#c9a227" opacity="0.9"/><circle cx="40" cy="38" r="3" fill="#0a0a0f"/></svg><span>HORUS OS</span></div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     SLIDE 7 — CONTROL CENTER
+════════════════════════════════════════════════════════ -->
+<div class="slide" data-slide="7">
+  <div class="eyebrow">App #1</div>
+  <h2>HORUS Control Center</h2>
+  <div class="sep"></div>
+  <div class="cols2">
+    <div>
+      <ul class="bullets">
+        <li>Real-time <span class="gold">CPU, RAM, disk, network</span>, temperature, battery</li>
+        <li><strong class="gold">Python FastAPI</strong> backend reading from <code>/proc</code> and <code>/sys</code> directly</li>
+        <li><strong class="gold">React + Tailwind</strong> frontend with live WebSocket charts</li>
+        <li>Export full system report to PDF/JSON</li>
+        <li>Performance mode control: <span class="cyan">performance / balanced / powersave</span></li>
+        <li>Runs as systemd service → auto-starts at boot</li>
+      </ul>
+      <div class="chips" style="justify-content:flex-start;margin-top:1rem">
+        <span class="chip chip-cyan">localhost:8420</span>
+        <span class="chip chip-gold">FastAPI</span>
+        <span class="chip chip-purple">React + Tailwind</span>
+      </div>
+    </div>
+    <div class="code-block" style="max-width:100%;font-size:.75rem">
+      <span class="comment"># backend/main.py — live CPU reading</span><br>
+      <span class="cmd">@app.get("/api/stats")</span><br>
+      <span class="flag">async def get_stats():</span><br>
+      &nbsp;&nbsp;<span class="out">return {</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;<span class="out">"cpu": psutil.cpu_percent(0.1),</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;<span class="out">"ram": psutil.virtual_memory(),</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;<span class="out">"temp": get_cpu_temp(),</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;<span class="out">"net": psutil.net_io_counters()</span><br>
+      &nbsp;&nbsp;<span class="out">}</span><br><br>
+      <span class="cmd">$ curl localhost:8420/api/stats</span><br>
+      <span class="out">{"cpu": 23.4, "ram": {"percent": 31.2}, ...}</span>
+    </div>
+  </div>
+  <div class="slide-logo"><svg width="22" height="22" viewBox="0 0 80 80" fill="none"><ellipse cx="40" cy="38" rx="24" ry="14" stroke="#c9a227" stroke-width="2.5"/><circle cx="40" cy="38" r="7" fill="#c9a227" opacity="0.9"/><circle cx="40" cy="38" r="3" fill="#0a0a0f"/></svg><span>HORUS OS</span></div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     SLIDE 8 — AI ASSISTANT
+════════════════════════════════════════════════════════ -->
+<div class="slide" data-slide="8">
+  <div class="eyebrow">App #2</div>
+  <h2>HORUS AI — Built-In Intelligence</h2>
+  <div class="sep"></div>
+  <div class="cols2">
+    <div>
+      <ul class="bullets">
+        <li>Runs <strong class="gold">100% OFFLINE</strong> via Ollama + Mistral 7B (no internet)</li>
+        <li>Falls back to <span class="cyan">OpenAI API</span> when online</li>
+        <li>Knows your CPU model, RAM, OS version — <span class="gold">aware of THIS machine</span></li>
+        <li>Four modes: <span class="gold">Student · Engineer · Debug · Competition</span></li>
+        <li>Arabic + English conversation — answers in any language</li>
+        <li>Hardware Q&A: "why is my i2c device not detected?"</li>
+      </ul>
+      <div class="chips" style="justify-content:flex-start;margin-top:1rem">
+        <span class="chip chip-green">Offline-First</span>
+        <span class="chip chip-gold">Ollama</span>
+        <span class="chip chip-cyan">Mistral 7B</span>
+      </div>
+    </div>
+    <div style="background:var(--surface);border:1px solid rgba(201,162,39,.15);border-radius:6px;overflow:hidden;max-width:100%">
+      <div style="background:rgba(201,162,39,.08);padding:.6rem 1rem;border-bottom:1px solid rgba(201,162,39,.1);font-family:'Cinzel',serif;font-size:.72rem;color:var(--gold);letter-spacing:.1em">HORUS AI ASSISTANT — OFFLINE MODE</div>
+      <div style="padding:1rem;display:flex;flex-direction:column;gap:.6rem">
+        <div style="background:rgba(201,162,39,.08);border:1px solid rgba(201,162,39,.15);border-radius:4px;padding:.5rem .8rem;font-size:.8rem;color:var(--sand);align-self:flex-start;max-width:85%">ليه i2c sensor مش شغال مع sudo python3؟</div>
+        <div style="background:var(--surface2);border:1px solid rgba(255,255,255,.07);border-radius:4px;padding:.5rem .8rem;font-size:.8rem;color:var(--text);align-self:flex-end;max-width:90%">المشكلة في i2c group permissions. شغّل: <code style="color:var(--gold)">sudo usermod -aG i2c $USER</code> ثم logout وlogin مرة ثانية.</div>
+        <div style="background:rgba(201,162,39,.08);border:1px solid rgba(201,162,39,.15);border-radius:4px;padding:.5rem .8rem;font-size:.8rem;color:var(--sand);align-self:flex-start;max-width:85%">what CPU does this machine have?</div>
+        <div style="background:var(--surface2);border:1px solid rgba(255,255,255,.07);border-radius:4px;padding:.5rem .8rem;font-size:.8rem;color:var(--text);align-self:flex-end;max-width:90%">Your system is running an <span style="color:var(--gold)">Intel Core processor</span>. I can see 4 cores with base frequency from /proc/cpuinfo on HORUS OS 1.0.0.</div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-logo"><svg width="22" height="22" viewBox="0 0 80 80" fill="none"><ellipse cx="40" cy="38" rx="24" ry="14" stroke="#c9a227" stroke-width="2.5"/><circle cx="40" cy="38" r="7" fill="#c9a227" opacity="0.9"/><circle cx="40" cy="38" r="3" fill="#0a0a0f"/></svg><span>HORUS OS</span></div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     SLIDE 9 — DEMO MODE
+════════════════════════════════════════════════════════ -->
+<div class="slide" data-slide="9">
+  <div class="eyebrow">App #3</div>
+  <h2>HORUS Demo Mode</h2>
+  <div class="sep"></div>
+  <div class="cols2">
+    <ul class="bullets" style="max-width:100%">
+      <li>Full-screen <span class="gold">kiosk application</span> built for competitions</li>
+      <li>Live system statistics pulled from Control Center API</li>
+      <li>Complete OS story — bilingual <span class="gold">Arabic/English toggle</span></li>
+      <li>Auto-advances through sections with smooth animations</li>
+      <li>Shows real CPU, RAM, temperature — <span class="cyan">live on this machine</span></li>
+      <li>Used in <strong class="gold">this competition, right now</strong></li>
+      <li>Built with React + Vite, deployed via Chromium kiosk mode</li>
+    </ul>
+    <div class="code-block" style="max-width:100%;font-size:.75rem">
+      <span class="comment"># Launch Demo Mode</span><br>
+      <span class="cmd">$ horus-demo</span><br><br>
+      <span class="comment"># Behind the scenes:</span><br>
+      <span class="flag">chromium-browser \</span><br>
+      &nbsp;&nbsp;<span class="flag">--kiosk \</span><br>
+      &nbsp;&nbsp;<span class="flag">--app=file:///opt/horus/demo/index.html \</span><br>
+      &nbsp;&nbsp;<span class="flag">--disable-background-mode \</span><br>
+      &nbsp;&nbsp;<span class="flag">--no-first-run</span><br><br>
+      <span class="comment"># Or via systemd:</span><br>
+      <span class="cmd">$ systemctl start horus-demo</span>
+    </div>
+  </div>
+  <div class="slide-logo"><svg width="22" height="22" viewBox="0 0 80 80" fill="none"><ellipse cx="40" cy="38" rx="24" ry="14" stroke="#c9a227" stroke-width="2.5"/><circle cx="40" cy="38" r="7" fill="#c9a227" opacity="0.9"/><circle cx="40" cy="38" r="3" fill="#0a0a0f"/></svg><span>HORUS OS</span></div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     SLIDE 10 — DEVELOPER TOOLCHAIN
+════════════════════════════════════════════════════════ -->
+<div class="slide" data-slide="10">
+  <div class="eyebrow">Ready to Work</div>
+  <h2>Embedded Developer Toolchain</h2>
+  <div class="sep"></div>
+  <table class="data-table">
+    <thead>
+      <tr><th>Category</th><th>Tools</th><th>Status</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Languages</td><td>Python 3.11 · Node.js 18 · GCC 12 · Rust</td><td><span class="chip chip-green" style="font-size:.65rem">Pre-installed</span></td></tr>
+      <tr><td>Embedded</td><td>Arduino CLI · PlatformIO · esptool</td><td><span class="chip chip-green" style="font-size:.65rem">Pre-installed</span></td></tr>
+      <tr><td>Hardware</td><td>i2c-tools · libgpiod · minicom · picocom</td><td><span class="chip chip-green" style="font-size:.65rem">Pre-installed</span></td></tr>
+      <tr><td>Build</td><td>Git · CMake · Make · Docker · pkg-config</td><td><span class="chip chip-green" style="font-size:.65rem">Pre-installed</span></td></tr>
+      <tr><td>Monitor</td><td>htop · btop · fastfetch · iotop · nethogs</td><td><span class="chip chip-green" style="font-size:.65rem">Pre-installed</span></td></tr>
+      <tr><td>IDE</td><td>VS Code · Gedit · JetBrains Mono font</td><td><span class="chip chip-green" style="font-size:.65rem">Pre-installed</span></td></tr>
+    </tbody>
+  </table>
+  <div class="code-block" style="margin-top:1.5rem;font-size:.78rem">
+    <span class="cmd">$ arduino-cli board list</span>&nbsp;&nbsp;<span class="out">→ lists connected Arduino boards</span><br>
+    <span class="cmd">$ i2cdetect -y 1</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="out">→ scan I2C bus for connected sensors</span><br>
+    <span class="cmd">$ gpioinfo</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="out">→ list all GPIO lines on the system</span>
+  </div>
+  <div class="slide-logo"><svg width="22" height="22" viewBox="0 0 80 80" fill="none"><ellipse cx="40" cy="38" rx="24" ry="14" stroke="#c9a227" stroke-width="2.5"/><circle cx="40" cy="38" r="7" fill="#c9a227" opacity="0.9"/><circle cx="40" cy="38" r="3" fill="#0a0a0f"/></svg><span>HORUS OS</span></div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     SLIDE 11 — HARDWARE DEMO
+════════════════════════════════════════════════════════ -->
+<div class="slide" data-slide="11">
+  <div class="eyebrow">Real Hardware</div>
+  <h2>Embedded Hardware Control</h2>
+  <div class="sep"></div>
+  <div class="cols2">
+    <ul class="bullets" style="max-width:100%">
+      <li>GPIO control via Python + <span class="gold">libgpiod</span> (no deprecated RPi.GPIO)</li>
+      <li>I2C sensor scanning with <span class="gold">i2cdetect</span> + Python smbus2</li>
+      <li>Arduino compile and <span class="gold">upload from terminal</span> via arduino-cli</li>
+      <li>Serial monitor with minicom + auto-baud detection</li>
+      <li>ARM64 build available for <span class="cyan">Raspberry Pi 4</span></li>
+      <li>SPI, UART, PWM — all kernel modules loaded by default</li>
+    </ul>
+    <div class="code-block" style="max-width:100%;font-size:.75rem">
+      <span class="comment"># I2C scan — find connected sensors</span><br>
+      <span class="cmd">$ i2cdetect -y 1</span><br>
+      <span class="out">     0  1  2  3  4  5  6  7</span><br>
+      <span class="out">10: -- -- -- -- -- -- -- 17</span><br>
+      <span class="out">40: -- -- -- -- -- -- -- 48</span><br><br>
+      <span class="comment"># GPIO via Python + libgpiod</span><br>
+      <span class="cmd">import gpiod</span><br>
+      <span class="flag">chip = gpiod.Chip('gpiochip0')</span><br>
+      <span class="flag">line = chip.get_line(18)</span><br>
+      <span class="flag">line.request(consumer="horus", type=gpiod.LINE_REQ_DIR_OUT)</span><br>
+      <span class="out">line.set_value(1)  # LED ON</span>
+    </div>
+  </div>
+  <div class="slide-logo"><svg width="22" height="22" viewBox="0 0 80 80" fill="none"><ellipse cx="40" cy="38" rx="24" ry="14" stroke="#c9a227" stroke-width="2.5"/><circle cx="40" cy="38" r="7" fill="#c9a227" opacity="0.9"/><circle cx="40" cy="38" r="3" fill="#0a0a0f"/></svg><span>HORUS OS</span></div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     SLIDE 12 — SECURITY
+════════════════════════════════════════════════════════ -->
+<div class="slide" data-slide="12">
+  <div class="eyebrow">App #4</div>
+  <h2>HORUS Security Center</h2>
+  <div class="sep"></div>
+  <div class="cols2">
+    <ul class="bullets" style="max-width:100%">
+      <li><strong class="gold">UFW Firewall</strong> — deny all incoming by default, configured at first boot</li>
+      <li><strong class="gold">SSH Hardened</strong> — PasswordAuth disabled, key-only, port 2222</li>
+      <li><strong class="gold">AppArmor</strong> — mandatory access control for all apps</li>
+      <li><strong class="gold">LUKS Encryption</strong> — full disk encryption available at install</li>
+      <li>Network connections dashboard — live map of all connections</li>
+      <li>System log viewer with severity filtering</li>
+    </ul>
+    <div class="code-block" style="max-width:100%;font-size:.75rem">
+      <span class="comment"># UFW default rules</span><br>
+      <span class="cmd">$ sudo ufw status verbose</span><br>
+      <span class="out">Status: active</span><br>
+      <span class="out">Default: deny (incoming), allow (outgoing)</span><br>
+      <span class="out">To          Action    From</span><br>
+      <span class="out">2222/tcp    ALLOW IN  Anywhere</span><br><br>
+      <span class="comment"># AppArmor status</span><br>
+      <span class="cmd">$ sudo aa-status</span><br>
+      <span class="out">apparmor module is loaded.</span><br>
+      <span class="out">12 profiles are in enforce mode.</span>
+    </div>
+  </div>
+  <div class="slide-logo"><svg width="22" height="22" viewBox="0 0 80 80" fill="none"><ellipse cx="40" cy="38" rx="24" ry="14" stroke="#c9a227" stroke-width="2.5"/><circle cx="40" cy="38" r="7" fill="#c9a227" opacity="0.9"/><circle cx="40" cy="38" r="3" fill="#0a0a0f"/></svg><span>HORUS OS</span></div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     SLIDE 13 — BRANDING & IDENTITY
+════════════════════════════════════════════════════════ -->
+<div class="slide" data-slide="13">
+  <div class="eyebrow">Design Language</div>
+  <h2>The HORUS Identity</h2>
+  <div class="sep"></div>
+  <div class="cols2">
+    <div>
+      <ul class="bullets">
+        <li>Inspired by <span class="gold">Ancient Egyptian Horus mythology</span> + futuristic embedded intelligence</li>
+        <li><strong class="gold">Eye of Horus</strong> logo: divine protection + circuit board fusion</li>
+        <li>Cinzel (Egyptian classical) + Inter (modern UI) + JetBrains Mono</li>
+        <li>Glassmorphism dark UI throughout all apps</li>
+        <li>Full Arabic RTL support at OS level</li>
+      </ul>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:.75rem">
+      <div style="display:flex;gap:.75rem">
+        <div style="flex:1;height:50px;border-radius:3px;background:#c9a227;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:.65rem;color:#000;font-weight:700">#c9a227<br>Horus Gold</div>
+        <div style="flex:1;height:50px;border-radius:3px;background:#00d4ff;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:.65rem;color:#000;font-weight:700">#00d4ff<br>Electric Blue</div>
+        <div style="flex:1;height:50px;border-radius:3px;background:#00ff88;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:.65rem;color:#000;font-weight:700">#00ff88<br>Cyber Cyan</div>
+        <div style="flex:1;height:50px;border-radius:3px;background:#0a0a0f;border:1px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:.65rem;color:#fff;font-weight:700">#0a0a0f<br>Deep Black</div>
+      </div>
+      <div style="background:var(--surface);border:1px solid rgba(201,162,39,.15);border-radius:4px;padding:1rem;text-align:center">
+        <svg width="50" height="50" viewBox="0 0 80 80" fill="none" style="margin-bottom:.5rem">
+          <ellipse cx="40" cy="38" rx="24" ry="14" stroke="#c9a227" stroke-width="2.5"/>
+          <circle cx="40" cy="38" r="7" fill="#c9a227" opacity="0.9"/>
+          <circle cx="40" cy="38" r="3" fill="#0a0a0f"/>
+          <path d="M40 52 Q48 58 44 68 Q40 72 36 68 Q32 58 40 52Z" stroke="#c9a227" stroke-width="2" fill="rgba(201,162,39,0.2)"/>
+          <path d="M40 52 Q28 56 24 64" stroke="#c9a227" stroke-width="1.8" fill="none"/>
+        </svg>
+        <div style="font-family:'Cinzel',serif;color:var(--gold);font-size:.85rem;letter-spacing:.1em">HORUS OS</div>
+        <div style="font-size:.65rem;color:var(--text2);margin-top:.2rem">Intelligence Awakened</div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-logo"><svg width="22" height="22" viewBox="0 0 80 80" fill="none"><ellipse cx="40" cy="38" rx="24" ry="14" stroke="#c9a227" stroke-width="2.5"/><circle cx="40" cy="38" r="7" fill="#c9a227" opacity="0.9"/><circle cx="40" cy="38" r="3" fill="#0a0a0f"/></svg><span>HORUS OS</span></div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     SLIDE 14 — BUILD PIPELINE
+════════════════════════════════════════════════════════ -->
+<div class="slide" data-slide="14">
+  <div class="eyebrow">Build System</div>
+  <h2>How HORUS OS Is Built</h2>
+  <div class="sep"></div>
+  <div class="cols2">
+    <div>
+      <ul class="bullets" style="max-width:100%">
+        <li><strong class="gold">Step 1:</strong> <code style="color:var(--cyan)">debootstrap</code> → clean Ubuntu 22.04 rootfs in chroot</li>
+        <li><strong class="gold">Step 2:</strong> Mount pseudo-filesystems, copy DNS, set APT sources</li>
+        <li><strong class="gold">Step 3:</strong> Install 80+ packages inside chroot environment</li>
+        <li><strong class="gold">Step 4:</strong> Apply HORUS branding — themes, GTK, Plymouth, GRUB</li>
+        <li><strong class="gold">Step 5:</strong> Install 5 custom apps to <code style="color:var(--cyan)">/opt/horus/</code></li>
+        <li><strong class="gold">Step 6:</strong> <code style="color:var(--cyan)">mksquashfs</code> → <code style="color:var(--cyan)">xorriso</code> → bootable hybrid ISO</li>
+      </ul>
+    </div>
+    <div class="code-block" style="max-width:100%;font-size:.74rem">
+      <span class="comment"># One command, full ISO</span><br>
+      <span class="cmd">$ sudo bash scripts/build-iso.sh</span><br><br>
+      <span class="out">══ Bootstrapping Ubuntu jammy ══</span><br>
+      <span class="out">  ✓  Ubuntu 22.04 base bootstrapped</span><br>
+      <span class="out">══ Installing HORUS OS Packages ══</span><br>
+      <span class="out">  ✓  All 83 packages installed</span><br>
+      <span class="out">══ Applying HORUS OS Branding ══</span><br>
+      <span class="out">  ✓  Branding applied</span><br>
+      <span class="out">══ Building HORUS OS ISO Image ══</span><br>
+      <span class="out">  ✓  ISO created (2.1 GB)</span><br>
+      <span class="path">→  dist/horus-os-1.0.0-amd64.iso</span>
+    </div>
+  </div>
+  <div class="slide-logo"><svg width="22" height="22" viewBox="0 0 80 80" fill="none"><ellipse cx="40" cy="38" rx="24" ry="14" stroke="#c9a227" stroke-width="2.5"/><circle cx="40" cy="38" r="7" fill="#c9a227" opacity="0.9"/><circle cx="40" cy="38" r="3" fill="#0a0a0f"/></svg><span>HORUS OS</span></div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     SLIDE 15 — STATS
+════════════════════════════════════════════════════════ -->
+<div class="slide" data-slide="15">
+  <div class="eyebrow">By The Numbers</div>
+  <h2>What Was Built</h2>
+  <div class="sep"></div>
+  <div class="stat-grid" style="margin-bottom:2rem">
+    <div class="stat-card">
+      <div class="stat-num">5</div>
+      <div class="stat-label">Original Apps</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">83</div>
+      <div class="stat-label">Packages Bundled</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">70+</div>
+      <div class="stat-label">Source Files</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">10K+</div>
+      <div class="stat-label">Lines of Code</div>
+    </div>
+  </div>
+  <div class="stat-grid">
+    <div class="stat-card" style="border-color:rgba(0,212,255,.2)">
+      <div class="stat-num" style="color:var(--cyan)">6</div>
+      <div class="stat-label">Build Steps</div>
+    </div>
+    <div class="stat-card" style="border-color:rgba(0,255,136,.2)">
+      <div class="stat-num" style="color:var(--green)">2</div>
+      <div class="stat-label">Languages (AR+EN)</div>
+    </div>
+    <div class="stat-card" style="border-color:rgba(192,132,252,.2)">
+      <div class="stat-num" style="color:#c084fc">1</div>
+      <div class="stat-label">Student Built It</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">~2GB</div>
+      <div class="stat-label">ISO Size</div>
+    </div>
+  </div>
+  <div class="slide-logo"><svg width="22" height="22" viewBox="0 0 80 80" fill="none"><ellipse cx="40" cy="38" rx="24" ry="14" stroke="#c9a227" stroke-width="2.5"/><circle cx="40" cy="38" r="7" fill="#c9a227" opacity="0.9"/><circle cx="40" cy="38" r="3" fill="#0a0a0f"/></svg><span>HORUS OS</span></div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     SLIDE 16 — ROADMAP
+════════════════════════════════════════════════════════ -->
+<div class="slide" data-slide="16">
+  <div class="eyebrow">Future</div>
+  <h2>What's Next</h2>
+  <div class="sep"></div>
+  <div class="roadmap-grid">
+    <div class="roadmap-card">
+      <div class="roadmap-ver">v1.1</div>
+      <div class="roadmap-focus">Intelligence</div>
+      <ul class="roadmap-items">
+        <li>Full Ollama AI integration</li>
+        <li>Hardware Q&A database</li>
+        <li>Voice commands</li>
+        <li>Auto hardware diagnosis</li>
+      </ul>
+    </div>
+    <div class="roadmap-card" style="border-top-color:var(--cyan)">
+      <div class="roadmap-ver" style="color:var(--cyan)">v1.2</div>
+      <div class="roadmap-focus" style="color:var(--text2)">Shell</div>
+      <ul class="roadmap-items">
+        <li>Custom Flutter desktop shell</li>
+        <li>Wayland support</li>
+        <li>Widget system</li>
+        <li>Dynamic workspaces</li>
+      </ul>
+    </div>
+    <div class="roadmap-card" style="border-top-color:#c084fc">
+      <div class="roadmap-ver" style="color:#c084fc">v1.3</div>
+      <div class="roadmap-focus" style="color:var(--text2)">Experience</div>
+      <ul class="roadmap-items">
+        <li>OEM setup wizard</li>
+        <li>Auto-detect hardware</li>
+        <li>Cloud sync for notes</li>
+        <li>University portal integration</li>
+      </ul>
+    </div>
+    <div class="roadmap-card" style="border-top-color:var(--green)">
+      <div class="roadmap-ver" style="color:var(--green)">v2.0</div>
+      <div class="roadmap-focus" style="color:var(--text2)">Platform</div>
+      <ul class="roadmap-items">
+        <li>Custom kernel patches</li>
+        <li>HORUS APT repository</li>
+        <li>Multi-arch builds</li>
+        <li>App store for students</li>
+      </ul>
+    </div>
+  </div>
+  <div class="slide-logo"><svg width="22" height="22" viewBox="0 0 80 80" fill="none"><ellipse cx="40" cy="38" rx="24" ry="14" stroke="#c9a227" stroke-width="2.5"/><circle cx="40" cy="38" r="7" fill="#c9a227" opacity="0.9"/><circle cx="40" cy="38" r="3" fill="#0a0a0f"/></svg><span>HORUS OS</span></div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     SLIDE 17 — LIVE DEMO
+════════════════════════════════════════════════════════ -->
+<div class="slide" data-slide="17">
+  <div class="eyebrow">Right Now</div>
+  <h2>Live Demonstration</h2>
+  <div class="sep"></div>
+  <div style="width:100%;max-width:700px">
+    <div class="demo-step">
+      <div class="demo-num">1</div>
+      <div><span class="gold">Cold boot</span> → Plymouth splash → desktop — watch the animation</div>
+    </div>
+    <div class="demo-step">
+      <div class="demo-num">2</div>
+      <div>Open terminal → <code style="color:var(--cyan)">fastfetch</code> → HORUS ASCII art + system info</div>
+    </div>
+    <div class="demo-step">
+      <div class="demo-num">3</div>
+      <div>Open <span class="gold">HORUS Control Center</span> → live CPU/RAM/temp charts</div>
+    </div>
+    <div class="demo-step">
+      <div class="demo-num">4</div>
+      <div>Ask <span class="gold">HORUS AI</span>: <em style="color:var(--text2)">"What CPU is in this machine?"</em> — answers from /proc</div>
+    </div>
+    <div class="demo-step">
+      <div class="demo-num">5</div>
+      <div><code style="color:var(--cyan)">arduino-cli board list</code> — detect connected Arduino boards</div>
+    </div>
+    <div class="demo-step">
+      <div class="demo-num">6</div>
+      <div><code style="color:var(--cyan)">horus-help</code> → show all available HORUS commands</div>
+    </div>
+  </div>
+  <div class="slide-logo"><svg width="22" height="22" viewBox="0 0 80 80" fill="none"><ellipse cx="40" cy="38" rx="24" ry="14" stroke="#c9a227" stroke-width="2.5"/><circle cx="40" cy="38" r="7" fill="#c9a227" opacity="0.9"/><circle cx="40" cy="38" r="3" fill="#0a0a0f"/></svg><span>HORUS OS</span></div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     SLIDE 18 — CLOSING
+════════════════════════════════════════════════════════ -->
+<div class="slide" data-slide="18">
+  <div class="horus-glow"></div>
+  <svg width="70" height="70" viewBox="0 0 80 80" fill="none" style="margin-bottom:1.5rem;filter:drop-shadow(0 0 20px rgba(201,162,39,.5))">
+    <ellipse cx="40" cy="38" rx="24" ry="14" stroke="#c9a227" stroke-width="2.5"/>
+    <circle cx="40" cy="38" r="8" fill="#c9a227" opacity=".9"/>
+    <circle cx="40" cy="38" r="3.5" fill="#0a0a0f"/>
+    <path d="M40 52 Q50 60 46 70 Q40 75 34 70 Q30 60 40 52Z" stroke="#c9a227" stroke-width="2" fill="rgba(201,162,39,0.2)"/>
+    <path d="M40 52 Q26 57 22 67" stroke="#c9a227" stroke-width="1.8" fill="none"/>
+  </svg>
+  <div class="quote-block" style="margin-bottom:1.5rem">
+    <p>"One student. One complete operating system. Built for the engineers who build the future."</p>
+    <p class="ar">"طالب واحد. نظام تشغيل متكامل. مبني للمهندسين الذين يبنون المستقبل."</p>
+  </div>
+  <h1 style="font-size:clamp(2rem,4vw,3rem)">HORUS OS</h1>
+  <div class="cover-subtitle" style="font-size:1rem;margin-top:.3rem">Intelligence Awakened</div>
+  <div class="divider" style="margin:1rem auto"></div>
+  <div style="display:flex;flex-direction:column;align-items:center;gap:.3rem;margin-top:.5rem">
+    <div style="font-family:'JetBrains Mono',monospace;font-size:.8rem;color:var(--text2)">Alaa Saber</div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:.78rem;color:var(--gold)">alaa00saber@gmail.com</div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--text2)">github.com/alaa00saber/horus-edu-os</div>
+  </div>
+  <div class="slide-logo"><svg width="22" height="22" viewBox="0 0 80 80" fill="none"><ellipse cx="40" cy="38" rx="24" ry="14" stroke="#c9a227" stroke-width="2.5"/><circle cx="40" cy="38" r="7" fill="#c9a227" opacity="0.9"/><circle cx="40" cy="38" r="3" fill="#0a0a0f"/></svg><span>HORUS OS</span></div>
+</div>
+
+</div><!-- /deck -->
+
+<script>
+const TOTAL = 18;
+let current = 1;
+
+const deck = document.getElementById('deck');
+const slides = deck.querySelectorAll('.slide');
+const progress = document.getElementById('progress-bar');
+const counter = document.getElementById('slide-counter');
+const dotNav = document.getElementById('dot-nav');
+
+// Build dot nav
+for (let i = 1; i <= TOTAL; i++) {
+  const d = document.createElement('div');
+  d.className = 'dot' + (i === 1 ? ' active' : '');
+  d.onclick = () => goTo(i);
+  dotNav.appendChild(d);
+}
+
+function goTo(n) {
+  if (n < 1 || n > TOTAL) return;
+  const prev = deck.querySelector('.slide.active');
+  const next = deck.querySelector(`[data-slide="${n}"]`);
+  if (!next || prev === next) return;
+
+  prev.classList.remove('active');
+  prev.classList.add(n > current ? 'prev' : '');
+  setTimeout(() => prev.classList.remove('prev'), 500);
+
+  next.style.transform = n > current ? 'translateX(60px)' : 'translateX(-60px)';
+  next.style.opacity = '0';
+  requestAnimationFrame(() => {
+    next.classList.add('active');
+  });
+
+  current = n;
+  updateUI();
+}
+
+function changeSlide(dir) { goTo(current + dir); }
+
+function updateUI() {
+  // Progress bar
+  progress.style.width = ((current / TOTAL) * 100) + '%';
+  // Counter
+  counter.textContent = current + ' / ' + TOTAL;
+  // Dots
+  dotNav.querySelectorAll('.dot').forEach((d, i) => {
+    d.classList.toggle('active', i + 1 === current);
+  });
+}
+
+// Keyboard
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') { e.preventDefault(); changeSlide(1); }
+  if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')                     { e.preventDefault(); changeSlide(-1); }
+  if (e.key === 'f' || e.key === 'F') {
+    if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+    else document.exitFullscreen();
+  }
+  if (e.key === 'Home') goTo(1);
+  if (e.key === 'End')  goTo(TOTAL);
+});
+
+// Touch / swipe
+let touchX = 0;
+document.addEventListener('touchstart', e => { touchX = e.touches[0].clientX; });
+document.addEventListener('touchend', e => {
+  const dx = e.changedTouches[0].clientX - touchX;
+  if (Math.abs(dx) > 50) changeSlide(dx < 0 ? 1 : -1);
+});
+
+updateUI();
+</script>
+</body>
+</html>
