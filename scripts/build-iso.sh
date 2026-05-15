@@ -493,47 +493,66 @@ EOF
   echo "HORUS OS ${HORUS_VERSION} (${HORUS_CODENAME})" > "${ISO_DIR}/.disk/info"
   touch "${ISO_DIR}/.disk/base_installable"
 
-  # EFI boot image
+  # ── BIOS El Torito boot image ──────────────────────────────────────────
+  # grub-pc-bin ships cdboot.img (512-byte CD boot record) but NOT eltorito.img.
+  # We build the El Torito image by generating a GRUB core with grub-mkstandalone
+  # (i386-pc format) and prepending cdboot.img to make it CD-bootable.
+  step_start "Building GRUB BIOS El Torito boot image"
+  grub-mkstandalone \
+    --format=i386-pc \
+    --output="${BUILD_DIR}/grub_bios_core.img" \
+    --locales="" --fonts="" \
+    "boot/grub/grub.cfg=${ISO_DIR}/boot/grub/grub.cfg"
+  cat /usr/lib/grub/i386-pc/cdboot.img "${BUILD_DIR}/grub_bios_core.img" \
+    > "${ISO_DIR}/boot/grub/bios.img"
+  log_info "BIOS boot  : ${ISO_DIR}/boot/grub/bios.img"
+
+  # ── EFI boot image ─────────────────────────────────────────────────────
+  # mtools (mmd/mcopy) fails on many CI runners — use loop mount instead.
   step_start "Building EFI boot image"
   grub-mkstandalone \
     --format=x86_64-efi \
     --output="${BUILD_DIR}/bootx64.efi" \
     --locales="" --fonts="" \
-    "boot/grub/grub.cfg=${ISO_DIR}/boot/grub/grub.cfg" 2>/dev/null || \
-    log_warn "EFI standalone build failed; using fallback"
+    "boot/grub/grub.cfg=${ISO_DIR}/boot/grub/grub.cfg" 2>/dev/null \
+    || log_warn "grub-mkstandalone EFI failed — skipping UEFI boot"
 
-  # Create EFI FAT image
-  (cd "${BUILD_DIR}" && \
-    dd if=/dev/zero of=efi.img bs=1M count=10 2>/dev/null && \
-    mkfs.fat -F 32 efi.img && \
-    mmd -i efi.img ::/EFI ::/EFI/boot && \
-    mcopy -i efi.img bootx64.efi ::/EFI/boot/ 2>/dev/null) || true
+  if [[ -f "${BUILD_DIR}/bootx64.efi" && -s "${BUILD_DIR}/bootx64.efi" ]]; then
+    dd if=/dev/zero of="${BUILD_DIR}/efi.img" bs=1M count=20 2>/dev/null
+    mkfs.fat -F 16 "${BUILD_DIR}/efi.img"
+    mkdir -p "${BUILD_DIR}/efi_mnt"
+    if mount -o loop "${BUILD_DIR}/efi.img" "${BUILD_DIR}/efi_mnt" 2>/dev/null; then
+      mkdir -p "${BUILD_DIR}/efi_mnt/EFI/boot"
+      cp "${BUILD_DIR}/bootx64.efi" "${BUILD_DIR}/efi_mnt/EFI/boot/"
+      umount "${BUILD_DIR}/efi_mnt"
+      cp "${BUILD_DIR}/efi.img" "${ISO_DIR}/EFI/boot/efi.img"
+      log_info "EFI image  : created (UEFI enabled)"
+    else
+      log_warn "Loop mount failed — skipping EFI image"
+    fi
+    rmdir "${BUILD_DIR}/efi_mnt" 2>/dev/null || true
+  else
+    log_warn "bootx64.efi not built — BIOS-only ISO"
+  fi
 
-  cp "${BUILD_DIR}/efi.img" "${ISO_DIR}/EFI/boot/efi.img" 2>/dev/null || true
-
-  # Build the ISO
+  # ── xorriso ────────────────────────────────────────────────────────────
   step_start "Running xorriso to create hybrid ISO"
   mkdir -p "$OUTPUT_DIR"
   local iso_name="horus-os-${HORUS_VERSION}-${ARCH}.iso"
   # ISO 9660 volume IDs must not contain dots — replace with underscores
   local volid="HORUS_OS_$(echo "$HORUS_VERSION" | tr '.' '_')"
 
-  # Verify GRUB BIOS images exist (installed via grub-pc-bin)
-  local grub_bios="/usr/lib/grub/i386-pc/eltorito.img"
-  local grub_mbr="/usr/lib/grub/i386-pc/boot_hybrid.img"
-  [[ -f "$grub_bios" ]] || log_error "GRUB BIOS eltorito.img not found — install grub-pc-bin"
-  log_info "GRUB bios : $grub_bios"
-
-  # Optional --grub2-mbr (enables hybrid MBR so USB/BIOS boot works)
+  # Optional hybrid MBR — makes ISO USB-bootable (not just CD/VM)
   local mbr_args=()
+  local grub_mbr="/usr/lib/grub/i386-pc/boot_hybrid.img"
   if [[ -f "$grub_mbr" ]]; then
     mbr_args=(--grub2-mbr "$grub_mbr")
-    log_info "GRUB MBR  : $grub_mbr"
+    log_info "Hybrid MBR : enabled"
   else
-    log_warn "boot_hybrid.img not found — ISO will lack hybrid MBR (BIOS USB boot may fail)"
+    log_warn "boot_hybrid.img not found — ISO not USB hybrid-bootable"
   fi
 
-  # Optional EFI support — only enable if efi.img exists and is non-empty
+  # Optional UEFI — only if efi.img was successfully created above
   local efi_args=()
   if [[ -f "${ISO_DIR}/EFI/boot/efi.img" && -s "${ISO_DIR}/EFI/boot/efi.img" ]]; then
     efi_args=(
@@ -542,11 +561,12 @@ EOF
       -no-emul-boot
       -append_partition 2 0xef "${ISO_DIR}/EFI/boot/efi.img"
     )
-    log_info "EFI image : present — UEFI boot enabled"
+    log_info "UEFI boot  : enabled"
   else
-    log_warn "EFI image missing or empty — ISO will be BIOS-only (still bootable in VMs)"
+    log_warn "EFI image absent — BIOS-only ISO (VMs boot fine without it)"
   fi
 
+  # bios.img is now physically inside ISO_DIR — no graft points needed
   xorriso -as mkisofs \
     -iso-level 3 \
     -full-iso9660-filenames \
@@ -558,9 +578,7 @@ EOF
     "${mbr_args[@]}" \
     "${efi_args[@]}" \
     -output "${OUTPUT_DIR}/${iso_name}" \
-    -graft-points \
-      "${ISO_DIR}" \
-      /boot/grub/bios.img="$grub_bios"
+    "${ISO_DIR}"
 
   log_info "ISO created: ${OUTPUT_DIR}/${iso_name}"
 
