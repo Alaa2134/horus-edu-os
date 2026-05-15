@@ -5,7 +5,7 @@
 #
 # Usage: sudo ./install-packages.sh [chroot_dir]
 
-set -euo pipefail
+set -uo pipefail
 
 CHROOT_DIR="${1:-/}"
 DEBIAN_FRONTEND=noninteractive
@@ -85,7 +85,6 @@ log_pkg "Network stack"
 _apt \
   network-manager \
   network-manager-gnome \
-  nm-tray \
   wireless-tools \
   wpasupplicant \
   net-tools \
@@ -126,14 +125,11 @@ _apt \
   htop \
   btop \
   neofetch \
-  fastfetch \
   lm-sensors \
-  fancontrol \
   upower \
   acpi \
   smartmontools \
   inxi \
-  hwinfo \
   lshw \
   pciutils \
   usbutils \
@@ -143,8 +139,21 @@ _apt \
   zip unzip \
   rsync \
   tree \
-  bat \
-  jq
+  jq || log_warn "Some system utilities failed"
+
+# fastfetch via PPA (not in Ubuntu 22.04 default repos)
+log_pkg "fastfetch"
+chroot "$CHROOT_DIR" bash -c "
+  add-apt-repository -y ppa:zhangsongcui3371/fastfetch 2>/dev/null
+  apt-get update -qq 2>/dev/null
+  apt-get install -y fastfetch 2>/dev/null
+" || log_warn "fastfetch install failed — using neofetch as fallback"
+
+# bat (sometimes needs different package name)
+chroot "$CHROOT_DIR" bash -c "
+  apt-get install -y bat 2>/dev/null || apt-get install -y batcat 2>/dev/null
+  command -v batcat &>/dev/null && ln -sf /usr/bin/batcat /usr/local/bin/bat 2>/dev/null || true
+" || true
 
 # ── 10. Python 3 ─────────────────────────────────────────────────────────
 log_pkg "Python 3 runtime"
