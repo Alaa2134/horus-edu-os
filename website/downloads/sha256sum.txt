@@ -1,0 +1,12 @@
+# Horus Edu OS v1.0.0 — SHA256 Checksums
+# يُحدَّث هذا الملف بعد بناء الـ ISO النهائي
+# Updated after final ISO build
+
+# Format: <hash>  <filename>
+# التحقق: sha256sum -c sha256sum.txt
+
+PLACEHOLDER_BUILD_ISO_FIRST  horus-edu-os-1.0.0-amd64.iso
+
+# ملاحظة: لبناء الـ ISO:
+# sudo bash scripts/build-iso.sh
+# (يتطلب Ubuntu 22.04 + 10GB مساحة + إنترنت)

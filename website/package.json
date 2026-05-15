@@ -1,0 +1,16 @@
+{
+  "name": "horus-edu-website",
+  "version": "1.0.0",
+  "description": "Horus Edu OS Official Website — SaaS Landing Page",
+  "private": true,
+  "scripts": {
+    "dev": "npx serve . -l 3000",
+    "build": "echo 'Static site — no build needed. Deploy the entire folder.'",
+    "preview": "npx serve . -l 3001",
+    "deploy:netlify": "npx netlify deploy --dir=. --prod",
+    "deploy:vercel": "npx vercel --prod"
+  },
+  "keywords": ["horus", "edu", "os", "linux", "education"],
+  "author": "Alaa Saber <alaa00saber@gmail.com>",
+  "license": "MIT"
+}

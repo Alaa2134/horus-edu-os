@@ -1,0 +1,1211 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Horus Edu OS — جامعة حورس</title>
+<meta name="description" content="نظام تشغيل تعليمي متكامل مبني على Linux لطلاب جامعة حورس">
+<meta property="og:title" content="Horus Edu OS">
+<meta property="og:description" content="التعلم بلا حدود — Horus University Educational OS">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Cinzel:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --gold:#c9a227;
+  --gold2:#e8c547;
+  --lapis:#1a3a6e;
+  --lapis2:#2456a4;
+  --bg:#04070f;
+  --bg2:#080e1c;
+  --bg3:#0d1528;
+  --surface:#111827;
+  --surface2:#1a2540;
+  --papyrus:#f5e6c8;
+  --sand:#d4a96a;
+  --text:#e8dcc8;
+  --text2:#b8a87a;
+  --emerald:#10b981;
+  --p:#6366f1;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Cairo',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  overflow-x:hidden;
+}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:var(--bg2)}
+::-webkit-scrollbar-thumb{background:var(--gold);border-radius:3px}
+
+/* ── NAV ── */
+nav{
+  position:fixed;top:0;width:100%;z-index:100;
+  background:rgba(4,7,15,.92);
+  border-bottom:1px solid rgba(201,162,39,.2);
+  backdrop-filter:blur(20px);
+  padding:.75rem 2rem;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.nav-logo{display:flex;align-items:center;gap:.75rem}
+.nav-logo-icon{width:40px;height:40px}
+.nav-brand{font-family:'Cinzel',serif;font-size:1.05rem;color:var(--gold);letter-spacing:.05em}
+.nav-brand small{display:block;font-size:.55rem;color:var(--text2);font-family:'Cairo',sans-serif;letter-spacing:.08em}
+.nav-links{display:flex;gap:2rem;list-style:none}
+.nav-links a{color:var(--text2);text-decoration:none;font-size:.9rem;transition:.2s;font-weight:600}
+.nav-links a:hover{color:var(--gold)}
+.nav-actions{display:flex;gap:.75rem;align-items:center}
+.btn-lang{
+  background:transparent;border:1px solid rgba(201,162,39,.4);
+  color:var(--gold);padding:.35rem .85rem;border-radius:4px;
+  cursor:pointer;font-size:.85rem;font-family:'Cairo',sans-serif;transition:.2s;
+}
+.btn-lang:hover{background:rgba(201,162,39,.1)}
+.btn-dl{
+  background:linear-gradient(135deg,var(--gold),#a07820);
+  color:#000;padding:.4rem 1.1rem;border-radius:4px;
+  text-decoration:none;font-weight:700;font-size:.85rem;
+  transition:.2s;border:none;cursor:pointer;font-family:'Cairo',sans-serif;
+}
+.btn-dl:hover{transform:translateY(-1px);box-shadow:0 4px 20px rgba(201,162,39,.4)}
+
+/* ── HERO ── */
+#hero{
+  position:relative;min-height:100vh;
+  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;padding:5rem 2rem 3rem;
+}
+#canvas-bg{position:absolute;inset:0;z-index:1}
+.hero-pyramid{position:absolute;bottom:0;left:50%;transform:translateX(-50%);z-index:2;opacity:.07;width:100%;max-width:900px}
+.hero-content{
+  position:relative;z-index:3;
+  max-width:1100px;width:100%;
+  display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center;
+}
+.hero-badge{
+  display:inline-flex;align-items:center;gap:.5rem;
+  background:rgba(201,162,39,.1);border:1px solid rgba(201,162,39,.3);
+  color:var(--gold);padding:.35rem 1rem;border-radius:2px;
+  font-size:.8rem;font-weight:700;letter-spacing:.1em;margin-bottom:1.5rem;
+}
+.hero-badge::before,.hero-badge::after{content:'𓂀';font-size:.9rem}
+h1.hero-title{
+  font-size:clamp(2rem,5vw,3.5rem);
+  font-family:'Cinzel',serif;
+  color:var(--gold);line-height:1.15;margin-bottom:.5rem;
+  text-shadow:0 0 40px rgba(201,162,39,.3);
+}
+h1.hero-title span{color:var(--papyrus)}
+.hero-sub{font-size:1.1rem;color:var(--text2);margin-bottom:1rem;font-weight:400}
+.hero-tagline{font-size:1.35rem;color:var(--sand);margin-bottom:2rem;font-weight:700}
+.hero-btns{display:flex;gap:1rem;flex-wrap:wrap}
+.btn-primary{
+  display:inline-flex;align-items:center;gap:.5rem;
+  background:linear-gradient(135deg,var(--gold),#a07820);
+  color:#000;padding:.8rem 2rem;border-radius:3px;
+  text-decoration:none;font-weight:700;font-size:1rem;transition:.25s;
+}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(201,162,39,.5)}
+.btn-secondary{
+  display:inline-flex;align-items:center;gap:.5rem;
+  background:transparent;border:2px solid rgba(201,162,39,.5);
+  color:var(--gold);padding:.8rem 2rem;border-radius:3px;
+  text-decoration:none;font-weight:700;font-size:1rem;transition:.25s;
+}
+.btn-secondary:hover{background:rgba(201,162,39,.08);border-color:var(--gold)}
+.hero-stats{
+  display:flex;gap:2rem;margin-top:2.5rem;
+  padding-top:2rem;border-top:1px solid rgba(201,162,39,.15);flex-wrap:wrap;
+}
+.stat-item{text-align:center}
+.stat-num{font-family:'Cinzel',serif;font-size:1.6rem;color:var(--gold);font-weight:700}
+.stat-label{font-size:.75rem;color:var(--text2);letter-spacing:.05em}
+
+/* OS MOCKUP */
+.os-mockup{
+  background:var(--surface);border-radius:8px;
+  border:1px solid rgba(201,162,39,.2);
+  box-shadow:0 30px 80px rgba(0,0,0,.8),0 0 0 1px rgba(201,162,39,.08),
+             inset 0 1px 0 rgba(201,162,39,.1);
+  overflow:hidden;
+}
+.mock-titlebar{
+  background:linear-gradient(135deg,#0d1528,#111827);
+  padding:.6rem 1rem;
+  display:flex;align-items:center;gap:.5rem;
+  border-bottom:1px solid rgba(201,162,39,.15);
+}
+.mock-btn{width:12px;height:12px;border-radius:50%}
+.mock-btn:nth-child(1){background:#ff5f57}
+.mock-btn:nth-child(2){background:#febc2e}
+.mock-btn:nth-child(3){background:#28c840}
+.mock-title{flex:1;text-align:center;font-size:.7rem;color:var(--text2);font-family:'Cinzel',serif;letter-spacing:.05em}
+.mock-body{display:grid;grid-template-columns:60px 1fr;min-height:280px}
+.mock-dock{
+  background:#0a1020;border-left:1px solid rgba(201,162,39,.1);
+  display:flex;flex-direction:column;align-items:center;padding:.75rem .25rem;gap:.5rem;
+}
+.dock-icon{
+  width:36px;height:36px;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1rem;cursor:pointer;transition:.2s;
+  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);
+}
+.dock-icon:hover{background:rgba(201,162,39,.15);border-color:rgba(201,162,39,.3);transform:scale(1.1)}
+.dock-icon.active{background:rgba(201,162,39,.2);border-color:var(--gold)}
+.mock-desktop{background:linear-gradient(135deg,#0a1020 0%,#0f1830 100%);padding:1rem;position:relative;overflow:hidden}
+.mock-widget{
+  background:rgba(13,21,40,.9);border:1px solid rgba(201,162,39,.15);
+  border-radius:6px;padding:.6rem .8rem;margin-bottom:.5rem;font-size:.68rem;color:var(--text2);
+}
+.mock-widget-title{color:var(--gold);font-size:.65rem;font-weight:700;margin-bottom:.3rem;letter-spacing:.05em}
+.mock-progress{height:3px;background:rgba(255,255,255,.1);border-radius:2px;overflow:hidden;margin-top:.3rem}
+.mock-progress-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--lapis2));border-radius:2px}
+.mock-apps-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.4rem}
+.mock-app{
+  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);
+  border-radius:6px;padding:.5rem;text-align:center;font-size:.55rem;color:var(--text2);
+  cursor:pointer;transition:.2s;
+}
+.mock-app:hover{background:rgba(201,162,39,.08);border-color:rgba(201,162,39,.2);color:var(--gold)}
+.mock-app-icon{font-size:1.1rem;margin-bottom:.2rem}
+
+/* ── SECTIONS ── */
+section{position:relative;z-index:2;padding:5rem 2rem}
+.container{max-width:1100px;margin:0 auto}
+.section-header{text-align:center;margin-bottom:3.5rem}
+.section-eyebrow{
+  display:inline-flex;align-items:center;gap:.5rem;
+  color:var(--gold2);font-size:.75rem;font-weight:700;
+  letter-spacing:.15em;text-transform:uppercase;margin-bottom:.75rem;
+}
+.section-eyebrow::before,.section-eyebrow::after{content:'𓂋';opacity:.6}
+h2.section-title{
+  font-family:'Cinzel',serif;font-size:clamp(1.6rem,3vw,2.4rem);
+  color:var(--papyrus);margin-bottom:.75rem;
+}
+h2.section-title span{color:var(--gold)}
+.section-desc{color:var(--text2);font-size:1rem;max-width:600px;margin:0 auto}
+
+/* LOTUS DIVIDER */
+.lotus-divider{
+  display:flex;align-items:center;justify-content:center;gap:1rem;
+  padding:1.5rem 2rem;opacity:.45;
+}
+.lotus-divider::before,.lotus-divider::after{
+  content:'';flex:1;height:1px;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);
+}
+
+/* SEAL SECTION */
+#seal-section{
+  padding:3rem 2rem;
+  background:linear-gradient(180deg,var(--bg) 0%,var(--bg2) 100%);
+  border-top:1px solid rgba(201,162,39,.1);border-bottom:1px solid rgba(201,162,39,.1);
+}
+.seal-inner{
+  max-width:900px;margin:0 auto;
+  display:flex;align-items:center;justify-content:center;gap:3rem;flex-wrap:wrap;
+}
+.seal-info{max-width:420px}
+.seal-info h3{font-family:'Cinzel',serif;font-size:1.35rem;color:var(--gold);margin-bottom:.6rem}
+.seal-info p{color:var(--text2);font-size:.95rem;line-height:1.7}
+
+/* FEATURES */
+.features-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.5rem}
+.feature-card{
+  background:var(--surface);border:1px solid rgba(201,162,39,.12);
+  border-radius:4px;padding:1.75rem;transition:.3s;position:relative;overflow:hidden;
+}
+.feature-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);
+  transform:scaleX(0);transition:.3s;
+}
+.feature-card:hover{transform:translateY(-4px);border-color:rgba(201,162,39,.35);
+  box-shadow:0 20px 40px rgba(0,0,0,.4)}
+.feature-card:hover::before{transform:scaleX(1)}
+.feature-icon{
+  width:52px;height:52px;border-radius:4px;
+  background:rgba(201,162,39,.08);border:1px solid rgba(201,162,39,.2);
+  display:flex;align-items:center;justify-content:center;font-size:1.5rem;margin-bottom:1rem;
+}
+.feature-title{font-weight:700;color:var(--papyrus);margin-bottom:.5rem;font-size:1rem}
+.feature-desc{color:var(--text2);font-size:.9rem;line-height:1.65}
+
+/* APPS */
+.apps-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.5rem}
+.app-card{
+  background:var(--surface);border:1px solid rgba(201,162,39,.12);
+  border-radius:4px;overflow:hidden;transition:.3s;
+}
+.app-card:hover{transform:translateY(-4px);border-color:rgba(201,162,39,.35);
+  box-shadow:0 20px 50px rgba(0,0,0,.5)}
+.app-preview{
+  height:160px;position:relative;overflow:hidden;
+  background:linear-gradient(135deg,#0a1020,#0f1830);
+  display:flex;align-items:center;justify-content:center;
+}
+.app-preview-icon{font-size:3rem;opacity:.85;z-index:1}
+.app-preview-glow{position:absolute;inset:0;background:radial-gradient(circle at 50% 50%,rgba(201,162,39,.15),transparent 70%)}
+.app-preview-label{
+  position:absolute;bottom:.5rem;right:.75rem;
+  font-size:.65rem;color:rgba(201,162,39,.6);font-family:'Cinzel',serif;letter-spacing:.1em;
+}
+.app-info{padding:1.25rem}
+.app-name{font-weight:700;color:var(--papyrus);font-size:1.05rem;margin-bottom:.3rem}
+.app-desc{color:var(--text2);font-size:.85rem;line-height:1.6;margin-bottom:.75rem}
+.app-port{
+  display:inline-flex;align-items:center;gap:.4rem;
+  background:rgba(201,162,39,.08);border:1px solid rgba(201,162,39,.2);
+  color:var(--gold);padding:.2rem .65rem;border-radius:2px;font-size:.72rem;font-family:monospace;
+}
+
+/* DOWNLOAD */
+.dl-file-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1rem;margin-bottom:2.5rem}
+.dl-file{
+  background:var(--surface);border:1px solid rgba(201,162,39,.15);
+  border-radius:4px;padding:1.25rem;
+  display:flex;align-items:center;gap:1rem;text-decoration:none;transition:.25s;
+}
+.dl-file:hover{border-color:var(--gold);background:rgba(201,162,39,.05);transform:translateY(-2px)}
+.dl-file-icon{font-size:2rem;flex-shrink:0}
+.dl-file-info{flex:1}
+.dl-file-name{color:var(--papyrus);font-weight:700;font-size:.9rem;margin-bottom:.2rem}
+.dl-file-meta{color:var(--text2);font-size:.75rem}
+.dl-file-btn{
+  background:linear-gradient(135deg,var(--gold),#a07820);
+  color:#000;padding:.35rem .75rem;border-radius:3px;font-size:.75rem;font-weight:700;white-space:nowrap;
+}
+
+/* TABS */
+.tabs{display:flex;gap:.5rem;margin-bottom:1.5rem;border-bottom:1px solid rgba(201,162,39,.15);padding-bottom:.5rem;flex-wrap:wrap}
+.tab-btn{
+  background:transparent;border:1px solid transparent;
+  color:var(--text2);padding:.5rem 1.25rem;border-radius:3px 3px 0 0;
+  cursor:pointer;font-size:.85rem;font-family:'Cairo',sans-serif;font-weight:600;transition:.2s;
+}
+.tab-btn:hover{color:var(--gold)}
+.tab-btn.active{background:rgba(201,162,39,.1);border-color:rgba(201,162,39,.3);color:var(--gold)}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+.install-steps{list-style:none;counter-reset:step}
+.install-steps li{
+  counter-increment:step;
+  display:flex;align-items:flex-start;gap:1rem;
+  padding:.75rem 0;border-bottom:1px solid rgba(255,255,255,.04);
+  color:var(--text2);font-size:.9rem;line-height:1.6;
+}
+.install-steps li::before{
+  content:counter(step);width:28px;height:28px;border-radius:50%;flex-shrink:0;
+  background:rgba(201,162,39,.1);border:1px solid rgba(201,162,39,.3);
+  color:var(--gold);display:flex;align-items:center;justify-content:center;
+  font-weight:700;font-size:.8rem;
+}
+code{background:rgba(255,255,255,.07);color:var(--sand);padding:.15rem .45rem;border-radius:3px;font-family:monospace;font-size:.85em}
+
+/* AI CHAT */
+.ai-layout{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:center}
+.ai-chat-window{
+  background:var(--surface);border:1px solid rgba(201,162,39,.15);
+  border-radius:6px;overflow:hidden;height:400px;
+  display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.5);
+}
+.chat-header{
+  background:linear-gradient(135deg,rgba(201,162,39,.1),transparent);
+  padding:.75rem 1rem;border-bottom:1px solid rgba(201,162,39,.1);
+  display:flex;align-items:center;gap:.75rem;
+}
+.chat-avatar{
+  width:36px;height:36px;border-radius:50%;
+  background:rgba(201,162,39,.15);border:2px solid rgba(201,162,39,.3);
+  display:flex;align-items:center;justify-content:center;font-size:1rem;
+}
+.chat-name{font-weight:700;color:var(--papyrus);font-size:.9rem}
+.chat-status{font-size:.7rem;color:var(--emerald)}
+.chat-msgs{flex:1;overflow-y:auto;padding:1rem;display:flex;flex-direction:column;gap:.75rem}
+.chat-msgs::-webkit-scrollbar{width:3px}
+.chat-msgs::-webkit-scrollbar-thumb{background:rgba(201,162,39,.3)}
+.msg{max-width:80%;padding:.6rem .9rem;border-radius:6px;font-size:.85rem;line-height:1.5;animation:msgIn .3s ease}
+@keyframes msgIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.msg.user{align-self:flex-start;background:rgba(201,162,39,.1);border:1px solid rgba(201,162,39,.2);color:var(--sand)}
+.msg.ai{align-self:flex-end;background:var(--surface2);border:1px solid rgba(255,255,255,.07);color:var(--text)}
+.msg-typing{display:flex;gap:4px;align-items:center;padding:.6rem .9rem}
+.typing-dot{width:6px;height:6px;border-radius:50%;background:var(--gold);animation:bounce .8s infinite}
+.typing-dot:nth-child(2){animation-delay:.15s}
+.typing-dot:nth-child(3){animation-delay:.3s}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.chat-input{padding:.75rem;border-top:1px solid rgba(201,162,39,.1);display:flex;gap:.5rem}
+.chat-input input{
+  flex:1;background:rgba(255,255,255,.05);border:1px solid rgba(201,162,39,.2);
+  color:var(--text);padding:.5rem .75rem;border-radius:4px;
+  font-family:'Cairo',sans-serif;font-size:.85rem;outline:none;
+}
+.chat-input input:focus{border-color:var(--gold)}
+.chat-send{
+  background:linear-gradient(135deg,var(--gold),#a07820);
+  color:#000;border:none;padding:.5rem .9rem;border-radius:4px;
+  cursor:pointer;font-size:.9rem;font-weight:700;font-family:'Cairo',sans-serif;transition:.2s;
+}
+.chat-send:hover{transform:scale(1.05)}
+.ai-features{display:flex;flex-direction:column;gap:1rem}
+.ai-feat{display:flex;align-items:flex-start;gap:1rem}
+.ai-feat-icon{
+  width:44px;height:44px;border-radius:4px;flex-shrink:0;
+  background:rgba(201,162,39,.08);border:1px solid rgba(201,162,39,.2);
+  display:flex;align-items:center;justify-content:center;font-size:1.2rem;
+}
+.ai-feat-title{font-weight:700;color:var(--papyrus);margin-bottom:.25rem;font-size:.9rem}
+.ai-feat-desc{color:var(--text2);font-size:.82rem;line-height:1.5}
+
+/* SPECS */
+.specs-grid{display:grid;grid-template-columns:1fr 1fr;gap:2rem}
+.spec-block{background:var(--surface);border:1px solid rgba(201,162,39,.12);border-radius:4px;padding:1.5rem}
+.spec-block-title{
+  font-family:'Cinzel',serif;color:var(--gold);font-size:1rem;
+  margin-bottom:1rem;padding-bottom:.5rem;border-bottom:1px solid rgba(201,162,39,.15);letter-spacing:.05em;
+}
+.spec-row{display:flex;justify-content:space-between;align-items:center;padding:.4rem 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:.85rem}
+.spec-key{color:var(--text2)}
+.spec-val{color:var(--papyrus);font-weight:600}
+.spec-val.good{color:var(--emerald)}
+.spec-val.gold{color:var(--gold)}
+
+/* FOOTER */
+footer{background:var(--bg2);border-top:1px solid rgba(201,162,39,.15);padding:3rem 2rem 1.5rem}
+.footer-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:3rem;margin-bottom:2rem}
+.footer-logo{display:flex;align-items:center;gap:.75rem;margin-bottom:.75rem}
+.footer-brand-name{font-family:'Cinzel',serif;font-size:1.05rem;color:var(--gold)}
+.footer-brand-name small{display:block;font-size:.6rem;color:var(--text2);font-family:'Cairo',sans-serif}
+.footer-brand-desc{color:var(--text2);font-size:.85rem;line-height:1.65;max-width:280px}
+.footer-col h4{color:var(--papyrus);font-weight:700;margin-bottom:.75rem;font-size:.9rem}
+.footer-col ul{list-style:none;display:flex;flex-direction:column;gap:.4rem}
+.footer-col a{color:var(--text2);text-decoration:none;font-size:.85rem;transition:.2s}
+.footer-col a:hover{color:var(--gold)}
+.footer-bottom{border-top:1px solid rgba(201,162,39,.1);padding-top:1.25rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.75rem;max-width:1100px;margin:0 auto}
+.footer-copy{color:var(--text2);font-size:.8rem}
+.footer-glyphs{color:rgba(201,162,39,.35);font-size:1.1rem;letter-spacing:.25rem}
+
+/* REVEAL */
+.reveal{opacity:0;transform:translateY(30px);transition:.6s}
+.reveal.visible{opacity:1;transform:translateY(0)}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  .hero-content{grid-template-columns:1fr;gap:2rem}
+  .hero-right{order:-1}
+  .ai-layout{grid-template-columns:1fr}
+  .specs-grid{grid-template-columns:1fr}
+  .footer-inner{grid-template-columns:1fr}
+  .nav-links{display:none}
+  .hero-stats{gap:1rem}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════ NAV ═══════════════ -->
+<nav>
+  <div class="nav-logo">
+    <svg class="nav-logo-icon" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="40" cy="38" rx="24" ry="14" stroke="#c9a227" stroke-width="2.5"/>
+      <circle cx="40" cy="38" r="7" fill="#c9a227" opacity="0.9"/>
+      <circle cx="40" cy="38" r="3" fill="#04070f"/>
+      <path d="M40 52 Q48 58 44 68 Q40 72 36 68 Q32 58 40 52Z" stroke="#c9a227" stroke-width="1.8" fill="rgba(201,162,39,0.15)"/>
+      <path d="M40 52 Q28 56 24 64" stroke="#c9a227" stroke-width="1.8" fill="none"/>
+      <path d="M16 38 Q20 44 26 44" stroke="#c9a227" stroke-width="1.8" fill="none"/>
+      <path d="M64 38 Q60 32 54 30" stroke="#c9a227" stroke-width="1.8" fill="none"/>
+    </svg>
+    <div class="nav-brand">
+      HORUS EDU OS
+      <small id="nav-tagline">جامعة حورس · التعلم بلا حدود</small>
+    </div>
+  </div>
+  <ul class="nav-links" id="nav-links">
+    <li><a href="#features" id="nav-features">المميزات</a></li>
+    <li><a href="#apps" id="nav-apps">التطبيقات</a></li>
+    <li><a href="#download" id="nav-download">تحميل</a></li>
+    <li><a href="#ai-demo" id="nav-ai">المساعد</a></li>
+    <li><a href="#specs" id="nav-specs">المواصفات</a></li>
+  </ul>
+  <div class="nav-actions">
+    <button class="btn-lang" onclick="toggleLang()" id="lang-btn">EN</button>
+    <a href="#download" class="btn-dl" id="nav-cta">⬇ تحميل</a>
+  </div>
+</nav>
+
+<!-- ═══════════════ HERO ═══════════════ -->
+<section id="hero">
+  <canvas id="canvas-bg"></canvas>
+
+  <!-- Pyramid silhouette -->
+  <svg class="hero-pyramid" viewBox="0 0 1200 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <polygon points="600,20 1100,380 100,380" fill="url(#pyg)" stroke="rgba(201,162,39,0.25)" stroke-width="1"/>
+    <line x1="600" y1="20" x2="600" y2="380" stroke="rgba(201,162,39,0.12)" stroke-width="1"/>
+    <line x1="350" y1="200" x2="850" y2="200" stroke="rgba(201,162,39,0.08)" stroke-width="1"/>
+    <line x1="475" y1="110" x2="725" y2="110" stroke="rgba(201,162,39,0.06)" stroke-width="1"/>
+    <defs>
+      <linearGradient id="pyg" x1="600" y1="20" x2="600" y2="380" gradientUnits="userSpaceOnUse">
+        <stop offset="0%" stop-color="rgba(201,162,39,0.2)"/>
+        <stop offset="100%" stop-color="rgba(201,162,39,0.03)"/>
+      </linearGradient>
+    </defs>
+  </svg>
+
+  <div class="hero-content">
+    <div class="hero-left">
+      <div class="hero-badge" id="hero-badge">نظام التشغيل الرسمي</div>
+      <h1 class="hero-title">
+        <span id="hero-title1">نظام حورس</span><br>
+        HORUS EDU OS
+      </h1>
+      <p class="hero-sub" id="hero-sub">القاعدة: Ubuntu 22.04 LTS · XFCE4 · مفتوح المصدر</p>
+      <p class="hero-tagline" id="hero-tagline">𓂀 التعلم بلا حدود 𓂀</p>
+      <div class="hero-btns">
+        <a href="#download" class="btn-primary" id="hero-btn1">⬇ تحميل مجاني</a>
+        <a href="#apps" class="btn-secondary" id="hero-btn2">🔍 استكشف التطبيقات</a>
+      </div>
+      <div class="hero-stats">
+        <div class="stat-item"><div class="stat-num">7</div><div class="stat-label" id="stat1">تطبيق تعليمي</div></div>
+        <div class="stat-item"><div class="stat-num">22.04</div><div class="stat-label" id="stat2">Ubuntu LTS</div></div>
+        <div class="stat-item"><div class="stat-num">∞</div><div class="stat-label" id="stat3">إمكانيات</div></div>
+        <div class="stat-item"><div class="stat-num">100%</div><div class="stat-label" id="stat4">مجاني مفتوح</div></div>
+      </div>
+    </div>
+    <div class="hero-right">
+      <div class="os-mockup">
+        <div class="mock-titlebar">
+          <div class="mock-btn"></div><div class="mock-btn"></div><div class="mock-btn"></div>
+          <div class="mock-title">HORUS EDU OS 1.0.0</div>
+        </div>
+        <div class="mock-body">
+          <div class="mock-dock">
+            <div class="dock-icon active">🏛</div>
+            <div class="dock-icon">🤖</div>
+            <div class="dock-icon">💻</div>
+            <div class="dock-icon">📝</div>
+            <div class="dock-icon">🧠</div>
+            <div class="dock-icon">📚</div>
+            <div class="dock-icon">🔢</div>
+          </div>
+          <div class="mock-desktop">
+            <div class="mock-widget">
+              <div class="mock-widget-title">📊 النظام</div>
+              <div style="display:flex;gap:.5rem;font-size:.6rem"><span>CPU: 23%</span><span>RAM: 1.2/4 GB</span></div>
+              <div class="mock-progress"><div class="mock-progress-fill" style="width:23%"></div></div>
+            </div>
+            <div class="mock-apps-grid">
+              <div class="mock-app"><div class="mock-app-icon">🏛</div>Edu Hub</div>
+              <div class="mock-app"><div class="mock-app-icon">🤖</div>AI Tutor</div>
+              <div class="mock-app"><div class="mock-app-icon">💻</div>Code Lab</div>
+              <div class="mock-app"><div class="mock-app-icon">📝</div>Notes</div>
+              <div class="mock-app"><div class="mock-app-icon">🧠</div>Quiz</div>
+              <div class="mock-app"><div class="mock-app-icon">📚</div>Library</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ UNIVERSITY SEAL ═══════════════ -->
+<section id="seal-section">
+  <div class="seal-inner">
+    <!-- Horus University Circular Seal -->
+    <svg width="175" height="175" viewBox="0 0 180 180" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <path id="arc1" d="M90,90 m-72,0 a72,72 0 1,1 144,0 a72,72 0 1,1 -144,0"/>
+        <path id="arc2" d="M90,90 m-58,0 a58,58 0 1,1 116,0 a58,58 0 1,1 -116,0"/>
+      </defs>
+      <circle cx="90" cy="90" r="84" fill="none" stroke="#c9a227" stroke-width="2"/>
+      <circle cx="90" cy="90" r="78" fill="none" stroke="rgba(201,162,39,0.25)" stroke-width="0.8"/>
+      <circle cx="90" cy="90" r="68" fill="none" stroke="#c9a227" stroke-width="1.5"/>
+      <circle cx="90" cy="90" r="62" fill="rgba(4,7,15,0.85)" stroke="rgba(201,162,39,0.1)" stroke-width="0.5"/>
+      <!-- Outer dots -->
+      <g fill="#c9a227">
+        <circle cx="90" cy="6" r="2.5"/><circle cx="90" cy="174" r="2.5"/>
+        <circle cx="6" cy="90" r="2.5"/><circle cx="174" cy="90" r="2.5"/>
+        <circle cx="29" cy="29" r="1.8"/><circle cx="151" cy="29" r="1.8"/>
+        <circle cx="29" cy="151" r="1.8"/><circle cx="151" cy="151" r="1.8"/>
+      </g>
+      <!-- Eye of Horus center -->
+      <ellipse cx="90" cy="80" rx="21" ry="13" fill="none" stroke="#c9a227" stroke-width="2.2"/>
+      <circle cx="90" cy="80" r="7" fill="#c9a227"/>
+      <circle cx="90" cy="80" r="3" fill="#04070f"/>
+      <!-- Tear mark -->
+      <path d="M90 93 Q97 101 94 110 Q90 115 86 110 Q83 101 90 93Z" fill="rgba(201,162,39,0.45)" stroke="#c9a227" stroke-width="1.2"/>
+      <path d="M90 93 Q82 97 77 106" stroke="#c9a227" stroke-width="1.2" fill="none"/>
+      <!-- Arabic text -->
+      <text fill="#c9a227" font-size="9" font-family="Cairo,sans-serif" font-weight="700" text-anchor="middle">
+        <textPath href="#arc1" startOffset="18%">جامعة حورس للعلوم والتكنولوجيا</textPath>
+      </text>
+      <!-- English text -->
+      <text fill="rgba(201,162,39,0.8)" font-size="7" font-family="Cinzel,serif" font-weight="600" text-anchor="middle">
+        <textPath href="#arc2" startOffset="52%">HORUS UNIVERSITY · EST. 2024</textPath>
+      </text>
+      <!-- Bottom Arabic -->
+      <text x="90" y="120" fill="#d4a96a" font-size="7.5" font-family="Cairo,sans-serif" text-anchor="middle" font-weight="700">التعلم بلا حدود</text>
+    </svg>
+    <div class="seal-info">
+      <h3 id="seal-title">جامعة حورس للعلوم والتكنولوجيا</h3>
+      <p id="seal-desc">Horus Edu OS هو نظام التشغيل الرسمي لطلاب جامعة حورس، مصمم خصيصاً لتوفير بيئة تعليمية متكاملة تجمع بين قوة Linux ومرونة التعليم الحديث.</p>
+      <br>
+      <p style="color:var(--gold);font-size:.78rem;font-family:'Cinzel',serif;letter-spacing:.08em;margin-top:.5rem">
+        𓂋 HORUS UNIVERSITY · LEARNING WITHOUT LIMITS 𓂀
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- LOTUS DIVIDER -->
+<div class="lotus-divider">
+  <svg width="40" height="22" viewBox="0 0 80 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M40 38 Q30 20 20 25 Q15 10 40 5 Q65 10 60 25 Q50 20 40 38Z" fill="rgba(201,162,39,0.3)" stroke="#c9a227" stroke-width="1.2"/>
+    <path d="M40 38 Q35 25 25 28 Q20 18 40 12" fill="rgba(201,162,39,0.12)" stroke="rgba(201,162,39,0.5)" stroke-width="0.8"/>
+    <path d="M40 38 Q45 25 55 28 Q60 18 40 12" fill="rgba(201,162,39,0.12)" stroke="rgba(201,162,39,0.5)" stroke-width="0.8"/>
+  </svg>
+</div>
+
+<!-- ═══════════════ FEATURES ═══════════════ -->
+<section id="features" style="background:var(--bg2)">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-eyebrow" id="feat-eyebrow">المميزات</div>
+      <h2 class="section-title" id="feat-title">لماذا <span>Horus Edu OS</span>؟</h2>
+      <p class="section-desc" id="feat-desc">نظام تشغيل مبني للتعليم من الأساس، ليس مجرد Linux عادي</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card reveal">
+        <div class="feature-icon">🏛</div>
+        <div class="feature-title" id="f1t">واجهة عربية كاملة</div>
+        <div class="feature-desc" id="f1d">واجهة مستخدم بالكامل باللغة العربية مع دعم RTL، مصممة لراحة الطالب العربي بشكل كامل.</div>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feature-icon">🤖</div>
+        <div class="feature-title" id="f2t">مساعد AI محلي</div>
+        <div class="feature-desc" id="f2d">مساعد ذكاء اصطناعي يعمل بدون إنترنت باستخدام Ollama + Llama 3، يشرح المواد ويساعد في حل المسائل.</div>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feature-icon">🔒</div>
+        <div class="feature-title" id="f3t">آمن ومحمي</div>
+        <div class="feature-desc" id="f3d">مبني على Ubuntu 22.04 LTS مع AppArmor وsystemd sandboxing وتشفير كامل لبيانات الطالب.</div>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feature-icon">⚡</div>
+        <div class="feature-title" id="f4t">خفيف وسريع</div>
+        <div class="feature-desc" id="f4d">XFCE4 مع picom compositor يعمل بكفاءة على أجهزة بـ 4GB RAM، مثالي لمعامل الجامعة.</div>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feature-icon">📡</div>
+        <div class="feature-title" id="f5t">يعمل بدون إنترنت</div>
+        <div class="feature-desc" id="f5d">جميع التطبيقات والمحتوى متاحة offline، الطالب لا يحتاج اتصال دائم للاستفادة الكاملة.</div>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feature-icon">🎓</div>
+        <div class="feature-title" id="f6t">مخصص للجامعة</div>
+        <div class="feature-desc" id="f6d">تكامل مباشر مع منهج جامعة حورس، مكتبة رقمية للكتب الدراسية والمراجع العلمية المعتمدة.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LOTUS DIVIDER -->
+<div class="lotus-divider" style="background:var(--bg2)">
+  <svg width="40" height="22" viewBox="0 0 80 40" fill="none"><path d="M40 38 Q30 20 20 25 Q15 10 40 5 Q65 10 60 25 Q50 20 40 38Z" fill="rgba(201,162,39,0.25)" stroke="#c9a227" stroke-width="1.2"/></svg>
+</div>
+
+<!-- ═══════════════ APPS ═══════════════ -->
+<section id="apps" style="background:var(--bg)">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-eyebrow" id="apps-eyebrow">التطبيقات</div>
+      <h2 class="section-title" id="apps-title">٧ تطبيقات <span>تعليمية متكاملة</span></h2>
+      <p class="section-desc" id="apps-desc">كل شيء يحتاجه الطالب في مكان واحد</p>
+    </div>
+    <div class="apps-grid">
+      <div class="app-card reveal">
+        <div class="app-preview" style="background:linear-gradient(135deg,#0f1a35,#1a2a50)">
+          <div class="app-preview-glow"></div>
+          <div class="app-preview-icon">🏛</div>
+          <div class="app-preview-label">EDU HUB</div>
+        </div>
+        <div class="app-info">
+          <div class="app-name" id="app1n">Edu Hub — البوابة الرئيسية</div>
+          <div class="app-desc" id="app1d">لوحة تحكم مركزية للوصول لجميع التطبيقات والمواد ومتابعة التقدم الدراسي.</div>
+          <div class="app-port">localhost:9100</div>
+        </div>
+      </div>
+      <div class="app-card reveal">
+        <div class="app-preview" style="background:linear-gradient(135deg,#0f2020,#1a3530)">
+          <div class="app-preview-glow" style="background:radial-gradient(circle,rgba(16,185,129,.15),transparent 70%)"></div>
+          <div class="app-preview-icon">🤖</div>
+          <div class="app-preview-label">AI TUTOR</div>
+        </div>
+        <div class="app-info">
+          <div class="app-name" id="app2n">AI Tutor — المعلم الذكي</div>
+          <div class="app-desc" id="app2d">مساعد ذكاء اصطناعي محلي يشرح الدروس ويجيب الأسئلة بدون إنترنت.</div>
+          <div class="app-port">localhost:9101</div>
+        </div>
+      </div>
+      <div class="app-card reveal">
+        <div class="app-preview" style="background:linear-gradient(135deg,#150f2a,#2a1a45)">
+          <div class="app-preview-glow" style="background:radial-gradient(circle,rgba(99,102,241,.15),transparent 70%)"></div>
+          <div class="app-preview-icon">💻</div>
+          <div class="app-preview-label">CODE LAB</div>
+        </div>
+        <div class="app-info">
+          <div class="app-name" id="app3n">Code Lab — معمل البرمجة</div>
+          <div class="app-desc" id="app3d">بيئة برمجة كاملة بالمتصفح مع Monaco Editor لـ Python وJS وC++.</div>
+          <div class="app-port">code launcher</div>
+        </div>
+      </div>
+      <div class="app-card reveal">
+        <div class="app-preview" style="background:linear-gradient(135deg,#1a1508,#302510)">
+          <div class="app-preview-glow" style="background:radial-gradient(circle,rgba(201,162,39,.15),transparent 70%)"></div>
+          <div class="app-preview-icon">📝</div>
+          <div class="app-preview-label">SMART NOTES</div>
+        </div>
+        <div class="app-info">
+          <div class="app-name" id="app4n">Smart Notes — الملاحظات الذكية</div>
+          <div class="app-desc" id="app4d">محرر Markdown مع دعم الرياضيات KaTeX والرسوم البيانية Mermaid.</div>
+          <div class="app-port">notes launcher</div>
+        </div>
+      </div>
+      <div class="app-card reveal">
+        <div class="app-preview" style="background:linear-gradient(135deg,#0f1f30,#1a3045)">
+          <div class="app-preview-glow" style="background:radial-gradient(circle,rgba(59,130,246,.15),transparent 70%)"></div>
+          <div class="app-preview-icon">🧠</div>
+          <div class="app-preview-label">QUIZ</div>
+        </div>
+        <div class="app-info">
+          <div class="app-name" id="app5n">Quiz & Flashcards — الاختبارات</div>
+          <div class="app-desc" id="app5d">نظام اختبارات وبطاقات تذكر ذكي بخوارزمية Spaced Repetition.</div>
+          <div class="app-port">quiz launcher</div>
+        </div>
+      </div>
+      <div class="app-card reveal">
+        <div class="app-preview" style="background:linear-gradient(135deg,#080f20,#10182f)">
+          <div class="app-preview-glow" style="background:radial-gradient(circle,rgba(139,92,246,.15),transparent 70%)"></div>
+          <div class="app-preview-icon">📚</div>
+          <div class="app-preview-label">LIBRARY</div>
+        </div>
+        <div class="app-info">
+          <div class="app-name" id="app6n">Digital Library — المكتبة الرقمية</div>
+          <div class="app-desc" id="app6d">مكتبة رقمية للكتب الجامعية وملفات PDF مع بحث متقدم.</div>
+          <div class="app-port">library launcher</div>
+        </div>
+      </div>
+      <div class="app-card reveal">
+        <div class="app-preview" style="background:linear-gradient(135deg,#0f1508,#1a2510)">
+          <div class="app-preview-glow" style="background:radial-gradient(circle,rgba(34,197,94,.15),transparent 70%)"></div>
+          <div class="app-preview-icon">🔢</div>
+          <div class="app-preview-label">CALCULATOR</div>
+        </div>
+        <div class="app-info">
+          <div class="app-name" id="app7n">Scientific Calculator — الآلة الحاسبة</div>
+          <div class="app-desc" id="app7d">آلة حاسبة علمية متقدمة مع رسم الدوال ورموز الفيزياء والكيمياء.</div>
+          <div class="app-port">calc launcher</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LOTUS DIVIDER -->
+<div class="lotus-divider" style="background:var(--bg)">
+  <svg width="40" height="22" viewBox="0 0 80 40" fill="none"><path d="M40 38 Q30 20 20 25 Q15 10 40 5 Q65 10 60 25 Q50 20 40 38Z" fill="rgba(201,162,39,0.25)" stroke="#c9a227" stroke-width="1.2"/></svg>
+</div>
+
+<!-- ═══════════════ DOWNLOAD ═══════════════ -->
+<section id="download" style="background:linear-gradient(180deg,var(--bg2),var(--bg3))">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-eyebrow" id="dl-eyebrow">تحميل مجاني</div>
+      <h2 class="section-title" id="dl-title">حمّل <span>Horus Edu OS</span> الآن</h2>
+      <p class="section-desc" id="dl-desc">متاح مجاناً لجميع طلاب جامعة حورس والمهتمين بالتعليم</p>
+    </div>
+
+    <!-- ISO main download (GitHub Release) -->
+    <div class="reveal" style="background:linear-gradient(135deg,rgba(201,162,39,.1),rgba(26,58,110,.1));border:2px solid rgba(201,162,39,.35);border-radius:6px;padding:1.75rem;margin-bottom:2rem;display:flex;gap:1.5rem;align-items:center;flex-wrap:wrap">
+      <div style="font-size:3rem;flex-shrink:0">💿</div>
+      <div style="flex:1;min-width:200px">
+        <div style="color:var(--gold);font-weight:700;font-size:1.1rem;margin-bottom:.35rem;font-family:'Cinzel',serif" id="iso-main-title">horus-edu-os-1.0.0-amd64.iso</div>
+        <div style="color:var(--text2);font-size:.88rem;margin-bottom:.6rem" id="iso-main-desc">الملف الرئيسي للنظام · ~2-3 GB · Ubuntu 22.04 Base</div>
+        <div style="display:flex;gap:.5rem;flex-wrap:wrap">
+          <span style="background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);color:#10b981;padding:.2rem .6rem;border-radius:2px;font-size:.72rem;font-weight:700">✓ UEFI + Legacy</span>
+          <span style="background:rgba(201,162,39,.1);border:1px solid rgba(201,162,39,.3);color:var(--gold);padding:.2rem .6rem;border-radius:2px;font-size:.72rem;font-weight:700">Live + Install</span>
+          <span style="background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.3);color:#818cf8;padding:.2rem .6rem;border-radius:2px;font-size:.72rem;font-weight:700">x86_64</span>
+        </div>
+      </div>
+      <a href="https://github.com/alaa00saber/horus-edu-os/releases/latest" target="_blank" class="btn-primary" style="flex-shrink:0" id="iso-dl-btn">
+        ⬇ تحميل من GitHub
+      </a>
+    </div>
+
+    <!-- Secondary files -->
+    <div class="dl-file-grid reveal">
+      <a href="downloads/horus-edu-os.vmx" download class="dl-file">
+        <div class="dl-file-icon">🖥</div>
+        <div class="dl-file-info">
+          <div class="dl-file-name">horus-edu-os.vmx</div>
+          <div class="dl-file-meta" id="vmx-meta">ملف VMware · فتح مباشر</div>
+        </div>
+        <div class="dl-file-btn" id="vmx-btn">⬇ تحميل</div>
+      </a>
+      <a href="downloads/INSTALL-GUIDE.txt" download class="dl-file">
+        <div class="dl-file-icon">📋</div>
+        <div class="dl-file-info">
+          <div class="dl-file-name">INSTALL-GUIDE.txt</div>
+          <div class="dl-file-meta" id="guide-meta">دليل التثبيت الكامل</div>
+        </div>
+        <div class="dl-file-btn" id="guide-btn">⬇ تحميل</div>
+      </a>
+      <a href="downloads/sha256sum.txt" download class="dl-file">
+        <div class="dl-file-icon">🔐</div>
+        <div class="dl-file-info">
+          <div class="dl-file-name">sha256sum.txt</div>
+          <div class="dl-file-meta" id="sha-meta">للتحقق من سلامة الملف</div>
+        </div>
+        <div class="dl-file-btn" id="sha-btn">⬇ تحميل</div>
+      </a>
+    </div>
+
+    <!-- Windows quick test banner -->
+    <div class="reveal" style="background:rgba(99,102,241,.07);border:1px solid rgba(99,102,241,.25);border-radius:4px;padding:1.25rem;margin-bottom:2rem;display:flex;gap:1rem;align-items:flex-start">
+      <div style="font-size:1.5rem;flex-shrink:0">🪟</div>
+      <div>
+        <div style="color:#818cf8;font-weight:700;margin-bottom:.3rem" id="wsl-title">اختبر على Windows الآن بدون ISO</div>
+        <div style="color:var(--text2);font-size:.85rem" id="wsl-desc">شغّل PowerShell كـ Administrator ونفّذ الأمر التالي — سيثبّت WSL2 ويشغّل كل التطبيقات تلقائياً:</div>
+        <code style="display:block;margin-top:.6rem;background:rgba(0,0,0,.4);padding:.6rem 1rem;border-radius:3px;font-size:.82rem;color:var(--sand)">.\scripts\wsl-quickstart.ps1</code>
+      </div>
+    </div>
+
+    <div class="reveal">
+      <div class="tabs">
+        <button class="tab-btn active" onclick="showTab('usb',event)" id="tab-usb">🔌 USB Flash</button>
+        <button class="tab-btn" onclick="showTab('vmware',event)" id="tab-vmware">🖥 VMware</button>
+        <button class="tab-btn" onclick="showTab('vbox',event)" id="tab-vbox">📦 VirtualBox</button>
+        <button class="tab-btn" onclick="showTab('dual',event)" id="tab-dual">⚡ Dual Boot</button>
+      </div>
+      <div style="background:var(--surface);border:1px solid rgba(201,162,39,.12);border-radius:4px;padding:1.5rem">
+        <div id="panel-usb" class="tab-panel active">
+          <ol class="install-steps">
+            <li id="usb1">حمّل ملف ISO من الرابط أعلاه بمجرد توفره</li>
+            <li id="usb2">تحقق من سلامة الملف: <code>sha256sum -c sha256sum.txt</code></li>
+            <li id="usb3">Windows: افتح Rufus → اختر ISO → GPT + UEFI → Start</li>
+            <li id="usb4">Linux/Mac: <code>sudo dd if=horus-edu-os.iso of=/dev/sdX bs=4M status=progress</code></li>
+            <li id="usb5">أعد تشغيل الحاسوب وادخل BIOS → Boot from USB</li>
+            <li id="usb6">اختر "جرّب Horus" أو "ثبّت Horus" من قائمة GRUB</li>
+          </ol>
+        </div>
+        <div id="panel-vmware" class="tab-panel">
+          <ol class="install-steps">
+            <li id="vm1">حمّل ملف <code>horus-edu-os.vmx</code> من الأعلى</li>
+            <li id="vm2">افتح VMware Workstation أو VMware Player</li>
+            <li id="vm3">File → Open → اختر ملف <code>horus-edu-os.vmx</code></li>
+            <li id="vm4">ضع ملف ISO في نفس مجلد ملف الـ VMX</li>
+            <li id="vm5">اضغط Power On → سيقلع تلقائياً من الـ ISO</li>
+            <li id="vm6">الإعدادات المقترحة: RAM 4GB · CPU 2 · Secure Boot OFF</li>
+          </ol>
+        </div>
+        <div id="panel-vbox" class="tab-panel">
+          <ol class="install-steps">
+            <li id="vb1">افتح VirtualBox → New</li>
+            <li id="vb2">الاسم: Horus Edu OS · النوع: Linux · Ubuntu 64-bit</li>
+            <li id="vb3">RAM: 4096 MB · VDI: 30 GB</li>
+            <li id="vb4">Settings → Storage → أضف ملف ISO</li>
+            <li id="vb5">Settings → System → Enable EFI</li>
+            <li id="vb6">Start → سيقلع من الـ ISO تلقائياً</li>
+          </ol>
+        </div>
+        <div id="panel-dual" class="tab-panel">
+          <ol class="install-steps">
+            <li id="db1">قم بعمل نسخة احتياطية لبياناتك أولاً !</li>
+            <li id="db2">حمّل Horus Edu OS ISO وفلّشه على USB</li>
+            <li id="db3">من Windows: Disk Management → حرر مساحة 40GB+</li>
+            <li id="db4">أقلع من USB → اختر "Install Horus Edu OS"</li>
+            <li id="db5">في المثبّت: "Install alongside existing OS"</li>
+            <li id="db6">GRUB سيظهر عند كل إقلاع لاختيار النظام</li>
+          </ol>
+        </div>
+        <div style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid rgba(255,255,255,.05)">
+          <div style="color:var(--text2);font-size:.8rem" id="login-info">
+            بيانات الدخول الافتراضية: <code>horus-student</code> / <code>horus2024</code>
+            — غيّر كلمة المرور بعد أول دخول: <code>passwd horus-student</code>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ AI DEMO ═══════════════ -->
+<section id="ai-demo" style="background:var(--bg)">
+  <div class="container">
+    <div class="ai-layout">
+      <div class="reveal">
+        <div class="section-eyebrow" id="ai-eyebrow">AI Tutor</div>
+        <h2 class="section-title" style="text-align:right" id="ai-title">مساعد <span>الذكاء الاصطناعي</span></h2>
+        <p style="color:var(--text2);margin-bottom:1.5rem" id="ai-desc">يعمل محلياً بالكامل بدون إنترنت — يشرح المواد ويحل المسائل ويساعدك في الفهم</p>
+        <div class="ai-features">
+          <div class="ai-feat">
+            <div class="ai-feat-icon">🧮</div>
+            <div><div class="ai-feat-title" id="aif1t">شرح الرياضيات</div><div class="ai-feat-desc" id="aif1d">يشرح المعادلات والتكاملات خطوة بخطوة</div></div>
+          </div>
+          <div class="ai-feat">
+            <div class="ai-feat-icon">💻</div>
+            <div><div class="ai-feat-title" id="aif2t">مساعد البرمجة</div><div class="ai-feat-desc" id="aif2d">يكتب ويشرح الكود ويصلح الأخطاء</div></div>
+          </div>
+          <div class="ai-feat">
+            <div class="ai-feat-icon">📖</div>
+            <div><div class="ai-feat-title" id="aif3t">تلخيص المحاضرات</div><div class="ai-feat-desc" id="aif3d">يلخص ملفات PDF ويستخرج النقاط الرئيسية</div></div>
+          </div>
+          <div class="ai-feat">
+            <div class="ai-feat-icon">🌍</div>
+            <div><div class="ai-feat-title" id="aif4t">عربي وإنجليزي</div><div class="ai-feat-desc" id="aif4d">يجيب باللغة التي تسأل بها</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="reveal">
+        <div class="ai-chat-window">
+          <div class="chat-header">
+            <div class="chat-avatar">𓂀</div>
+            <div>
+              <div class="chat-name">Horus AI Tutor</div>
+              <div class="chat-status" id="chat-online">● متصل ويعمل محلياً</div>
+            </div>
+          </div>
+          <div class="chat-msgs" id="chat-msgs">
+            <div class="msg ai" id="ai-greeting">مرحباً! أنا مساعدك الذكي. كيف أساعدك في دراستك اليوم؟ 🎓</div>
+          </div>
+          <div class="chat-input">
+            <input type="text" id="chat-in" placeholder="اسأل عن أي مادة..." onkeydown="if(event.key==='Enter')sendMsg()">
+            <button class="chat-send" onclick="sendMsg()" id="chat-send-btn">إرسال</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ SPECS ═══════════════ -->
+<section id="specs" style="background:var(--bg2)">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-eyebrow" id="specs-eyebrow">المواصفات</div>
+      <h2 class="section-title" id="specs-title">المواصفات <span>التقنية</span></h2>
+    </div>
+    <div class="specs-grid reveal">
+      <div class="spec-block">
+        <div class="spec-block-title">🖥 النظام الأساسي</div>
+        <div class="spec-row"><span class="spec-key" id="sk1">القاعدة</span><span class="spec-val">Ubuntu 22.04 LTS</span></div>
+        <div class="spec-row"><span class="spec-key" id="sk2">الواجهة</span><span class="spec-val">XFCE4 + picom</span></div>
+        <div class="spec-row"><span class="spec-key" id="sk3">المعالج</span><span class="spec-val">x86_64 / AMD64</span></div>
+        <div class="spec-row"><span class="spec-key" id="sk4">الذاكرة المطلوبة</span><span class="spec-val gold">4 GB RAM</span></div>
+        <div class="spec-row"><span class="spec-key" id="sk5">مساحة القرص</span><span class="spec-val">30 GB+</span></div>
+        <div class="spec-row"><span class="spec-key" id="sk6">الإقلاع</span><span class="spec-val">UEFI + Legacy</span></div>
+      </div>
+      <div class="spec-block">
+        <div class="spec-block-title">📦 التطبيقات المضمّنة</div>
+        <div class="spec-row"><span class="spec-key">Edu Hub</span><span class="spec-val good">FastAPI + React</span></div>
+        <div class="spec-row"><span class="spec-key">AI Tutor</span><span class="spec-val good">Ollama + Llama 3</span></div>
+        <div class="spec-row"><span class="spec-key">Code Lab</span><span class="spec-val good">Monaco + Pyodide</span></div>
+        <div class="spec-row"><span class="spec-key">Smart Notes</span><span class="spec-val good">Markdown + KaTeX</span></div>
+        <div class="spec-row"><span class="spec-key">Quiz</span><span class="spec-val good">Spaced Repetition</span></div>
+        <div class="spec-row"><span class="spec-key">Library</span><span class="spec-val good">PDF + Search</span></div>
+      </div>
+      <div class="spec-block">
+        <div class="spec-block-title">🔧 مكونات النظام</div>
+        <div class="spec-row"><span class="spec-key" id="sk7">المتصفح</span><span class="spec-val">Chromium</span></div>
+        <div class="spec-row"><span class="spec-key" id="sk8">الطرفية</span><span class="spec-val">XFCE Terminal</span></div>
+        <div class="spec-row"><span class="spec-key" id="sk9">المحرر</span><span class="spec-val">VSCode + Gedit</span></div>
+        <div class="spec-row"><span class="spec-key" id="sk10">قراءة PDF</span><span class="spec-val">Evince</span></div>
+        <div class="spec-row"><span class="spec-key" id="sk11">الأمان</span><span class="spec-val good">AppArmor ON</span></div>
+        <div class="spec-row"><span class="spec-key" id="sk12">الترخيص</span><span class="spec-val gold">GPL-3.0</span></div>
+      </div>
+      <div class="spec-block">
+        <div class="spec-block-title">🔑 بيانات الدخول</div>
+        <div class="spec-row"><span class="spec-key" id="sk13">المستخدم</span><span class="spec-val"><code>horus-student</code></span></div>
+        <div class="spec-row"><span class="spec-key" id="sk14">كلمة المرور</span><span class="spec-val"><code>horus2024</code></span></div>
+        <div class="spec-row"><span class="spec-key">Sudo</span><span class="spec-val gold">NOPASSWD</span></div>
+        <div class="spec-row"><span class="spec-key">Edu Hub</span><span class="spec-val"><code>:9100</code></span></div>
+        <div class="spec-row"><span class="spec-key">AI Tutor</span><span class="spec-val"><code>:9101</code></span></div>
+        <div class="spec-row"><span class="spec-key" id="sk15">البريد</span><span class="spec-val" style="font-size:.75rem">alaa00saber@gmail.com</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ FOOTER ═══════════════ -->
+<footer>
+  <div class="footer-inner">
+    <div>
+      <div class="footer-logo">
+        <svg width="34" height="34" viewBox="0 0 80 80" fill="none">
+          <ellipse cx="40" cy="38" rx="24" ry="14" stroke="#c9a227" stroke-width="2.5"/>
+          <circle cx="40" cy="38" r="7" fill="#c9a227" opacity="0.9"/>
+          <circle cx="40" cy="38" r="3" fill="#04070f"/>
+          <path d="M40 52 Q48 58 44 68 Q40 72 36 68 Q32 58 40 52Z" stroke="#c9a227" stroke-width="1.8" fill="rgba(201,162,39,0.15)"/>
+        </svg>
+        <div class="footer-brand-name">
+          HORUS EDU OS
+          <small id="footer-tagline">جامعة حورس · التعلم بلا حدود</small>
+        </div>
+      </div>
+      <p class="footer-brand-desc" id="footer-desc">نظام تشغيل تعليمي متكامل لطلاب جامعة حورس، مبني على Linux وموجه للتعلم والإبداع.</p>
+    </div>
+    <div class="footer-col">
+      <h4 id="fc1h">روابط سريعة</h4>
+      <ul>
+        <li><a href="#features" id="fc1l1">المميزات</a></li>
+        <li><a href="#apps" id="fc1l2">التطبيقات</a></li>
+        <li><a href="#download" id="fc1l3">تحميل</a></li>
+        <li><a href="#ai-demo" id="fc1l4">AI Tutor</a></li>
+        <li><a href="#specs" id="fc1l5">المواصفات</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4 id="fc2h">التواصل</h4>
+      <ul>
+        <li><a href="mailto:alaa00saber@gmail.com">alaa00saber@gmail.com</a></li>
+        <li><a href="#" id="fc2l2">جامعة حورس</a></li>
+        <li><a href="downloads/INSTALL-GUIDE.txt" download id="fc2l3">دليل التثبيت</a></li>
+        <li><a href="downloads/horus-edu-os.vmx" download id="fc2l4">VMware Config</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="footer-copy" id="footer-copy">© 2024 جامعة حورس للعلوم والتكنولوجيا · Horus University</div>
+    <div class="footer-glyphs">𓂀 𓂋 𓃭 𓆓 𓇋 𓏏</div>
+  </div>
+</footer>
+
+<script>
+// ── PARTICLE CANVAS ──
+(function(){
+  const c=document.getElementById('canvas-bg'),ctx=c.getContext('2d');
+  let W,H,pts=[];
+  function resize(){W=c.width=window.innerWidth;H=c.height=window.innerHeight;init()}
+  function rand(a,b){return a+Math.random()*(b-a)}
+  function init(){
+    pts=[];
+    const n=Math.floor(W*H/16000);
+    for(let i=0;i<n;i++)pts.push({x:rand(0,W),y:rand(0,H),vx:rand(-.25,.25),vy:rand(-.25,.25),r:rand(1,2.2)});
+  }
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    for(let i=0;i<pts.length;i++){
+      const p=pts[i];
+      p.x+=p.vx;p.y+=p.vy;
+      if(p.x<0||p.x>W)p.vx*=-1;
+      if(p.y<0||p.y>H)p.vy*=-1;
+      ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle='rgba(201,162,39,0.4)';ctx.fill();
+      for(let j=i+1;j<pts.length;j++){
+        const q=pts[j],d=Math.hypot(p.x-q.x,p.y-q.y);
+        if(d<130){
+          ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(q.x,q.y);
+          ctx.strokeStyle='rgba(201,162,39,'+(0.12*(1-d/130))+')';
+          ctx.lineWidth=0.7;ctx.stroke();
+        }
+      }
+    }
+    requestAnimationFrame(draw);
+  }
+  window.addEventListener('resize',resize);
+  resize();draw();
+})();
+
+// ── TABS ──
+function showTab(id,e){
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('panel-'+id).classList.add('active');
+  if(e&&e.target)e.target.classList.add('active');
+}
+
+// ── AI CHAT ──
+const REPLIES={
+  default:[
+    'يسعدني مساعدتك! الرجاء توضيح سؤالك أكثر.',
+    'سؤال ممتاز! هذا الموضوع مهم جداً في المنهج الدراسي.',
+    'دعني أشرح لك ذلك خطوة بخطوة...',
+  ],
+  math:['الرياضيات ممتعة! هذه المعادلة تحل كالتالي: نبسّط الطرف الأيسر أولاً...','بالنسبة للتكامل نستخدم قاعدة الاستبدال. نضع u = المتغير الداخلي...'],
+  code:['ها هو الكود بعد التصحيح:\n```python\ndef solve(n):\n    return n*(n+1)//2\n```','مشكلة شائعة! الخطأ يحدث لأن المتغير غير معرّف قبل الاستخدام.'],
+  explain:['بكل سرور! المفهوم الأساسي هو...','هذا يمكن تبسيطه كالتالي: تخيّل أنك...'],
+};
+function getReply(msg){
+  const m=msg.toLowerCase();
+  if(/رياض|معادل|تكامل|مشتق|حساب/.test(m))return pick(REPLIES.math);
+  if(/كود|برمج|python|خطأ|error/.test(m))return pick(REPLIES.code);
+  if(/اشرح|وضح|مفهوم|ما هو/.test(m))return pick(REPLIES.explain);
+  return pick(REPLIES.default);
+}
+function pick(arr){return arr[Math.floor(Math.random()*arr.length)]}
+function addMsg(text,cls){
+  const d=document.getElementById('chat-msgs');
+  const m=document.createElement('div');
+  m.className='msg '+cls;m.textContent=text;
+  d.appendChild(m);d.scrollTop=d.scrollHeight;
+}
+function sendMsg(){
+  const inp=document.getElementById('chat-in');
+  const txt=inp.value.trim();if(!txt)return;
+  addMsg(txt,'user');inp.value='';
+  const d=document.getElementById('chat-msgs');
+  const typing=document.createElement('div');
+  typing.className='msg ai msg-typing';
+  typing.innerHTML='<span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span>';
+  d.appendChild(typing);d.scrollTop=d.scrollHeight;
+  setTimeout(()=>{typing.remove();addMsg(getReply(txt),'ai')},900+Math.random()*600);
+}
+
+// ── REVEAL ON SCROLL ──
+const obs=new IntersectionObserver(e=>{e.forEach(x=>{if(x.isIntersecting)x.target.classList.add('visible')})},{threshold:.12});
+document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+
+// ── LANGUAGE ──
+let lang='ar';
+const T={
+ar:{
+  'nav-tagline':'جامعة حورس · التعلم بلا حدود',
+  'nav-features':'المميزات','nav-apps':'التطبيقات','nav-download':'تحميل',
+  'nav-ai':'المساعد','nav-specs':'المواصفات','nav-cta':'⬇ تحميل',
+  'hero-badge':'نظام التشغيل الرسمي',
+  'hero-title1':'نظام حورس','hero-sub':'القاعدة: Ubuntu 22.04 LTS · XFCE4 · مفتوح المصدر',
+  'hero-tagline':'𓂀 التعلم بلا حدود 𓂀',
+  'hero-btn1':'⬇ تحميل مجاني','hero-btn2':'🔍 استكشف التطبيقات',
+  'stat1':'تطبيق تعليمي','stat2':'Ubuntu LTS','stat3':'إمكانيات','stat4':'مجاني مفتوح',
+  'seal-title':'جامعة حورس للعلوم والتكنولوجيا',
+  'seal-desc':'Horus Edu OS هو نظام التشغيل الرسمي لطلاب جامعة حورس، مصمم لتوفير بيئة تعليمية متكاملة.',
+  'feat-eyebrow':'المميزات','feat-title':'لماذا Horus Edu OS؟','feat-desc':'نظام تشغيل مبني للتعليم من الأساس',
+  'f1t':'واجهة عربية كاملة','f1d':'واجهة RTL عربية كاملة مصممة للطالب العربي.',
+  'f2t':'مساعد AI محلي','f2d':'ذكاء اصطناعي يعمل offline باستخدام Ollama + Llama 3.',
+  'f3t':'آمن ومحمي','f3d':'Ubuntu 22.04 LTS مع AppArmor وsystemd sandboxing.',
+  'f4t':'خفيف وسريع','f4d':'XFCE4 يعمل على أجهزة بـ 4GB RAM.',
+  'f5t':'يعمل بدون إنترنت','f5d':'جميع التطبيقات متاحة offline.',
+  'f6t':'مخصص للجامعة','f6d':'تكامل مع منهج جامعة حورس ومكتبتها.',
+  'apps-eyebrow':'التطبيقات','apps-title':'٧ تطبيقات تعليمية متكاملة','apps-desc':'كل شيء يحتاجه الطالب في مكان واحد',
+  'app1n':'Edu Hub — البوابة الرئيسية','app2n':'AI Tutor — المعلم الذكي',
+  'app3n':'Code Lab — معمل البرمجة','app4n':'Smart Notes — الملاحظات الذكية',
+  'app5n':'Quiz & Flashcards — الاختبارات','app6n':'Digital Library — المكتبة الرقمية',
+  'app7n':'Scientific Calculator — الآلة الحاسبة',
+  'app1d':'لوحة تحكم مركزية لجميع التطبيقات.','app2d':'مساعد محلي يشرح الدروس بدون إنترنت.',
+  'app3d':'بيئة برمجة Monaco Editor كاملة.','app4d':'Markdown مع KaTeX للرياضيات.',
+  'app5d':'Spaced Repetition للحفظ الذكي.','app6d':'مكتبة PDF للكتب الجامعية.',
+  'app7d':'آلة حاسبة علمية مع رسم الدوال.',
+  'dl-eyebrow':'تحميل مجاني','dl-title':'حمّل Horus Edu OS الآن','dl-desc':'متاح مجاناً لجميع طلاب جامعة حورس',
+  'vmx-meta':'ملف VMware · فتح مباشر','guide-meta':'دليل التثبيت الكامل','sha-meta':'للتحقق من سلامة الملف',
+  'vmx-btn':'⬇ تحميل','guide-btn':'⬇ تحميل','sha-btn':'⬇ تحميل',
+  'iso-main-title':'horus-edu-os-1.0.0-amd64.iso','iso-main-desc':'الملف الرئيسي للنظام · ~2-3 GB · Ubuntu 22.04 Base',
+  'iso-dl-btn':'⬇ تحميل من GitHub',
+  'wsl-title':'اختبر على Windows الآن بدون ISO','wsl-desc':'شغّل PowerShell كـ Administrator ونفّذ: .\\scripts\\wsl-quickstart.ps1',
+  'tab-usb':'🔌 USB Flash','tab-vmware':'🖥 VMware','tab-vbox':'📦 VirtualBox','tab-dual':'⚡ Dual Boot',
+  'usb1':'حمّل ISO من الرابط','usb2':'تحقق من SHA256','usb3':'Windows: استخدم Rufus',
+  'usb4':'Linux: dd if=horus.iso of=/dev/sdX','usb5':'أقلع من USB','usb6':'اختر من GRUB',
+  'vm1':'حمّل horus-edu-os.vmx','vm2':'افتح VMware Workstation/Player',
+  'vm3':'File → Open → اختر الـ VMX','vm4':'ضع ISO في نفس مجلد VMX',
+  'vm5':'Power On → يقلع تلقائياً','vm6':'RAM 4GB · CPU 2 · Secure Boot OFF',
+  'vb1':'VirtualBox → New','vb2':'Linux · Ubuntu 64-bit',
+  'vb3':'RAM: 4096 MB · VDI: 30 GB','vb4':'Storage → أضف ISO',
+  'vb5':'System → Enable EFI','vb6':'Start',
+  'db1':'اعمل نسخة احتياطية أولاً!','db2':'فلّش ISO على USB',
+  'db3':'حرر 40GB+ من Disk Management','db4':'أقلع من USB',
+  'db5':'Install alongside','db6':'GRUB عند الإقلاع',
+  'login-info':'بيانات الدخول: horus-student / horus2024',
+  'ai-eyebrow':'AI Tutor','ai-title':'مساعد الذكاء الاصطناعي','ai-desc':'يعمل محلياً بدون إنترنت',
+  'aif1t':'شرح الرياضيات','aif1d':'يشرح المعادلات خطوة بخطوة',
+  'aif2t':'مساعد البرمجة','aif2d':'يكتب ويشرح الكود',
+  'aif3t':'تلخيص المحاضرات','aif3d':'يلخص PDF والمحاضرات',
+  'aif4t':'عربي وإنجليزي','aif4d':'يجيب باللغة التي تسأل بها',
+  'chat-online':'● متصل ويعمل محلياً','ai-greeting':'مرحباً! أنا مساعدك الذكي. كيف أساعدك؟ 🎓',
+  'chat-send-btn':'إرسال',
+  'specs-eyebrow':'المواصفات','specs-title':'المواصفات التقنية',
+  'sk1':'القاعدة','sk2':'الواجهة','sk3':'المعالج','sk4':'الذاكرة','sk5':'القرص',
+  'sk6':'الإقلاع','sk7':'المتصفح','sk8':'الطرفية','sk9':'المحرر','sk10':'PDF',
+  'sk11':'الأمان','sk12':'الترخيص','sk13':'المستخدم','sk14':'كلمة المرور','sk15':'البريد',
+  'fc1h':'روابط سريعة','fc1l1':'المميزات','fc1l2':'التطبيقات','fc1l3':'تحميل','fc1l4':'AI','fc1l5':'المواصفات',
+  'fc2h':'التواصل','fc2l2':'جامعة حورس','fc2l3':'دليل التثبيت','fc2l4':'VMware Config',
+  'footer-tagline':'جامعة حورس · التعلم بلا حدود',
+  'footer-desc':'نظام تعليمي متكامل لطلاب جامعة حورس مبني على Linux.',
+  'footer-copy':'© 2024 جامعة حورس للعلوم والتكنولوجيا','lang-btn':'EN',
+},
+en:{
+  'nav-tagline':'Horus University · Learning Without Limits',
+  'nav-features':'Features','nav-apps':'Apps','nav-download':'Download',
+  'nav-ai':'AI Tutor','nav-specs':'Specs','nav-cta':'⬇ Download',
+  'hero-badge':'Official OS',
+  'hero-title1':'Horus System','hero-sub':'Base: Ubuntu 22.04 LTS · XFCE4 · Open Source',
+  'hero-tagline':'𓂀 Learning Without Limits 𓂀',
+  'hero-btn1':'⬇ Free Download','hero-btn2':'🔍 Explore Apps',
+  'stat1':'Edu Apps','stat2':'Ubuntu LTS','stat3':'Possibilities','stat4':'Free & Open',
+  'seal-title':'Horus University of Science & Technology',
+  'seal-desc':'Horus Edu OS is the official OS for Horus University students, providing a complete educational Linux environment.',
+  'feat-eyebrow':'Features','feat-title':'Why Horus Edu OS?','feat-desc':'Built for education from the ground up',
+  'f1t':'Full Arabic UI','f1d':'Complete RTL Arabic interface designed for Arab students.',
+  'f2t':'Local AI Assistant','f2d':'AI works fully offline with Ollama + Llama 3.',
+  'f3t':'Secure & Protected','f3d':'Ubuntu 22.04 LTS with AppArmor and systemd sandboxing.',
+  'f4t':'Light & Fast','f4d':'XFCE4 runs smoothly on 4GB RAM devices.',
+  'f5t':'Offline-First','f5d':'All apps available without internet.',
+  'f6t':'University-Tailored','f6d':'Direct integration with Horus University curriculum.',
+  'apps-eyebrow':'Apps','apps-title':'7 Integrated Educational Apps','apps-desc':'Everything a student needs in one place',
+  'app1n':'Edu Hub — Main Portal','app2n':'AI Tutor — Smart Teacher',
+  'app3n':'Code Lab — Programming Lab','app4n':'Smart Notes — Note Taking',
+  'app5n':'Quiz & Flashcards','app6n':'Digital Library','app7n':'Scientific Calculator',
+  'app1d':'Central dashboard for all apps.','app2d':'Local AI explains lessons offline.',
+  'app3d':'Monaco Editor browser IDE.','app4d':'Markdown with KaTeX math.',
+  'app5d':'Spaced Repetition algorithm.','app6d':'University PDF library.',
+  'app7d':'Scientific calculator with function plots.',
+  'dl-eyebrow':'Free Download','dl-title':'Download Horus Edu OS','dl-desc':'Free for all Horus University students',
+  'vmx-meta':'VMware file · Open directly','guide-meta':'Full installation guide','sha-meta':'Verify file integrity',
+  'vmx-btn':'⬇ Download','guide-btn':'⬇ Download','sha-btn':'⬇ Download',
+  'iso-main-title':'horus-edu-os-1.0.0-amd64.iso','iso-main-desc':'Main OS file · ~2-3 GB · Ubuntu 22.04 Base',
+  'iso-dl-btn':'⬇ Download from GitHub',
+  'wsl-title':'Test on Windows now — no ISO needed','wsl-desc':'Run PowerShell as Administrator and execute: .\\scripts\\wsl-quickstart.ps1',
+  'tab-usb':'🔌 USB Flash','tab-vmware':'🖥 VMware','tab-vbox':'📦 VirtualBox','tab-dual':'⚡ Dual Boot',
+  'usb1':'Download ISO file','usb2':'Verify SHA256','usb3':'Windows: Use Rufus (GPT+UEFI)',
+  'usb4':'Linux: dd if=horus.iso of=/dev/sdX','usb5':'Reboot from USB','usb6':'Choose from GRUB',
+  'vm1':'Download horus-edu-os.vmx','vm2':'Open VMware Workstation/Player',
+  'vm3':'File → Open → select .vmx','vm4':'Place ISO in same folder as VMX',
+  'vm5':'Power On → boots from ISO','vm6':'RAM 4GB · 2 CPUs · Secure Boot OFF',
+  'vb1':'VirtualBox → New','vb2':'Linux · Ubuntu 64-bit',
+  'vb3':'RAM: 4096 MB · VDI: 30 GB','vb4':'Storage → Add ISO',
+  'vb5':'System → Enable EFI','vb6':'Start',
+  'db1':'Backup your data first!','db2':'Flash ISO to USB',
+  'db3':'Free 40GB+ from Disk Management','db4':'Boot from USB',
+  'db5':'Install alongside','db6':'GRUB on boot',
+  'login-info':'Default credentials: horus-student / horus2024',
+  'ai-eyebrow':'AI Tutor','ai-title':'AI Assistant','ai-desc':'Runs fully locally without internet',
+  'aif1t':'Math Explanations','aif1d':'Step-by-step equations and integrals',
+  'aif2t':'Coding Assistant','aif2d':'Writes, explains and debugs code',
+  'aif3t':'Lecture Summaries','aif3d':'Summarizes PDFs and lectures',
+  'aif4t':'Arabic & English','aif4d':'Answers in the language you ask in',
+  'chat-online':'● Connected · Running locally','ai-greeting':'Hello! I\'m your AI tutor. How can I help today? 🎓',
+  'chat-send-btn':'Send',
+  'specs-eyebrow':'Specs','specs-title':'Technical Specifications',
+  'sk1':'Base','sk2':'UI','sk3':'CPU','sk4':'RAM','sk5':'Disk',
+  'sk6':'Boot','sk7':'Browser','sk8':'Terminal','sk9':'Editor','sk10':'PDF',
+  'sk11':'Security','sk12':'License','sk13':'Username','sk14':'Password','sk15':'Email',
+  'fc1h':'Quick Links','fc1l1':'Features','fc1l2':'Apps','fc1l3':'Download','fc1l4':'AI','fc1l5':'Specs',
+  'fc2h':'Contact','fc2l2':'Horus University','fc2l3':'Install Guide','fc2l4':'VMware Config',
+  'footer-tagline':'Horus University · Learning Without Limits',
+  'footer-desc':'A complete educational Linux OS for Horus University students.',
+  'footer-copy':'© 2024 Horus University of Science & Technology','lang-btn':'عربي',
+}
+};
+function toggleLang(){
+  lang=lang==='ar'?'en':'ar';
+  const t=T[lang];
+  Object.keys(t).forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=t[id]});
+  document.documentElement.lang=lang;
+  document.documentElement.dir=lang==='ar'?'rtl':'ltr';
+  const inp=document.getElementById('chat-in');
+  if(inp)inp.placeholder=lang==='ar'?'اسأل عن أي مادة...':'Ask about any subject...';
+}
+</script>
+</body>
+</html>
