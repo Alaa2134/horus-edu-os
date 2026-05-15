@@ -122,7 +122,7 @@ bootstrap_base() {
   step_start "Running debootstrap (Ubuntu ${BASE_SUITE} ${ARCH})"
   debootstrap \
     --arch="$ARCH" \
-    --include=systemd,systemd-sysv,sudo,locales,curl,wget,gnupg2,apt-transport-https,ca-certificates \
+    --include=systemd,systemd-sysv,sudo,locales,curl,wget,gnupg,ca-certificates \
     "$BASE_SUITE" \
     "$CHROOT_DIR" \
     "$UBUNTU_MIRROR"
