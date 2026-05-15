@@ -150,8 +150,10 @@ prepare_chroot() {
     fi
   done
 
-  # Network access in chroot
-  cp /etc/resolv.conf "${CHROOT_DIR}/etc/resolv.conf"
+  # Network access in chroot (resolv.conf is a symlink on Ubuntu 22.04)
+  rm -f "${CHROOT_DIR}/etc/resolv.conf"
+  cp -L /etc/resolv.conf "${CHROOT_DIR}/etc/resolv.conf" 2>/dev/null || \
+    printf "nameserver 8.8.8.8\nnameserver 1.1.1.1\n" > "${CHROOT_DIR}/etc/resolv.conf"
 
   # APT sources
   cat > "${CHROOT_DIR}/etc/apt/sources.list" << EOF
