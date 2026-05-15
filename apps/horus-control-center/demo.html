@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HORUS Control Center</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--gold:#c9a227;--cyan:#00d4ff;--bg:#0a0a0f;--surface:#12121a;--surface2:#1a1a27;--text:#e8e8f0;--muted:#8888a8;--green:#10b981;--red:#ef4444;--amber:#f59e0b;--blue:#3b82f6}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh}
+.hdr{background:rgba(18,18,26,.95);border-bottom:1px solid rgba(201,162,39,.2);padding:.75rem 1.5rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;backdrop-filter:blur(12px)}
+.hdr-logo{font-family:'Cinzel',serif;font-size:1rem;color:var(--gold);letter-spacing:.08em;display:flex;align-items:center;gap:.6rem}
+.hdr-badge{font-size:.65rem;background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.3);color:var(--green);padding:.2rem .6rem;border-radius:3px;font-weight:700;letter-spacing:.08em}
+.hdr-mode{font-size:.72rem;color:var(--muted);font-family:'JetBrains Mono',monospace}
+.layout{display:grid;grid-template-columns:200px 1fr;min-height:calc(100vh - 50px)}
+.sidebar{background:var(--surface);border-right:1px solid rgba(255,255,255,.06);padding:1rem 0}
+.nav-item{display:flex;align-items:center;gap:.75rem;padding:.65rem 1.25rem;cursor:pointer;font-size:.85rem;color:var(--muted);transition:.15s;border-left:3px solid transparent}
+.nav-item:hover{color:var(--text);background:rgba(255,255,255,.04)}
+.nav-item.active{color:var(--gold);background:rgba(201,162,39,.08);border-left-color:var(--gold)}
+.nav-icon{font-size:1rem;width:20px;text-align:center}
+.main{padding:1.5rem;overflow-y:auto}
+.page{display:none}.page.active{display:block}
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.5rem}
+.stat-card{background:var(--surface);border:1px solid rgba(255,255,255,.07);border-radius:8px;padding:1.25rem;position:relative;overflow:hidden}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--accent,var(--gold))}
+.stat-label{font-size:.72rem;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:.4rem}
+.stat-val{font-family:'JetBrains Mono',monospace;font-size:1.8rem;font-weight:700;color:var(--text);line-height:1}
+.stat-sub{font-size:.72rem;color:var(--muted);margin-top:.3rem}
+.bar-wrap{margin-top:.75rem}
+.bar-track{height:4px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden}
+.bar-fill{height:100%;border-radius:2px;transition:width 1s ease;background:var(--accent,var(--gold))}
+.section-title{font-size:.75rem;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;margin-bottom:1rem;display:flex;align-items:center;gap:.75rem}
+.section-title::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.06)}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem}
+.panel{background:var(--surface);border:1px solid rgba(255,255,255,.07);border-radius:8px;padding:1.25rem}
+.panel-title{font-size:.8rem;color:var(--gold);font-weight:600;margin-bottom:1rem;font-family:'JetBrains Mono',monospace;letter-spacing:.06em}
+.row{display:flex;justify-content:space-between;align-items:center;padding:.45rem 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:.82rem}
+.row:last-child{border-bottom:none}
+.row-key{color:var(--muted)}
+.row-val{color:var(--text);font-family:'JetBrains Mono',monospace;font-size:.78rem}
+.row-val.green{color:var(--green)}
+.row-val.red{color:var(--red)}
+.row-val.amber{color:var(--amber)}
+.process-table{width:100%;border-collapse:collapse;font-size:.78rem}
+.process-table th{text-align:left;padding:.5rem;color:var(--muted);font-weight:600;font-size:.72rem;letter-spacing:.06em;border-bottom:1px solid rgba(255,255,255,.08)}
+.process-table td{padding:.5rem;border-bottom:1px solid rgba(255,255,255,.04);font-family:'JetBrains Mono',monospace}
+.process-table td:first-child{font-family:'Inter',sans-serif;color:var(--text)}
+.cpu-cores{display:grid;grid-template-columns:repeat(8,1fr);gap:.4rem;margin-top:.75rem}
+.core-box{background:var(--surface2);border-radius:4px;padding:.4rem;text-align:center;font-size:.65rem;color:var(--muted)}
+.core-box .pct{font-family:'JetBrains Mono',monospace;font-size:.85rem;color:var(--text);font-weight:600}
+.chart-area{height:80px;position:relative;margin-top:.5rem}
+.chart-area svg{width:100%;height:100%}
+.net-badge{display:inline-flex;align-items:center;gap:.3rem;background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.2);color:#93c5fd;padding:.25rem .6rem;border-radius:4px;font-size:.72rem;font-family:'JetBrains Mono',monospace;margin:.2rem}
+.perf-btn{background:var(--surface2);border:1px solid rgba(255,255,255,.1);color:var(--muted);padding:.5rem 1.25rem;border-radius:4px;cursor:pointer;font-size:.8rem;font-family:'Inter',sans-serif;transition:.2s;margin-right:.5rem}
+.perf-btn:hover{border-color:rgba(201,162,39,.3);color:var(--gold)}
+.perf-btn.active{background:rgba(201,162,39,.15);border-color:rgba(201,162,39,.4);color:var(--gold);font-weight:700}
+.score-ring{width:80px;height:80px;position:relative;margin:0 auto .75rem}
+.score-ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.score-ring .score-text{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Cinzel',serif;font-size:1.4rem;font-weight:700;color:var(--green)}
+.sec-check{display:flex;align-items:center;gap:.75rem;padding:.6rem 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:.83rem}
+.check-icon{font-size:1rem;width:20px;text-align:center}
+@media(max-width:768px){.layout{grid-template-columns:1fr}.sidebar{display:none}.stats-row{grid-template-columns:1fr 1fr}.grid-2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <div class="hdr-logo">
+    <svg width="28" height="28" viewBox="0 0 80 80" fill="none">
+      <ellipse cx="40" cy="38" rx="24" ry="14" stroke="#c9a227" stroke-width="2.5"/>
+      <circle cx="40" cy="38" r="7" fill="#c9a227" opacity=".9"/>
+      <circle cx="40" cy="38" r="3" fill="#0a0a0f"/>
+      <path d="M40 52 Q48 58 44 68 Q40 72 36 68 Q32 58 40 52Z" stroke="#c9a227" stroke-width="1.8" fill="rgba(201,162,39,.15)"/>
+    </svg>
+    HORUS Control Center
+    <span class="hdr-badge">LIVE</span>
+  </div>
+  <span class="hdr-mode" id="api-mode">● Connected to backend</span>
+</header>
+
+<div class="layout">
+  <nav class="sidebar">
+    <div class="nav-item active" onclick="showPage('dashboard',this)"><span class="nav-icon">📊</span>Dashboard</div>
+    <div class="nav-item" onclick="showPage('cpu',this)"><span class="nav-icon">🖥</span>CPU</div>
+    <div class="nav-item" onclick="showPage('memory',this)"><span class="nav-icon">💾</span>Memory</div>
+    <div class="nav-item" onclick="showPage('storage',this)"><span class="nav-icon">💿</span>Storage</div>
+    <div class="nav-item" onclick="showPage('network',this)"><span class="nav-icon">🌐</span>Network</div>
+    <div class="nav-item" onclick="showPage('processes',this)"><span class="nav-icon">⚙</span>Processes</div>
+    <div class="nav-item" onclick="showPage('hardware',this)"><span class="nav-icon">🔧</span>Hardware</div>
+    <div class="nav-item" onclick="showPage('security',this)"><span class="nav-icon">🛡</span>Security</div>
+  </nav>
+
+  <main class="main">
+
+    <!-- DASHBOARD -->
+    <div id="page-dashboard" class="page active">
+      <div class="stats-row">
+        <div class="stat-card" style="--accent:var(--gold)">
+          <div class="stat-label">CPU Usage</div>
+          <div class="stat-val" id="d-cpu">—</div>
+          <div class="stat-sub" id="d-cpu-model">Intel Core i7-12700H</div>
+          <div class="bar-wrap"><div class="bar-track"><div class="bar-fill" id="b-cpu" style="width:0%"></div></div></div>
+        </div>
+        <div class="stat-card" style="--accent:var(--cyan)">
+          <div class="stat-label">Memory</div>
+          <div class="stat-val" id="d-mem">—</div>
+          <div class="stat-sub" id="d-mem-detail">— / 16 GB</div>
+          <div class="bar-wrap"><div class="bar-track"><div class="bar-fill" id="b-mem" style="width:0%;background:var(--cyan)"></div></div></div>
+        </div>
+        <div class="stat-card" style="--accent:var(--blue)">
+          <div class="stat-label">Disk Usage</div>
+          <div class="stat-val" id="d-disk">—</div>
+          <div class="stat-sub" id="d-disk-detail">— / 256 GB SSD</div>
+          <div class="bar-wrap"><div class="bar-track"><div class="bar-fill" id="b-disk" style="width:0%;background:var(--blue)"></div></div></div>
+        </div>
+        <div class="stat-card" style="--accent:var(--amber)">
+          <div class="stat-label">Temperature</div>
+          <div class="stat-val" id="d-temp">—</div>
+          <div class="stat-sub">CPU Package Temp</div>
+          <div class="bar-wrap"><div class="bar-track"><div class="bar-fill" id="b-temp" style="width:0%;background:var(--amber)"></div></div></div>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="panel">
+          <div class="panel-title">SYSTEM INFO</div>
+          <div class="row"><span class="row-key">OS</span><span class="row-val" id="sys-os">HORUS OS 1.0.0</span></div>
+          <div class="row"><span class="row-key">Kernel</span><span class="row-val" id="sys-kernel">—</span></div>
+          <div class="row"><span class="row-key">Uptime</span><span class="row-val" id="sys-uptime">—</span></div>
+          <div class="row"><span class="row-key">Hostname</span><span class="row-val" id="sys-host">—</span></div>
+          <div class="row"><span class="row-key">Creator</span><span class="row-val green">Alaa Saber</span></div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">PERFORMANCE MODE</div>
+          <p style="color:var(--muted);font-size:.82rem;margin-bottom:.75rem">Select CPU governor for power/performance balance</p>
+          <button class="perf-btn" onclick="setMode('performance',this)">⚡ Performance</button>
+          <button class="perf-btn active" onclick="setMode('balanced',this)">⚖ Balanced</button>
+          <button class="perf-btn" onclick="setMode('powersave',this)">🔋 Power Save</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- CPU -->
+    <div id="page-cpu" class="page">
+      <div class="section-title">CPU Details</div>
+      <div class="grid-2">
+        <div class="panel">
+          <div class="panel-title">STATS</div>
+          <div class="row"><span class="row-key">Model</span><span class="row-val" id="cpu-model">—</span></div>
+          <div class="row"><span class="row-key">Usage</span><span class="row-val" id="cpu-pct">—</span></div>
+          <div class="row"><span class="row-key">Frequency</span><span class="row-val" id="cpu-freq">—</span></div>
+          <div class="row"><span class="row-key">Cores</span><span class="row-val" id="cpu-cores">—</span></div>
+          <div class="row"><span class="row-key">Load Avg</span><span class="row-val" id="cpu-load">—</span></div>
+          <div class="row"><span class="row-key">Temp</span><span class="row-val amber" id="cpu-temp">—</span></div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">PER-CORE USAGE</div>
+          <div class="cpu-cores" id="cpu-cores-grid"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MEMORY -->
+    <div id="page-memory" class="page">
+      <div class="section-title">Memory Details</div>
+      <div class="grid-2">
+        <div class="panel">
+          <div class="panel-title">RAM</div>
+          <div class="row"><span class="row-key">Total</span><span class="row-val" id="mem-total">—</span></div>
+          <div class="row"><span class="row-key">Used</span><span class="row-val" id="mem-used">—</span></div>
+          <div class="row"><span class="row-key">Free</span><span class="row-val green" id="mem-free">—</span></div>
+          <div class="row"><span class="row-key">Cached</span><span class="row-val" id="mem-cached">—</span></div>
+          <div class="row"><span class="row-key">Usage</span><span class="row-val" id="mem-pct">—</span></div>
+          <div class="bar-wrap" style="margin-top:.5rem"><div class="bar-track"><div class="bar-fill" id="bm-mem" style="width:0%;background:var(--cyan)"></div></div></div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">SWAP</div>
+          <div class="row"><span class="row-key">Total</span><span class="row-val" id="sw-total">—</span></div>
+          <div class="row"><span class="row-key">Used</span><span class="row-val" id="sw-used">—</span></div>
+          <div class="row"><span class="row-key">Free</span><span class="row-val green" id="sw-free">—</span></div>
+          <div class="row"><span class="row-key">Usage</span><span class="row-val" id="sw-pct">—</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STORAGE -->
+    <div id="page-storage" class="page">
+      <div class="section-title">Storage</div>
+      <div class="panel" id="disk-panel">
+        <div class="panel-title">DISK PARTITIONS</div>
+        <div id="disk-list"></div>
+      </div>
+    </div>
+
+    <!-- NETWORK -->
+    <div id="page-network" class="page">
+      <div class="section-title">Network</div>
+      <div class="panel" id="net-panel">
+        <div class="panel-title">INTERFACES</div>
+        <div id="net-list"></div>
+      </div>
+    </div>
+
+    <!-- PROCESSES -->
+    <div id="page-processes" class="page">
+      <div class="section-title">Top Processes</div>
+      <div class="panel">
+        <table class="process-table">
+          <thead><tr><th>Name</th><th>PID</th><th>CPU%</th><th>RAM%</th><th>Status</th></tr></thead>
+          <tbody id="proc-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- HARDWARE -->
+    <div id="page-hardware" class="page">
+      <div class="section-title">Hardware</div>
+      <div class="grid-2">
+        <div class="panel">
+          <div class="panel-title">CPU INFO</div>
+          <div id="hw-cpu"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">MEMORY MODULES</div>
+          <div id="hw-mem"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECURITY -->
+    <div id="page-security" class="page">
+      <div class="section-title">Security Status</div>
+      <div class="grid-2">
+        <div class="panel">
+          <div class="panel-title">SECURITY SCORE</div>
+          <div class="score-ring">
+            <svg viewBox="0 0 36 36">
+              <circle cx="18" cy="18" r="15.9" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="3"/>
+              <circle cx="18" cy="18" r="15.9" fill="none" stroke="#10b981" stroke-width="3" stroke-dasharray="85 100" stroke-linecap="round"/>
+            </svg>
+            <div class="score-text">A</div>
+          </div>
+          <div id="sec-checks"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">SYSTEM SECURITY</div>
+          <div class="row"><span class="row-key">Firewall (UFW)</span><span class="row-val green" id="sec-ufw">Active</span></div>
+          <div class="row"><span class="row-key">SSH Root Login</span><span class="row-val green" id="sec-ssh">Disabled</span></div>
+          <div class="row"><span class="row-key">Disk Encryption</span><span class="row-val" id="sec-luks">—</span></div>
+          <div class="row"><span class="row-key">Updates</span><span class="row-val" id="sec-updates">—</span></div>
+          <div class="row"><span class="row-key">AppArmor</span><span class="row-val green">Enforcing</span></div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+const API = 'http://127.0.0.1:8420';
+let apiOnline = false;
+let perfMode = 'balanced';
+
+// ── Navigation ──
+function showPage(id, el) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  el.classList.add('active');
+}
+
+// ── Performance Mode ──
+function setMode(mode, btn) {
+  perfMode = mode;
+  document.querySelectorAll('.perf-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  if (apiOnline) {
+    fetch(API + '/api/performance-mode/' + mode, {method:'POST'}).catch(()=>{});
+  }
+}
+
+// ── Format bytes ──
+function fmt(bytes, dec=1) {
+  if (!bytes) return '0 B';
+  const k=1024, sizes=['B','KB','MB','GB','TB'];
+  const i=Math.floor(Math.log(bytes)/Math.log(k));
+  return parseFloat((bytes/Math.pow(k,i)).toFixed(dec))+' '+sizes[i];
+}
+
+// ── Mock data (used when API unavailable) ──
+function mockData() {
+  const cpu = 15 + Math.random()*40;
+  const mem = 40 + Math.random()*20;
+  const temp = 45 + Math.random()*25;
+  applyMetrics({
+    cpu: {percent: cpu, model:'Intel Core i7-12700H', frequency_mhz: 2400+Math.random()*1200,
+      count:12, load_avg:[cpu/100*0.8, cpu/100*0.7, cpu/100*0.6],
+      per_core: Array.from({length:12},()=>Math.random()*60)},
+    memory: {percent:mem, total:17179869184, used:17179869184*mem/100,
+      free:17179869184*(1-mem/100), cached:1073741824, swap_total:4294967296,
+      swap_used:209715200, swap_free:4085251072, swap_percent:4.9},
+    disks: [{mountpoint:'/',total:274877906944, used:274877906944*.42,
+      free:274877906944*.58, percent:42, fstype:'ext4'}],
+    network: [{name:'eth0',bytes_sent:1073741824,bytes_recv:5368709120,
+      ip:'192.168.1.100',mac:'aa:bb:cc:dd:ee:ff'}],
+    temperatures: [{label:'Package id 0',current:temp}],
+    system: {hostname:'horus-os',os_name:'HORUS OS 1.0.0',
+      kernel:'6.5.0-horus-amd64',uptime:'3 days, 14:27:05',creator:'Alaa Saber'},
+    processes: [
+      {name:'horus-control',pid:1234,cpu_percent:cpu,memory_percent:2.1,status:'running'},
+      {name:'chromium',pid:2341,cpu_percent:8.2,memory_percent:4.7,status:'running'},
+      {name:'Xorg',pid:987,cpu_percent:1.3,memory_percent:1.2,status:'running'},
+      {name:'xfce4-session',pid:1001,cpu_percent:0.4,memory_percent:0.8,status:'running'},
+      {name:'horus-ai',pid:1456,cpu_percent:0.2,memory_percent:1.9,status:'running'},
+    ]
+  });
+}
+
+function applyMetrics(d) {
+  // Dashboard
+  const cpuPct = d.cpu?.percent ?? 0;
+  const memPct = d.memory?.percent ?? 0;
+  const diskPct = d.disks?.[0]?.percent ?? 0;
+  const temp = d.temperatures?.[0]?.current ?? 0;
+
+  setText('d-cpu', cpuPct.toFixed(1)+'%');
+  setText('d-cpu-model', d.cpu?.model ?? '—');
+  setBar('b-cpu', cpuPct, cpuPct>85?'var(--red)':cpuPct>60?'var(--amber)':'var(--gold)');
+
+  setText('d-mem', memPct.toFixed(1)+'%');
+  setText('d-mem-detail', fmt(d.memory?.used)+' / '+fmt(d.memory?.total));
+  setBar('b-mem', memPct, 'var(--cyan)');
+
+  setText('d-disk', diskPct.toFixed(0)+'%');
+  setText('d-disk-detail', fmt(d.disks?.[0]?.used)+' / '+fmt(d.disks?.[0]?.total));
+  setBar('b-disk', diskPct, 'var(--blue)');
+
+  setText('d-temp', temp.toFixed(0)+'°C');
+  setBar('b-temp', (temp/100)*100, temp>80?'var(--red)':temp>65?'var(--amber)':'var(--green)');
+
+  // System info
+  setText('sys-os', d.system?.os_name ?? 'HORUS OS 1.0.0');
+  setText('sys-kernel', d.system?.kernel ?? '—');
+  setText('sys-uptime', d.system?.uptime ?? '—');
+  setText('sys-host', d.system?.hostname ?? '—');
+
+  // CPU page
+  setText('cpu-model', d.cpu?.model ?? '—');
+  setText('cpu-pct', cpuPct.toFixed(1)+'%');
+  setText('cpu-freq', ((d.cpu?.frequency_mhz??0)/1000).toFixed(2)+' GHz');
+  setText('cpu-cores', d.cpu?.count+' cores');
+  const la = d.cpu?.load_avg ?? [];
+  setText('cpu-load', la.map(v=>v.toFixed(2)).join(' / '));
+  setText('cpu-temp', temp.toFixed(0)+'°C');
+
+  // Per-core grid
+  const grid = document.getElementById('cpu-cores-grid');
+  if (grid && d.cpu?.per_core) {
+    grid.innerHTML = d.cpu.per_core.slice(0,12).map((v,i)=>`
+      <div class="core-box"><div class="pct">${v.toFixed(0)}%</div><div>C${i}</div></div>`).join('');
+  }
+
+  // Memory page
+  setText('mem-total', fmt(d.memory?.total));
+  setText('mem-used', fmt(d.memory?.used));
+  setText('mem-free', fmt(d.memory?.free));
+  setText('mem-cached', fmt(d.memory?.cached));
+  setText('mem-pct', memPct.toFixed(1)+'%');
+  setBar('bm-mem', memPct, 'var(--cyan)');
+  setText('sw-total', fmt(d.memory?.swap_total));
+  setText('sw-used', fmt(d.memory?.swap_used));
+  setText('sw-free', fmt(d.memory?.swap_free));
+  setText('sw-pct', (d.memory?.swap_percent??0).toFixed(1)+'%');
+
+  // Storage
+  const dl = document.getElementById('disk-list');
+  if (dl && d.disks) {
+    dl.innerHTML = d.disks.map(dk=>`
+      <div class="row"><span class="row-key">${dk.mountpoint}</span><span class="row-val">${fmt(dk.used)} / ${fmt(dk.total)} (${dk.percent?.toFixed(0)}%)</span></div>
+      <div class="bar-wrap" style="margin-bottom:.75rem"><div class="bar-track"><div class="bar-fill" style="width:${dk.percent}%;background:${dk.percent>85?'var(--red)':dk.percent>60?'var(--amber)':'var(--blue)'}"></div></div></div>
+    `).join('');
+  }
+
+  // Network
+  const nl = document.getElementById('net-list');
+  if (nl && d.network) {
+    nl.innerHTML = d.network.map(n=>`
+      <div style="margin-bottom:.75rem">
+        <div style="color:var(--text);font-weight:600;margin-bottom:.35rem">${n.name} <span class="net-badge">↑ ${fmt(n.bytes_sent)}</span><span class="net-badge">↓ ${fmt(n.bytes_recv)}</span></div>
+        <div class="row"><span class="row-key">IP</span><span class="row-val">${n.ip??'—'}</span></div>
+        <div class="row"><span class="row-key">MAC</span><span class="row-val">${n.mac??'—'}</span></div>
+      </div>
+    `).join('');
+  }
+
+  // Processes
+  const tb = document.getElementById('proc-tbody');
+  if (tb && d.processes) {
+    tb.innerHTML = d.processes.slice(0,15).map(p=>`
+      <tr><td>${p.name}</td><td>${p.pid}</td>
+      <td style="color:${p.cpu_percent>20?'var(--amber)':'var(--green)'}">${p.cpu_percent?.toFixed(1)}%</td>
+      <td>${p.memory_percent?.toFixed(1)}%</td>
+      <td style="color:var(--green)">${p.status}</td></tr>
+    `).join('');
+  }
+
+  // Hardware
+  const hc = document.getElementById('hw-cpu');
+  if(hc) hc.innerHTML = `
+    <div class="row"><span class="row-key">Model</span><span class="row-val">${d.cpu?.model??'—'}</span></div>
+    <div class="row"><span class="row-key">Cores</span><span class="row-val">${d.cpu?.count??'—'}</span></div>
+    <div class="row"><span class="row-key">Frequency</span><span class="row-val">${((d.cpu?.frequency_mhz??0)/1000).toFixed(2)} GHz</span></div>
+  `;
+  const hm = document.getElementById('hw-mem');
+  if(hm) hm.innerHTML = `
+    <div class="row"><span class="row-key">Total RAM</span><span class="row-val">${fmt(d.memory?.total)}</span></div>
+    <div class="row"><span class="row-key">Swap</span><span class="row-val">${fmt(d.memory?.swap_total)}</span></div>
+  `;
+}
+
+function setText(id,val){const el=document.getElementById(id);if(el)el.textContent=val}
+function setBar(id,pct,color='var(--gold)'){const el=document.getElementById(id);if(el){el.style.width=Math.min(100,pct)+'%';el.style.background=color}}
+
+// ── Fetch from real API ──
+async function fetchAll() {
+  try {
+    const [cpuR,memR,diskR,netR,tempR,sysR,procR] = await Promise.allSettled([
+      fetch(API+'/api/cpu',{signal:AbortSignal.timeout(2000)}),
+      fetch(API+'/api/memory',{signal:AbortSignal.timeout(2000)}),
+      fetch(API+'/api/disks',{signal:AbortSignal.timeout(2000)}),
+      fetch(API+'/api/network',{signal:AbortSignal.timeout(2000)}),
+      fetch(API+'/api/temperatures',{signal:AbortSignal.timeout(2000)}),
+      fetch(API+'/api/system',{signal:AbortSignal.timeout(2000)}),
+      fetch(API+'/api/processes',{signal:AbortSignal.timeout(2000)}),
+    ]);
+    const ok = r => r.status==='fulfilled';
+    if (!ok(cpuR)) throw new Error('API offline');
+    apiOnline = true;
+    document.getElementById('api-mode').innerHTML = '● Connected to backend';
+    document.getElementById('api-mode').style.color = 'var(--green)';
+    applyMetrics({
+      cpu: ok(cpuR)?await cpuR.value.json():null,
+      memory: ok(memR)?await memR.value.json():null,
+      disks: ok(diskR)?await diskR.value.json():null,
+      network: ok(netR)?await netR.value.json():null,
+      temperatures: ok(tempR)?await tempR.value.json():null,
+      system: ok(sysR)?await sysR.value.json():null,
+      processes: ok(procR)?await procR.value.json():null,
+    });
+  } catch {
+    apiOnline = false;
+    document.getElementById('api-mode').innerHTML = '◎ Demo mode — simulated data';
+    document.getElementById('api-mode').style.color = 'var(--amber)';
+    mockData();
+  }
+}
+
+// Security checks (static)
+document.getElementById('sec-checks').innerHTML = [
+  ['✅','Firewall (UFW) active'],['✅','SSH root login disabled'],
+  ['✅','AppArmor enforcing'],['✅','No world-writable /etc files'],
+  ['⚠️','System updates available'],['✅','Secure boot enabled'],
+].map(([ic,lb])=>`<div class="sec-check"><span class="check-icon">${ic}</span><span style="font-size:.82rem;color:var(--text)">${lb}</span></div>`).join('');
+
+fetchAll();
+setInterval(fetchAll, 3000);
+</script>
+</body>
+</html>

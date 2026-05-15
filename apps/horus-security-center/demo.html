@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HORUS Security Center</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --gold:#c9a227;--gold2:#e8c547;
+  --cyan:#00d4ff;--bg:#04070f;--bg2:#080e1c;
+  --surface:#0f1520;--surface2:#161f30;
+  --text:#e8dcc8;--text2:#8892a4;
+  --green:#10b981;--red:#ef4444;--amber:#f59e0b;
+  --blue:#3b82f6;--purple:#8b5cf6;
+  --border:rgba(201,162,39,.12);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;
+     display:flex;height:100vh;overflow:hidden}
+/* ── SIDEBAR ── */
+.sidebar{
+  width:220px;min-width:220px;background:var(--bg2);
+  border-right:1px solid var(--border);
+  display:flex;flex-direction:column;overflow-y:auto;
+}
+.sidebar-logo{
+  padding:1.25rem 1rem;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:.75rem;
+}
+.sidebar-logo svg{width:32px;height:32px;flex-shrink:0;filter:drop-shadow(0 0 8px rgba(201,162,39,.4))}
+.logo-title{font-family:'Cinzel',serif;font-size:.82rem;color:var(--gold);line-height:1.3}
+.logo-sub{font-size:.62rem;color:var(--text2);margin-top:.1rem}
+.nav-section{padding:.75rem 0 .25rem;font-size:.62rem;color:var(--text2);
+             letter-spacing:.12em;text-transform:uppercase;padding-left:1rem;margin-top:.25rem}
+.nav-item{
+  display:flex;align-items:center;gap:.65rem;
+  padding:.55rem 1rem;cursor:pointer;transition:.15s;
+  font-size:.82rem;color:var(--text2);border-left:2px solid transparent;
+}
+.nav-item:hover{background:rgba(201,162,39,.05);color:var(--text)}
+.nav-item.active{color:var(--gold);border-left-color:var(--gold);
+                  background:rgba(201,162,39,.08)}
+.nav-icon{width:16px;text-align:center;font-size:.85rem}
+.nav-badge{margin-left:auto;font-size:.6rem;padding:.1rem .4rem;
+           border-radius:8px;background:rgba(239,68,68,.15);
+           border:1px solid rgba(239,68,68,.25);color:var(--red)}
+.nav-badge.green{background:rgba(16,185,129,.12);border-color:rgba(16,185,129,.2);color:var(--green)}
+.nav-badge.amber{background:rgba(245,158,11,.12);border-color:rgba(245,158,11,.2);color:var(--amber)}
+.sidebar-bottom{margin-top:auto;padding:1rem;border-top:1px solid var(--border)}
+.status-pill{
+  font-size:.7rem;padding:.3rem .7rem;border-radius:3px;
+  display:flex;align-items:center;gap:.4rem;
+}
+.status-pill.online{background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.2);color:var(--green)}
+.status-pill.offline{background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.2);color:var(--amber)}
+/* ── MAIN ── */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{
+  height:52px;background:var(--bg2);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;padding:0 1.5rem;gap:1rem;
+  flex-shrink:0;
+}
+.topbar-title{font-family:'Cinzel',serif;font-size:.95rem;color:var(--gold);margin-right:auto}
+.topbar-badge{font-size:.68rem;padding:.2rem .6rem;border-radius:2px;font-family:'JetBrains Mono',monospace}
+.tb-gold{background:rgba(201,162,39,.1);border:1px solid rgba(201,162,39,.25);color:var(--gold)}
+.tb-red{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);color:var(--red)}
+.tb-green{background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.2);color:var(--green)}
+.content{flex:1;overflow-y:auto;padding:1.5rem}
+.page{display:none}
+.page.active{display:block}
+/* ── CARDS ── */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin-bottom:1rem}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1rem}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:5px;padding:1.1rem}
+.card-title{font-size:.68rem;color:var(--text2);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.75rem;
+            display:flex;align-items:center;gap:.5rem}
+.card-title::after{content:'';flex:1;height:1px;background:var(--border)}
+.stat-num{font-family:'Cinzel',serif;font-size:2rem;color:var(--gold);line-height:1}
+.stat-num.green{color:var(--green)}
+.stat-num.red{color:var(--red)}
+.stat-num.amber{color:var(--amber)}
+.stat-lbl{font-size:.72rem;color:var(--text2);margin-top:.2rem}
+/* ── SCORE RING ── */
+.score-ring-wrap{display:flex;justify-content:center;margin:.5rem 0 1rem}
+.score-ring{position:relative;width:110px;height:110px}
+.score-ring svg{width:110px;height:110px;transform:rotate(-90deg)}
+.score-ring-num{
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+}
+.score-ring-num span:first-child{font-family:'Cinzel',serif;font-size:1.6rem;color:var(--gold);line-height:1}
+.score-ring-num span:last-child{font-size:.62rem;color:var(--text2);margin-top:.1rem}
+/* ── TABLE ── */
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.8rem}
+th{font-size:.64rem;color:var(--text2);letter-spacing:.08em;text-transform:uppercase;
+   text-align:left;padding:.5rem .75rem;border-bottom:1px solid var(--border)}
+td{padding:.5rem .75rem;border-bottom:1px solid rgba(255,255,255,.03);color:var(--text2)}
+tr:hover td{background:rgba(201,162,39,.03)}
+.td-mono{font-family:'JetBrains Mono',monospace;font-size:.75rem}
+/* ── PILLS ── */
+.pill{display:inline-flex;align-items:center;gap:.3rem;padding:.15rem .55rem;border-radius:10px;font-size:.68rem}
+.pill-green{background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.2);color:var(--green)}
+.pill-red{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);color:var(--red)}
+.pill-amber{background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.2);color:var(--amber)}
+.pill-blue{background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.2);color:var(--blue)}
+.pill-gray{background:rgba(136,146,164,.08);border:1px solid rgba(136,146,164,.12);color:var(--text2)}
+/* ── CHECK LIST ── */
+.check-item{display:flex;align-items:center;gap:.65rem;padding:.55rem 0;
+            border-bottom:1px solid rgba(255,255,255,.04)}
+.check-item:last-child{border-bottom:none}
+.check-icon{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+            font-size:.75rem;flex-shrink:0}
+.check-pass{background:rgba(16,185,129,.15);color:var(--green)}
+.check-fail{background:rgba(239,68,68,.12);color:var(--red)}
+.check-label{flex:1;font-size:.82rem;color:var(--text2)}
+.check-weight{font-family:'JetBrains Mono',monospace;font-size:.68rem;color:var(--text2)}
+/* ── LOG ENTRIES ── */
+.log-entry{font-family:'JetBrains Mono',monospace;font-size:.73rem;
+           padding:.35rem .5rem;border-left:2px solid;margin-bottom:2px;border-radius:0 3px 3px 0}
+.log-error{border-color:var(--red);background:rgba(239,68,68,.05);color:#fca5a5}
+.log-warn{border-color:var(--amber);background:rgba(245,158,11,.05);color:#fde68a}
+.log-info{border-color:rgba(136,146,164,.2);background:rgba(255,255,255,.02);color:var(--text2)}
+/* ── SSH ROW ── */
+.ssh-row{display:flex;align-items:center;justify-content:space-between;
+         padding:.55rem 0;border-bottom:1px solid rgba(255,255,255,.04)}
+.ssh-row:last-child{border-bottom:none}
+.ssh-key{font-size:.82rem;color:var(--text2)}
+.ssh-val{font-family:'JetBrains Mono',monospace;font-size:.78rem;color:var(--text)}
+/* ── PROGRESS BAR ── */
+.prog-wrap{height:5px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden;margin-top:.4rem}
+.prog-bar{height:100%;border-radius:3px;transition:width 1s ease}
+/* ── ANIM ── */
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+.pulse-dot{display:inline-block;width:6px;height:6px;border-radius:50%;
+           margin-right:.35rem;animation:pulse 2s infinite;vertical-align:middle}
+.pulse-green{background:var(--green)}
+.pulse-red{background:var(--red)}
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(201,162,39,.2);border-radius:3px}
+@media(max-width:700px){.sidebar{width:52px;min-width:52px}.logo-title,.logo-sub,.nav-section,.nav-item span:not(.nav-icon){display:none}.grid2,.grid3,.grid4{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="sidebar-logo">
+    <svg viewBox="0 0 80 80" fill="none">
+      <path d="M40 10 L70 55 H10 Z" stroke="#c9a227" stroke-width="2.5" fill="rgba(201,162,39,.08)"/>
+      <circle cx="40" cy="36" r="8" stroke="#c9a227" stroke-width="2" fill="rgba(201,162,39,.15)"/>
+      <line x1="40" y1="10" x2="40" y2="28" stroke="#c9a227" stroke-width="1.5"/>
+    </svg>
+    <div>
+      <div class="logo-title">HORUS</div>
+      <div class="logo-sub">Security Center</div>
+    </div>
+  </div>
+
+  <div class="nav-section">Security</div>
+  <div class="nav-item active" onclick="show('overview')"><span class="nav-icon">🛡</span><span>Overview</span></div>
+  <div class="nav-item" onclick="show('score')"><span class="nav-icon">📊</span><span>Security Score</span></div>
+  <div class="nav-item" onclick="show('firewall')"><span class="nav-icon">🔥</span><span>Firewall</span><span class="nav-badge green" id="fw-badge">ON</span></div>
+  <div class="nav-item" onclick="show('ssh')"><span class="nav-icon">🔑</span><span>SSH Config</span></div>
+
+  <div class="nav-section">Network</div>
+  <div class="nav-item" onclick="show('connections')"><span class="nav-icon">🌐</span><span>Connections</span><span class="nav-badge" id="conn-badge">12</span></div>
+  <div class="nav-item" onclick="show('ports')"><span class="nav-icon">📡</span><span>Open Ports</span></div>
+
+  <div class="nav-section">System</div>
+  <div class="nav-item" onclick="show('encryption')"><span class="nav-icon">🔐</span><span>Encryption</span></div>
+  <div class="nav-item" onclick="show('auth')"><span class="nav-icon">🚫</span><span>Auth Events</span><span class="nav-badge" id="auth-badge">3</span></div>
+  <div class="nav-item" onclick="show('logs')"><span class="nav-icon">📋</span><span>System Logs</span></div>
+
+  <div class="sidebar-bottom">
+    <div class="status-pill offline" id="status-pill">
+      <span class="pulse-dot pulse-red"></span>Demo mode
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title" id="page-title">🛡 Security Overview</div>
+    <span class="topbar-badge tb-gold">v1.0.0</span>
+    <span class="topbar-badge tb-green" id="fw-topbadge">UFW: Active</span>
+    <span class="topbar-badge" id="score-topbadge" style="background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.25);color:var(--amber);font-size:.68rem;padding:.2rem .6rem;border-radius:2px;font-family:'JetBrains Mono',monospace">Score: B</span>
+  </div>
+
+  <div class="content">
+
+    <!-- OVERVIEW -->
+    <div class="page active" id="page-overview">
+      <div class="grid4">
+        <div class="card">
+          <div class="stat-num green" id="ov-score">72</div>
+          <div class="stat-lbl">Security Score /100</div>
+        </div>
+        <div class="card">
+          <div class="stat-num green">Active</div>
+          <div class="stat-lbl">Firewall (UFW)</div>
+        </div>
+        <div class="card">
+          <div class="stat-num" id="ov-conns" style="color:var(--cyan)">12</div>
+          <div class="stat-lbl">Active Connections</div>
+        </div>
+        <div class="card">
+          <div class="stat-num amber" id="ov-failed">3</div>
+          <div class="stat-lbl">Failed Logins (24h)</div>
+        </div>
+      </div>
+
+      <div class="grid2">
+        <div class="card">
+          <div class="card-title">Quick Security Checks</div>
+          <div id="ov-checks"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Recent Auth Events</div>
+          <div id="ov-auth-log"></div>
+        </div>
+      </div>
+
+      <div class="grid2">
+        <div class="card">
+          <div class="card-title">Firewall Rules (top 5)</div>
+          <div class="table-wrap">
+            <table id="ov-fw-table">
+              <thead><tr><th>#</th><th>To</th><th>Action</th><th>From</th></tr></thead>
+              <tbody id="ov-fw-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Top Active Connections</div>
+          <div class="table-wrap">
+            <table><thead><tr><th>Proto</th><th>Local</th><th>Remote</th><th>State</th></tr></thead>
+              <tbody id="ov-conn-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCORE -->
+    <div class="page" id="page-score">
+      <div class="grid2">
+        <div class="card">
+          <div class="card-title">Security Score</div>
+          <div class="score-ring-wrap">
+            <div class="score-ring">
+              <svg viewBox="0 0 110 110">
+                <circle cx="55" cy="55" r="46" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="10"/>
+                <circle id="score-arc" cx="55" cy="55" r="46" fill="none" stroke="#c9a227"
+                        stroke-width="10" stroke-linecap="round"
+                        stroke-dasharray="289" stroke-dashoffset="80"/>
+              </svg>
+              <div class="score-ring-num">
+                <span id="score-big">72</span>
+                <span id="score-grade-big">B</span>
+              </div>
+            </div>
+          </div>
+          <div style="text-align:center;font-size:.8rem;color:var(--text2)">
+            Score: <span style="color:var(--gold)" id="score-label">72 / 100 — Good</span>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Grade Legend</div>
+          <div style="font-size:.82rem;line-height:2.1;color:var(--text2)">
+            <div><span style="color:var(--green);font-weight:700">A</span> — 85–100 &nbsp;Excellent</div>
+            <div><span style="color:var(--gold);font-weight:700">B</span> — 70–84 &nbsp;&nbsp;Good</div>
+            <div><span style="color:var(--amber);font-weight:700">C</span> — 55–69 &nbsp;&nbsp;Fair</div>
+            <div><span style="color:var(--red);font-weight:700">D</span> — 40–54 &nbsp;&nbsp;Poor</div>
+            <div><span style="color:#dc2626;font-weight:700">F</span> — 0–39 &nbsp;&nbsp;&nbsp;Critical</div>
+          </div>
+          <div style="margin-top:1rem;padding:.75rem;background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.15);border-radius:4px;font-size:.78rem;color:var(--amber)">
+            ⚠ Tip: Disable SSH password authentication and change default SSH port to improve score to A.
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Check Details</div>
+        <div id="score-checks"></div>
+      </div>
+    </div>
+
+    <!-- FIREWALL -->
+    <div class="page" id="page-firewall">
+      <div class="grid3">
+        <div class="card">
+          <div class="stat-num green">Active</div>
+          <div class="stat-lbl">UFW Status</div>
+        </div>
+        <div class="card">
+          <div class="stat-num" style="color:var(--red)">deny</div>
+          <div class="stat-lbl">Default Incoming</div>
+        </div>
+        <div class="card">
+          <div class="stat-num green">allow</div>
+          <div class="stat-lbl">Default Outgoing</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title" style="display:flex;align-items:center;justify-content:space-between">
+          <span>Firewall Rules</span>
+          <span style="font-size:.72rem;color:var(--text2)" id="fw-count">6 rules</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>#</th><th>To / Port</th><th>Action</th><th>From</th><th>Protocol</th></tr></thead>
+            <tbody id="fw-tbody"></tbody>
+          </table>
+        </div>
+        <div style="margin-top:1rem;padding:.6rem;background:rgba(201,162,39,.04);border:1px solid var(--border);border-radius:3px;font-size:.76rem;color:var(--text2)">
+          <span style="color:var(--cyan)">ℹ</span> Rules shown are from the live backend when connected. Demo shows typical HORUS OS defaults.
+        </div>
+      </div>
+    </div>
+
+    <!-- SSH -->
+    <div class="page" id="page-ssh">
+      <div class="grid2">
+        <div class="card">
+          <div class="card-title">SSH Configuration</div>
+          <div id="ssh-rows"></div>
+          <div style="margin-top:.75rem">
+            <span class="pill pill-amber" id="ssh-hardened-pill">⚠ Not fully hardened</span>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Hardening Recommendations</div>
+          <div style="font-size:.82rem;color:var(--text2);line-height:1.9">
+            <div style="padding:.4rem 0;border-bottom:1px solid rgba(255,255,255,.04)">
+              <span id="rec-port-icon">⚠</span> &nbsp;Change SSH port from 22 to custom port
+            </div>
+            <div style="padding:.4rem 0;border-bottom:1px solid rgba(255,255,255,.04)">
+              <span id="rec-root-icon">✓</span> &nbsp;Disable root login (PermitRootLogin no)
+            </div>
+            <div style="padding:.4rem 0;border-bottom:1px solid rgba(255,255,255,.04)">
+              <span id="rec-pw-icon">⚠</span> &nbsp;Disable password auth (use keys only)
+            </div>
+            <div style="padding:.4rem 0">
+              <span id="rec-tries-icon">✓</span> &nbsp;Reduce MaxAuthTries to 3 or fewer
+            </div>
+          </div>
+          <div style="margin-top:.75rem;background:#04070f;border:1px solid var(--border);border-radius:4px;padding:.75rem;font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--text2)">
+            <span style="color:var(--gold)"># /etc/ssh/sshd_config</span><br>
+            Port 2222<br>
+            PermitRootLogin no<br>
+            PasswordAuthentication no<br>
+            PubkeyAuthentication yes<br>
+            MaxAuthTries 3
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONNECTIONS -->
+    <div class="page" id="page-connections">
+      <div class="card">
+        <div class="card-title">Active Network Connections (<span id="conn-count">12</span>)</div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Proto</th><th>Local Address</th><th>Foreign Address</th><th>State</th><th>PID</th><th>Program</th></tr></thead>
+            <tbody id="conn-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- PORTS -->
+    <div class="page" id="page-ports">
+      <div class="card">
+        <div class="card-title">Listening Ports</div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Address</th><th>Port</th><th>Program</th><th>State</th><th>Risk</th></tr></thead>
+            <tbody id="ports-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ENCRYPTION -->
+    <div class="page" id="page-encryption">
+      <div class="card">
+        <div class="card-title">Disk Encryption Status</div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Device</th><th>Type</th><th>Encrypted</th><th>Status</th></tr></thead>
+            <tbody id="enc-tbody"></tbody>
+          </table>
+        </div>
+        <div style="margin-top:.75rem;padding:.75rem;background:rgba(59,130,246,.05);border:1px solid rgba(59,130,246,.12);border-radius:3px;font-size:.78rem;color:var(--blue)">
+          💡 LUKS full-disk encryption is strongly recommended. Use <code style="background:rgba(255,255,255,.06);padding:.1rem .3rem;border-radius:2px">cryptsetup luksFormat /dev/sdX</code> during installation.
+        </div>
+      </div>
+    </div>
+
+    <!-- AUTH EVENTS -->
+    <div class="page" id="page-auth">
+      <div class="grid3">
+        <div class="card">
+          <div class="stat-num amber" id="auth-count">3</div>
+          <div class="stat-lbl">Failed Attempts (24h)</div>
+        </div>
+        <div class="card">
+          <div class="stat-num green">0</div>
+          <div class="stat-lbl">Successful Root Logins</div>
+        </div>
+        <div class="card">
+          <div class="stat-num" style="color:var(--cyan)">2</div>
+          <div class="stat-lbl">Unique Attacker IPs</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Recent Failed SSH Attempts</div>
+        <div id="auth-log"></div>
+      </div>
+    </div>
+
+    <!-- LOGS -->
+    <div class="page" id="page-logs">
+      <div class="card">
+        <div class="card-title" style="display:flex;align-items:center;justify-content:space-between">
+          <span>System Logs</span>
+          <div style="display:flex;gap:.5rem">
+            <button onclick="filterLogs('all')" id="filter-all" style="font-size:.68rem;padding:.2rem .5rem;border-radius:3px;cursor:pointer;background:rgba(201,162,39,.15);border:1px solid rgba(201,162,39,.25);color:var(--gold)">All</button>
+            <button onclick="filterLogs('error')" id="filter-error" style="font-size:.68rem;padding:.2rem .5rem;border-radius:3px;cursor:pointer;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);color:var(--text2)">Errors</button>
+            <button onclick="filterLogs('warning')" id="filter-warning" style="font-size:.68rem;padding:.2rem .5rem;border-radius:3px;cursor:pointer;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);color:var(--text2)">Warnings</button>
+          </div>
+        </div>
+        <div id="logs-container" style="max-height:420px;overflow-y:auto"></div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<script>
+// ── MOCK DATA ────────────────────────────────────────────────────────────────
+const MOCK = {
+  score: {
+    score: 72, max_score: 100, grade: 'B',
+    checks: [
+      { id:'firewall', label:'Firewall (UFW) enabled',     pass:true,  weight:20 },
+      { id:'ssh_root', label:'SSH root login disabled',     pass:true,  weight:20 },
+      { id:'ssh_pw',   label:'SSH password auth disabled',  pass:false, weight:15 },
+      { id:'ssh_port', label:'SSH non-default port',        pass:false, weight:10 },
+      { id:'updates',  label:'Automatic updates configured',pass:true,  weight:15 },
+      { id:'etc_perms',label:'No world-writable /etc files',pass:true,  weight:10 },
+      { id:'encryption',label:'LUKS disk encryption',       pass:false, weight:10 },
+    ]
+  },
+  firewall: {
+    enabled: true, status:'active',
+    default_incoming:'deny', default_outgoing:'allow',
+    rules: [
+      { number:1, to:'22/tcp',   action:'ALLOW', from_:'Anywhere' },
+      { number:2, to:'8420/tcp', action:'ALLOW', from_:'127.0.0.1' },
+      { number:3, to:'8421/tcp', action:'ALLOW', from_:'127.0.0.1' },
+      { number:4, to:'8422/tcp', action:'ALLOW', from_:'127.0.0.1' },
+      { number:5, to:'80/tcp',   action:'ALLOW', from_:'Anywhere' },
+      { number:6, to:'443/tcp',  action:'ALLOW', from_:'Anywhere' },
+    ]
+  },
+  ssh: {
+    port:22, permit_root_login:'no', password_authentication:'yes',
+    pubkey_authentication:'yes', max_auth_tries:6, hardened:false
+  },
+  connections: [
+    { proto:'tcp', local_address:'127.0.0.1:8420', foreign_address:'127.0.0.1:54210', state:'ESTABLISHED', pid:1842, program:'uvicorn' },
+    { proto:'tcp', local_address:'127.0.0.1:8421', foreign_address:'127.0.0.1:54812', state:'ESTABLISHED', pid:1903, program:'uvicorn' },
+    { proto:'tcp', local_address:'0.0.0.0:22',     foreign_address:'0.0.0.0:0',       state:'LISTEN',      pid:887,  program:'sshd' },
+    { proto:'tcp', local_address:'127.0.0.53:53',  foreign_address:'0.0.0.0:0',       state:'LISTEN',      pid:521,  program:'systemd-resolve' },
+    { proto:'tcp', local_address:'192.168.1.100:45123', foreign_address:'142.250.186.14:443', state:'ESTABLISHED', pid:2341, program:'chromium' },
+    { proto:'tcp', local_address:'192.168.1.100:45200', foreign_address:'172.217.168.14:443', state:'ESTABLISHED', pid:2341, program:'chromium' },
+    { proto:'udp', local_address:'0.0.0.0:68',     foreign_address:'0.0.0.0:0',       state:'STATELESS',   pid:654,  program:'dhclient' },
+    { proto:'udp', local_address:'127.0.0.53:53',  foreign_address:'0.0.0.0:0',       state:'STATELESS',   pid:521,  program:'systemd-resolve' },
+    { proto:'tcp', local_address:'0.0.0.0:80',     foreign_address:'0.0.0.0:0',       state:'LISTEN',      pid:1122, program:'nginx' },
+    { proto:'tcp', local_address:'0.0.0.0:443',    foreign_address:'0.0.0.0:0',       state:'LISTEN',      pid:1122, program:'nginx' },
+    { proto:'tcp', local_address:'127.0.0.1:631',  foreign_address:'0.0.0.0:0',       state:'LISTEN',      pid:1033, program:'cupsd' },
+    { proto:'tcp', local_address:'192.168.1.100:55001',foreign_address:'52.7.212.3:443',state:'TIME_WAIT',  pid:null, program:null },
+  ],
+  ports: [
+    { address:'0.0.0.0:22',    program:'sshd',             state:'LISTEN', risk:'medium' },
+    { address:'0.0.0.0:80',    program:'nginx',            state:'LISTEN', risk:'low' },
+    { address:'0.0.0.0:443',   program:'nginx',            state:'LISTEN', risk:'low' },
+    { address:'127.0.0.1:8420',program:'uvicorn',          state:'LISTEN', risk:'low' },
+    { address:'127.0.0.1:8421',program:'uvicorn',          state:'LISTEN', risk:'low' },
+    { address:'127.0.0.1:8422',program:'uvicorn',          state:'LISTEN', risk:'low' },
+    { address:'127.0.0.1:631', program:'cupsd',            state:'LISTEN', risk:'low' },
+    { address:'127.0.0.53:53', program:'systemd-resolved', state:'LISTEN', risk:'low' },
+  ],
+  encryption: [
+    { device:'/dev/sda',  name:'sda',  type:'disk', encrypted:false },
+    { device:'/dev/sda1', name:'sda1', type:'part', encrypted:false },
+    { device:'/dev/sda2', name:'sda2', type:'part', encrypted:false },
+  ],
+  auth_events: {
+    failed_attempts: 3,
+    recent: [
+      '2026-05-15T02:14:33+0000 horus sshd[9812]: Failed password for invalid user admin from 192.168.1.200 port 49821 ssh2',
+      '2026-05-15T02:14:35+0000 horus sshd[9815]: Failed password for invalid user root from 192.168.1.200 port 49823 ssh2',
+      '2026-05-14T23:07:11+0000 horus sshd[8201]: Invalid user deploy from 45.33.32.156 port 38742 ssh2',
+    ]
+  },
+  logs: [
+    { timestamp:'2026-05-15T08:22:11+0000', level:'info',    unit:'sshd',           message:'Accepted publickey for horus from 192.168.1.10 port 52341 ssh2' },
+    { timestamp:'2026-05-15T08:10:44+0000', level:'warning', unit:'kernel',         message:'[UFW BLOCK] IN=eth0 OUT= SRC=192.168.1.200 DST=192.168.1.100 DPT=22' },
+    { timestamp:'2026-05-15T07:55:32+0000', level:'info',    unit:'systemd',        message:'Started horus-control.service — HORUS Control Center' },
+    { timestamp:'2026-05-15T07:55:30+0000', level:'info',    unit:'systemd',        message:'Started horus-security.service — HORUS Security Center' },
+    { timestamp:'2026-05-15T07:54:12+0000', level:'info',    unit:'NetworkManager', message:'<info> device eth0 state change: activated -> ip-config (reason: none)' },
+    { timestamp:'2026-05-15T07:50:01+0000', level:'warning', unit:'kernel',         message:'ACPI: battery: Failed to get battery info' },
+    { timestamp:'2026-05-15T07:48:22+0000', level:'info',    unit:'lightdm',        message:'Seat seat0: User horus logged in' },
+    { timestamp:'2026-05-15T07:40:05+0000', level:'error',   unit:'cups',           message:'Unable to open listen socket for address 0.0.0.0:631' },
+    { timestamp:'2026-05-15T07:38:14+0000', level:'info',    unit:'systemd',        message:'Reached target Graphical Interface' },
+    { timestamp:'2026-05-15T07:38:00+0000', level:'info',    unit:'ufw',            message:'[UFW] Enabled firewall (active)' },
+    { timestamp:'2026-05-14T23:07:11+0000', level:'warning', unit:'sshd',           message:'Invalid user deploy from 45.33.32.156 port 38742' },
+    { timestamp:'2026-05-14T22:59:01+0000', level:'info',    unit:'cron',           message:'(root) CMD (  [ -x /usr/lib/php/sessionclean ] && if [ ! -d /run/systemd/system ]; then /usr/lib/php/sessionclean; fi)' },
+    { timestamp:'2026-05-14T22:00:01+0000', level:'info',    unit:'cron',           message:'(root) CMD (   cd / && run-parts --report /etc/cron.hourly)' },
+    { timestamp:'2026-05-14T21:55:00+0000', level:'error',   unit:'kernel',         message:'EXT4-fs error (device sda2): ext4_validate_block_bitmap_csum:376: comm kworker/u4:2' },
+    { timestamp:'2026-05-14T21:45:22+0000', level:'info',    unit:'rsyslog',        message:'rsyslogd: imuxsock: Acquired UNIX socket /run/systemd/journal/syslog' },
+  ]
+};
+
+let currentFilter = 'all';
+
+// ── RENDER FUNCTIONS ─────────────────────────────────────────────────────────
+function actionColor(a){return a==='ALLOW'?'pill-green':a==='DENY'?'pill-red':'pill-amber'}
+function stateColor(s){
+  if(s==='ESTABLISHED')return 'pill-green';
+  if(s==='LISTEN')return 'pill-blue';
+  if(s==='TIME_WAIT')return 'pill-amber';
+  return 'pill-gray';
+}
+function riskPill(r){
+  if(r==='high')return '<span class="pill pill-red">High</span>';
+  if(r==='medium')return '<span class="pill pill-amber">Med</span>';
+  return '<span class="pill pill-green">Low</span>';
+}
+
+function renderOverview(){
+  // checks
+  const el = document.getElementById('ov-checks');
+  el.innerHTML = MOCK.score.checks.slice(0,5).map(c=>`
+    <div class="check-item">
+      <div class="check-icon ${c.pass?'check-pass':'check-fail'}">${c.pass?'✓':'✗'}</div>
+      <div class="check-label">${c.label}</div>
+      <div class="check-weight">${c.weight}pt</div>
+    </div>`).join('');
+
+  // auth log
+  const al = document.getElementById('ov-auth-log');
+  al.innerHTML = MOCK.auth_events.recent.slice(0,3).map(l=>`
+    <div class="log-entry log-warn" style="margin-bottom:4px;font-size:.7rem">${l.substring(0,100)}…</div>`).join('');
+
+  // fw table
+  const fwt = document.getElementById('ov-fw-tbody');
+  fwt.innerHTML = MOCK.firewall.rules.slice(0,5).map(r=>`
+    <tr>
+      <td class="td-mono">${r.number}</td>
+      <td class="td-mono">${r.to}</td>
+      <td><span class="pill ${actionColor(r.action)}">${r.action}</span></td>
+      <td class="td-mono">${r.from_}</td>
+    </tr>`).join('');
+
+  // connections
+  const ct = document.getElementById('ov-conn-tbody');
+  ct.innerHTML = MOCK.connections.slice(0,5).map(c=>`
+    <tr>
+      <td class="td-mono">${c.proto}</td>
+      <td class="td-mono" style="font-size:.7rem">${c.local_address}</td>
+      <td class="td-mono" style="font-size:.7rem">${c.foreign_address}</td>
+      <td><span class="pill ${stateColor(c.state)}" style="font-size:.64rem">${c.state}</span></td>
+    </tr>`).join('');
+}
+
+function renderScore(){
+  const s = MOCK.score;
+  const pct = s.score / s.max_score;
+  const circ = 2 * Math.PI * 46;
+  document.getElementById('score-arc').style.strokeDashoffset = circ * (1 - pct);
+  document.getElementById('score-arc').style.stroke = s.grade === 'A' ? '#10b981' : s.grade === 'B' ? '#c9a227' : s.grade === 'C' ? '#f59e0b' : '#ef4444';
+  document.getElementById('score-big').textContent = s.score;
+  document.getElementById('score-grade-big').textContent = s.grade;
+  document.getElementById('score-label').textContent = `${s.score} / ${s.max_score} — ${s.grade === 'A' ? 'Excellent' : s.grade === 'B' ? 'Good' : 'Fair'}`;
+
+  const el = document.getElementById('score-checks');
+  el.innerHTML = s.checks.map(c=>`
+    <div class="check-item">
+      <div class="check-icon ${c.pass?'check-pass':'check-fail'}">${c.pass?'✓':'✗'}</div>
+      <div class="check-label">${c.label}</div>
+      <div>
+        <span class="pill ${c.pass?'pill-green':'pill-red'}" style="margin-right:.4rem">${c.pass?'PASS':'FAIL'}</span>
+        <span class="check-weight">${c.weight}pt</span>
+      </div>
+    </div>`).join('');
+}
+
+function renderFirewall(){
+  const t = document.getElementById('fw-tbody');
+  document.getElementById('fw-count').textContent = MOCK.firewall.rules.length + ' rules';
+  t.innerHTML = MOCK.firewall.rules.map(r=>`
+    <tr>
+      <td class="td-mono">${r.number}</td>
+      <td class="td-mono">${r.to}</td>
+      <td><span class="pill ${actionColor(r.action)}">${r.action}</span></td>
+      <td class="td-mono">${r.from_}</td>
+      <td class="td-mono">${r.protocol||'—'}</td>
+    </tr>`).join('');
+}
+
+function renderSSH(){
+  const s = MOCK.ssh;
+  const rows = [
+    ['Port', s.port, s.port !== 22 ? 'green' : 'red'],
+    ['PermitRootLogin', s.permit_root_login, s.permit_root_login !== 'yes' ? 'green' : 'red'],
+    ['PasswordAuthentication', s.password_authentication, s.password_authentication === 'no' ? 'green' : 'red'],
+    ['PubkeyAuthentication', s.pubkey_authentication, s.pubkey_authentication === 'yes' ? 'green' : 'red'],
+    ['MaxAuthTries', s.max_auth_tries, s.max_auth_tries <= 3 ? 'green' : 'amber'],
+  ];
+  document.getElementById('ssh-rows').innerHTML = rows.map(([k,v,c])=>`
+    <div class="ssh-row">
+      <span class="ssh-key">${k}</span>
+      <span class="ssh-val" style="color:var(--${c})">${v}</span>
+    </div>`).join('');
+
+  document.getElementById('ssh-hardened-pill').textContent = s.hardened ? '✓ SSH hardened' : '⚠ Not fully hardened';
+  document.getElementById('ssh-hardened-pill').className = 'pill ' + (s.hardened ? 'pill-green' : 'pill-amber');
+  document.getElementById('rec-port-icon').textContent  = s.port !== 22 ? '✓' : '⚠';
+  document.getElementById('rec-root-icon').textContent  = s.permit_root_login !== 'yes' ? '✓' : '⚠';
+  document.getElementById('rec-pw-icon').textContent    = s.password_authentication === 'no' ? '✓' : '⚠';
+  document.getElementById('rec-tries-icon').textContent = s.max_auth_tries <= 3 ? '✓' : '⚠';
+}
+
+function renderConnections(){
+  document.getElementById('conn-count').textContent = MOCK.connections.length;
+  const t = document.getElementById('conn-tbody');
+  t.innerHTML = MOCK.connections.map(c=>`
+    <tr>
+      <td class="td-mono">${c.proto}</td>
+      <td class="td-mono" style="font-size:.72rem">${c.local_address}</td>
+      <td class="td-mono" style="font-size:.72rem">${c.foreign_address}</td>
+      <td><span class="pill ${stateColor(c.state)}" style="font-size:.64rem">${c.state}</span></td>
+      <td class="td-mono">${c.pid||'—'}</td>
+      <td class="td-mono">${c.program||'—'}</td>
+    </tr>`).join('');
+}
+
+function renderPorts(){
+  const t = document.getElementById('ports-tbody');
+  t.innerHTML = MOCK.ports.map(p=>{
+    const [addr,port] = p.address.includes(':') ? p.address.split(':').slice(-2) : [p.address,''];
+    return `<tr>
+      <td class="td-mono" style="font-size:.72rem">${p.address.split(':').slice(0,-1).join(':')}</td>
+      <td class="td-mono">${p.address.split(':').pop()}</td>
+      <td class="td-mono">${p.program}</td>
+      <td><span class="pill pill-blue" style="font-size:.64rem">${p.state}</span></td>
+      <td>${riskPill(p.risk)}</td>
+    </tr>`;
+  }).join('');
+}
+
+function renderEncryption(){
+  const t = document.getElementById('enc-tbody');
+  t.innerHTML = MOCK.encryption.map(d=>`
+    <tr>
+      <td class="td-mono">${d.device}</td>
+      <td class="td-mono">${d.type}</td>
+      <td><span class="pill ${d.encrypted?'pill-green':'pill-red'}">${d.encrypted?'LUKS':'Plain'}</span></td>
+      <td style="font-size:.78rem;color:var(--text2)">${d.encrypted?'Encrypted (LUKS)':'Not encrypted'}</td>
+    </tr>`).join('');
+}
+
+function renderAuth(){
+  document.getElementById('auth-count').textContent = MOCK.auth_events.failed_attempts;
+  const al = document.getElementById('auth-log');
+  al.innerHTML = MOCK.auth_events.recent.map(l=>`
+    <div class="log-entry log-warn" style="margin-bottom:4px">${l}</div>`).join('');
+}
+
+function renderLogs(filter){
+  const entries = filter === 'all' ? MOCK.logs :
+                  MOCK.logs.filter(l=>l.level === filter);
+  const el = document.getElementById('logs-container');
+  el.innerHTML = entries.map(l=>`
+    <div class="log-entry log-${l.level === 'error' ? 'error' : l.level === 'warning' ? 'warn' : 'info'}">
+      <span style="opacity:.6">${l.timestamp.substring(0,19)}</span>
+      <span style="color:var(--gold);margin:0 .4rem">${l.unit}</span>
+      ${l.message}
+    </div>`).join('');
+}
+
+function filterLogs(f){
+  currentFilter = f;
+  ['all','error','warning'].forEach(id=>{
+    const btn = document.getElementById('filter-'+id);
+    if(id===f){btn.style.background='rgba(201,162,39,.15)';btn.style.color='var(--gold)';btn.style.borderColor='rgba(201,162,39,.25)'}
+    else{btn.style.background='rgba(255,255,255,.04)';btn.style.color='var(--text2)';btn.style.borderColor='rgba(255,255,255,.08)'}
+  });
+  renderLogs(f);
+}
+
+// ── NAV ──────────────────────────────────────────────────────────────────────
+const TITLES = {
+  overview:'🛡 Security Overview', score:'📊 Security Score',
+  firewall:'🔥 Firewall Rules', ssh:'🔑 SSH Configuration',
+  connections:'🌐 Active Connections', ports:'📡 Open Ports',
+  encryption:'🔐 Disk Encryption', auth:'🚫 Auth Events', logs:'📋 System Logs'
+};
+function show(page){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>{
+    if(n.getAttribute('onclick')===`show('${page}')`){n.classList.add('active')}
+  });
+  document.getElementById('page-title').textContent = TITLES[page]||page;
+}
+
+// ── INIT ─────────────────────────────────────────────────────────────────────
+// Try real API first
+(async()=>{
+  try{
+    const r = await fetch('http://127.0.0.1:8422/api/score',{signal:AbortSignal.timeout(2000)});
+    if(r.ok){
+      const d = await r.json();
+      Object.assign(MOCK.score,d);
+      document.getElementById('status-pill').className='status-pill online';
+      document.getElementById('status-pill').innerHTML='<span class="pulse-dot pulse-green"></span>Connected';
+    }
+  }catch(e){}
+
+  try{
+    const r = await fetch('http://127.0.0.1:8422/api/firewall',{signal:AbortSignal.timeout(2000)});
+    if(r.ok) Object.assign(MOCK.firewall, await r.json());
+  }catch(e){}
+
+  try{
+    const r = await fetch('http://127.0.0.1:8422/api/ssh',{signal:AbortSignal.timeout(2000)});
+    if(r.ok) Object.assign(MOCK.ssh, await r.json());
+  }catch(e){}
+
+  try{
+    const r = await fetch('http://127.0.0.1:8422/api/connections',{signal:AbortSignal.timeout(2000)});
+    if(r.ok) MOCK.connections = await r.json();
+  }catch(e){}
+
+  try{
+    const r = await fetch('http://127.0.0.1:8422/api/auth-events',{signal:AbortSignal.timeout(2000)});
+    if(r.ok) Object.assign(MOCK.auth_events, await r.json());
+  }catch(e){}
+
+  try{
+    const r = await fetch('http://127.0.0.1:8422/api/logs?lines=50',{signal:AbortSignal.timeout(2000)});
+    if(r.ok) MOCK.logs = await r.json();
+  }catch(e){}
+
+  // Render all pages
+  renderOverview();
+  renderScore();
+  renderFirewall();
+  renderSSH();
+  renderConnections();
+  renderPorts();
+  renderEncryption();
+  renderAuth();
+  renderLogs('all');
+
+  // Update top badges
+  document.getElementById('score-topbadge').textContent = `Score: ${MOCK.score.grade}`;
+  document.getElementById('fw-topbadge').textContent = MOCK.firewall.enabled ? 'UFW: Active' : 'UFW: Inactive';
+  document.getElementById('fw-topbadge').className = 'topbar-badge ' + (MOCK.firewall.enabled ? 'tb-green' : 'tb-red');
+  document.getElementById('ov-score').textContent = MOCK.score.score;
+  document.getElementById('fw-badge').textContent  = MOCK.firewall.enabled ? 'ON' : 'OFF';
+  document.getElementById('fw-badge').className    = 'nav-badge ' + (MOCK.firewall.enabled ? 'green' : '');
+  document.getElementById('conn-badge').textContent = MOCK.connections.length;
+  document.getElementById('auth-badge').textContent = MOCK.auth_events.failed_attempts;
+  document.getElementById('ov-conns').textContent  = MOCK.connections.length;
+  document.getElementById('ov-failed').textContent = MOCK.auth_events.failed_attempts;
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,63 @@
+version: "3.9"
+
+# HORUS OS — Local development environment
+# Runs all three Python backends so every app works on Windows/Mac/Linux
+# Usage: docker compose up -d
+# Then open LAUNCH.html in a browser.
+
+services:
+
+  horus-control-center:
+    image: python:3.11-slim
+    container_name: horus-control
+    working_dir: /app
+    volumes:
+      - ./apps/horus-control-center/backend:/app
+    command: >
+      bash -c "pip install -q -r requirements.txt &&
+               uvicorn main:app --host 0.0.0.0 --port 8420"
+    ports:
+      - "127.0.0.1:8420:8420"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8420/api/cpu')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  horus-ai-assistant:
+    image: python:3.11-slim
+    container_name: horus-ai
+    working_dir: /app
+    volumes:
+      - ./apps/horus-ai-assistant:/app
+    command: >
+      bash -c "pip install -q fastapi 'uvicorn[standard]' psutil httpx pydantic aiofiles &&
+               uvicorn main:app --host 0.0.0.0 --port 8421"
+    ports:
+      - "127.0.0.1:8421:8421"
+    environment:
+      - OLLAMA_URL=${OLLAMA_URL:-http://host.docker.internal:11434}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - OPENAI_MODEL=${OPENAI_MODEL:-gpt-4o-mini}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
+
+  horus-security-center:
+    image: python:3.11-slim
+    container_name: horus-security
+    working_dir: /app
+    volumes:
+      - ./apps/horus-security-center:/app
+    command: >
+      bash -c "pip install -q -r requirements.txt &&
+               uvicorn main:app --host 0.0.0.0 --port 8422"
+    ports:
+      - "127.0.0.1:8422:8422"
+    restart: unless-stopped
+
+# NOTE: The security center reads /etc/ssh/sshd_config and runs ufw/ss/journalctl.
+# Those commands won't work inside Docker (they need the host OS).
+# The app falls back gracefully to empty/default values in that case.
+# For full security data, run horus-security-center directly on the HORUS OS machine.

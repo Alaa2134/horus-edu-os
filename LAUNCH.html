@@ -293,25 +293,48 @@ footer{
   </div>
 
   <!-- APPS THAT NEED PYTHON -->
-  <div class="sec-title">تطبيقات Python — تشغيل على Linux/WSL2</div>
+  <div class="sec-title">تطبيقات Python — Demo أو تشغيل على Linux/WSL2</div>
+  <div class="apps-grid">
+    <a class="app-card" href="apps/horus-control-center/demo.html" target="_blank" style="text-decoration:none">
+      <div class="app-icon">📊</div>
+      <div class="app-name">Control Center <span style="font-size:.65rem;color:var(--green)">▶ Demo</span></div>
+      <div class="app-desc">لوحة CPU/RAM/Network الحية — بيحاول يتصل بـ API أو بيشغل mock data</div>
+      <div class="app-tag">demo.html · :8420 optional</div>
+    </a>
+    <a class="app-card" href="apps/horus-ai-assistant/demo.html" target="_blank" style="text-decoration:none">
+      <div class="app-icon">🤖</div>
+      <div class="app-name">AI Assistant <span style="font-size:.65rem;color:var(--green)">▶ Demo</span></div>
+      <div class="app-desc">مساعد AI كامل مع ردود offline — Ollama لما بيشتغل</div>
+      <div class="app-tag">demo.html · :8421 optional</div>
+    </a>
+    <a class="app-card" href="apps/horus-security-center/demo.html" target="_blank" style="text-decoration:none">
+      <div class="app-icon">🛡</div>
+      <div class="app-name">Security Center <span style="font-size:.65rem;color:var(--green)">▶ Demo</span></div>
+      <div class="app-desc">Firewall + SSH + security score — بيشغل mock data أو live data</div>
+      <div class="app-tag">demo.html · :8422 optional</div>
+    </a>
+  </div>
+
+  <!-- PYTHON START INSTRUCTIONS -->
+  <div class="sec-title" style="margin-top:.5rem">للتشغيل الحقيقي — Linux / WSL2</div>
   <div class="apps-grid">
     <div class="app-card" onclick="showPythonNote('control-center','8420')">
-      <div class="app-icon">📊</div>
-      <div class="app-name">Control Center</div>
-      <div class="app-desc">لوحة CPU/RAM/Network الحية — FastAPI + React</div>
-      <div class="app-tag">:8420 · python backend</div>
+      <div class="app-icon">⚙</div>
+      <div class="app-name">Start Control Center</div>
+      <div class="app-desc">تشغيل الـ backend الحقيقي على Linux أو WSL2</div>
+      <div class="app-tag">python3 · :8420</div>
     </div>
     <div class="app-card" onclick="showPythonNote('ai-assistant','8421')">
-      <div class="app-icon">🤖</div>
-      <div class="app-name">AI Assistant</div>
-      <div class="app-desc">مساعد ذكاء اصطناعي محلي — Ollama + Mistral</div>
-      <div class="app-tag">:8421 · python backend</div>
+      <div class="app-icon">⚙</div>
+      <div class="app-name">Start AI Assistant</div>
+      <div class="app-desc">تشغيل الـ backend + Ollama للـ AI المحلي</div>
+      <div class="app-tag">python3 · :8421</div>
     </div>
     <div class="app-card" onclick="showPythonNote('security-center','8422')">
-      <div class="app-icon">🛡</div>
-      <div class="app-name">Security Center</div>
-      <div class="app-desc">Firewall + SSH + network monitor</div>
-      <div class="app-tag">:8422 · python backend</div>
+      <div class="app-icon">⚙</div>
+      <div class="app-name">Start Security Center</div>
+      <div class="app-desc">تشغيل الـ backend للـ firewall + network monitoring</div>
+      <div class="app-tag">python3 · :8422</div>
     </div>
   </div>
 
@@ -354,12 +377,13 @@ footer{
     ├── <span style="color:var(--gold)">apps/</span><br>
     │&nbsp;&nbsp; ├── <a href="apps/horus-demo-mode/index.html" target="_blank" style="color:var(--cyan);text-decoration:none">horus-demo-mode/</a> &nbsp;&nbsp;&nbsp;<span style="color:#3d4a5c">← كشك المسابقة</span><br>
     │&nbsp;&nbsp; ├── <a href="apps/horus-about/index.html" target="_blank" style="color:var(--cyan);text-decoration:none">horus-about/</a> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#3d4a5c">← About page</span><br>
-    │&nbsp;&nbsp; ├── horus-control-center/ &nbsp;<span style="color:#3d4a5c">← Python :8420</span><br>
-    │&nbsp;&nbsp; ├── horus-ai-assistant/ &nbsp;&nbsp;&nbsp;<span style="color:#3d4a5c">← Python :8421</span><br>
-    │&nbsp;&nbsp; └── horus-security-center/ <span style="color:#3d4a5c">← Python :8422</span><br>
+    │&nbsp;&nbsp; ├── <a href="apps/horus-control-center/demo.html" target="_blank" style="color:var(--cyan);text-decoration:none">horus-control-center/</a> &nbsp;<span style="color:#3d4a5c">← demo.html · Python :8420</span><br>
+    │&nbsp;&nbsp; ├── <a href="apps/horus-ai-assistant/demo.html" target="_blank" style="color:var(--cyan);text-decoration:none">horus-ai-assistant/</a> &nbsp;&nbsp;&nbsp;<span style="color:#3d4a5c">← demo.html · Python :8421</span><br>
+    │&nbsp;&nbsp; └── <a href="apps/horus-security-center/demo.html" target="_blank" style="color:var(--cyan);text-decoration:none">horus-security-center/</a> <span style="color:#3d4a5c">← demo.html · Python :8422</span><br>
     ├── <span style="color:var(--gold)">scripts/</span><br>
     │&nbsp;&nbsp; ├── build-iso.sh &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#3d4a5c">← يبني الـ ISO (Ubuntu فقط)</span><br>
     │&nbsp;&nbsp; └── wsl-quickstart.ps1 &nbsp;&nbsp;<span style="color:#3d4a5c">← تشغيل على Windows الآن</span><br>
+    ├── <span style="color:var(--cyan)">docker-compose.yml</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#3d4a5c">← تشغيل كل الـ backends بأمر واحد</span><br>
     ├── <span style="color:var(--gold)">.github/workflows/</span><br>
     │&nbsp;&nbsp; └── build-release.yml &nbsp;&nbsp;&nbsp;<span style="color:#3d4a5c">← GitHub Actions auto-build</span><br>
     └── <a href="website/index.html" target="_blank" style="color:#6366f1;text-decoration:none">website/</a> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#3d4a5c">← الموقع الرسمي</span>
