@@ -78,6 +78,37 @@ nav{
   overflow:hidden;padding:5rem 2rem 3rem;
 }
 #canvas-bg{position:absolute;inset:0;z-index:1}
+.hero-photo{
+  position:absolute;inset:0;z-index:0;
+  background-image:url('https://images.unsplash.com/photo-1539650116574-8efeb43e2750?w=1920&q=80&auto=format&fit=crop');
+  background-size:cover;background-position:center 40%;
+  opacity:.13;
+}
+
+/* ── GALLERY ── */
+.gallery-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:1rem;
+}
+.gallery-item{
+  border-radius:6px;overflow:hidden;
+  border:1px solid rgba(201,162,39,.15);
+  position:relative;cursor:pointer;
+  transition:.3s;aspect-ratio:16/10;
+}
+.gallery-item:hover{border-color:rgba(201,162,39,.5);transform:translateY(-4px);box-shadow:0 20px 40px rgba(0,0,0,.6)}
+.gallery-item img{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(.7) brightness(.75)}
+.gallery-item:hover img{filter:saturate(1) brightness(.9)}
+.gallery-item-label{
+  position:absolute;bottom:0;left:0;right:0;
+  padding:.6rem .85rem;
+  background:linear-gradient(0deg,rgba(4,7,15,.95),transparent);
+  color:var(--gold);font-size:.75rem;font-weight:700;font-family:'Cinzel',serif;
+  letter-spacing:.08em;
+}
+.gallery-item.wide{grid-column:span 2}
+@media(max-width:768px){.gallery-grid{grid-template-columns:1fr 1fr}.gallery-item.wide{grid-column:span 2}}
 .hero-pyramid{position:absolute;bottom:0;left:50%;transform:translateX(-50%);z-index:2;opacity:.07;width:100%;max-width:900px}
 .hero-content{
   position:relative;z-index:3;
@@ -204,6 +235,13 @@ h2.section-title span{color:var(--gold)}
   padding:3rem 2rem;
   background:linear-gradient(180deg,var(--bg) 0%,var(--bg2) 100%);
   border-top:1px solid rgba(201,162,39,.1);border-bottom:1px solid rgba(201,162,39,.1);
+  position:relative;overflow:hidden;
+}
+#seal-section::before{
+  content:'';position:absolute;inset:0;
+  background-image:url('https://images.unsplash.com/photo-1553913861-c0fddf2619ee?w=1200&q=60&auto=format&fit=crop');
+  background-size:cover;background-position:center;
+  opacity:.06;pointer-events:none;
 }
 .seal-inner{
   max-width:900px;margin:0 auto;
@@ -438,6 +476,7 @@ footer{background:var(--bg2);border-top:1px solid rgba(201,162,39,.15);padding:3
 
 <!-- ═══════════════ HERO ═══════════════ -->
 <section id="hero">
+  <div class="hero-photo"></div>
   <canvas id="canvas-bg"></canvas>
 
   <!-- Pyramid silhouette -->
@@ -628,6 +667,7 @@ footer{background:var(--bg2);border-top:1px solid rgba(201,162,39,.15);padding:3
     <div class="apps-grid">
       <div class="app-card reveal">
         <div class="app-preview" style="background:linear-gradient(135deg,#0f1a35,#1a2a50)">
+          <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&q=70&auto=format&fit=crop" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.22">
           <div class="app-preview-glow"></div>
           <div class="app-preview-icon">🏛</div>
           <div class="app-preview-label">EDU HUB</div>
@@ -640,6 +680,7 @@ footer{background:var(--bg2);border-top:1px solid rgba(201,162,39,.15);padding:3
       </div>
       <div class="app-card reveal">
         <div class="app-preview" style="background:linear-gradient(135deg,#0f2020,#1a3530)">
+          <img src="https://images.unsplash.com/photo-1677442136019-21780ecad995?w=400&q=70&auto=format&fit=crop" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.22">
           <div class="app-preview-glow" style="background:radial-gradient(circle,rgba(16,185,129,.15),transparent 70%)"></div>
           <div class="app-preview-icon">🤖</div>
           <div class="app-preview-label">AI TUTOR</div>
@@ -652,6 +693,7 @@ footer{background:var(--bg2);border-top:1px solid rgba(201,162,39,.15);padding:3
       </div>
       <div class="app-card reveal">
         <div class="app-preview" style="background:linear-gradient(135deg,#150f2a,#2a1a45)">
+          <img src="https://images.unsplash.com/photo-1629654297299-c8506221ca97?w=400&q=70&auto=format&fit=crop" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.22">
           <div class="app-preview-glow" style="background:radial-gradient(circle,rgba(99,102,241,.15),transparent 70%)"></div>
           <div class="app-preview-icon">💻</div>
           <div class="app-preview-label">CODE LAB</div>
@@ -664,6 +706,7 @@ footer{background:var(--bg2);border-top:1px solid rgba(201,162,39,.15);padding:3
       </div>
       <div class="app-card reveal">
         <div class="app-preview" style="background:linear-gradient(135deg,#1a1508,#302510)">
+          <img src="https://images.unsplash.com/photo-1455390582262-044cdead277a?w=400&q=70&auto=format&fit=crop" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.22">
           <div class="app-preview-glow" style="background:radial-gradient(circle,rgba(201,162,39,.15),transparent 70%)"></div>
           <div class="app-preview-icon">📝</div>
           <div class="app-preview-label">SMART NOTES</div>
@@ -676,6 +719,7 @@ footer{background:var(--bg2);border-top:1px solid rgba(201,162,39,.15);padding:3
       </div>
       <div class="app-card reveal">
         <div class="app-preview" style="background:linear-gradient(135deg,#0f1f30,#1a3045)">
+          <img src="https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=400&q=70&auto=format&fit=crop" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.22">
           <div class="app-preview-glow" style="background:radial-gradient(circle,rgba(59,130,246,.15),transparent 70%)"></div>
           <div class="app-preview-icon">🧠</div>
           <div class="app-preview-label">QUIZ</div>
@@ -688,6 +732,7 @@ footer{background:var(--bg2);border-top:1px solid rgba(201,162,39,.15);padding:3
       </div>
       <div class="app-card reveal">
         <div class="app-preview" style="background:linear-gradient(135deg,#080f20,#10182f)">
+          <img src="https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=400&q=70&auto=format&fit=crop" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.22">
           <div class="app-preview-glow" style="background:radial-gradient(circle,rgba(139,92,246,.15),transparent 70%)"></div>
           <div class="app-preview-icon">📚</div>
           <div class="app-preview-label">LIBRARY</div>
@@ -700,6 +745,7 @@ footer{background:var(--bg2);border-top:1px solid rgba(201,162,39,.15);padding:3
       </div>
       <div class="app-card reveal">
         <div class="app-preview" style="background:linear-gradient(135deg,#0f1508,#1a2510)">
+          <img src="https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=400&q=70&auto=format&fit=crop" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.22">
           <div class="app-preview-glow" style="background:radial-gradient(circle,rgba(34,197,94,.15),transparent 70%)"></div>
           <div class="app-preview-icon">🔢</div>
           <div class="app-preview-label">CALCULATOR</div>
@@ -716,6 +762,69 @@ footer{background:var(--bg2);border-top:1px solid rgba(201,162,39,.15);padding:3
 
 <!-- LOTUS DIVIDER -->
 <div class="lotus-divider" style="background:var(--bg)">
+  <svg width="40" height="22" viewBox="0 0 80 40" fill="none"><path d="M40 38 Q30 20 20 25 Q15 10 40 5 Q65 10 60 25 Q50 20 40 38Z" fill="rgba(201,162,39,0.25)" stroke="#c9a227" stroke-width="1.2"/></svg>
+</div>
+
+<!-- ═══════════════ GALLERY / SCREENSHOTS ═══════════════ -->
+<section id="gallery" style="background:var(--bg2);padding:4rem 2rem">
+  <div class="container">
+    <div class="section-header reveal" style="margin-bottom:2.5rem">
+      <div class="section-eyebrow">صور المشروع</div>
+      <h2 class="section-title">من <span>مصر الفرعونية</span> إلى مستقبل التقنية</h2>
+      <p class="section-desc">إلهامنا من حضارة الفراعنة — عين حورس رمز المعرفة والحماية</p>
+    </div>
+
+    <!-- Pharaonic images row -->
+    <div class="gallery-grid reveal" style="margin-bottom:1rem">
+      <div class="gallery-item wide">
+        <img src="https://images.unsplash.com/photo-1539650116574-8efeb43e2750?w=900&q=80&auto=format&fit=crop" alt="Pyramids of Giza" loading="lazy">
+        <div class="gallery-item-label">الأهرامات — مصدر إلهام HORUS OS</div>
+      </div>
+      <div class="gallery-item">
+        <img src="https://images.unsplash.com/photo-1568322445389-f64ac2515020?w=500&q=80&auto=format&fit=crop" alt="Sphinx" loading="lazy">
+        <div class="gallery-item-label">أبو الهول — الحارس الأبدي</div>
+      </div>
+    </div>
+
+    <div class="gallery-grid reveal" style="margin-bottom:1rem">
+      <div class="gallery-item">
+        <img src="https://images.unsplash.com/photo-1588666309990-d68f08e3d4a6?w=500&q=80&auto=format&fit=crop" alt="Egyptian temple" loading="lazy">
+        <div class="gallery-item-label">معبد الكرنك — جمال الهندسة القديمة</div>
+      </div>
+      <div class="gallery-item">
+        <img src="https://images.unsplash.com/photo-1553913861-c0fddf2619ee?w=500&q=80&auto=format&fit=crop" alt="Hieroglyphs" loading="lazy">
+        <div class="gallery-item-label">الهيروغليفية — لغة الفراعنة</div>
+      </div>
+      <div class="gallery-item">
+        <img src="https://images.unsplash.com/photo-1542051841857-5f90071e7989?w=500&q=80&auto=format&fit=crop" alt="Cairo at night" loading="lazy">
+        <div class="gallery-item-label">مصر الحديثة — الجمع بين الأصالة والتقنية</div>
+      </div>
+    </div>
+
+    <!-- Tech/OS theme row -->
+    <div class="section-header" style="margin:2.5rem 0 1.5rem">
+      <div class="section-eyebrow">التقنية</div>
+      <h2 class="section-title" style="font-size:1.5rem">بيئة <span>التطوير والتعليم</span></h2>
+    </div>
+    <div class="gallery-grid reveal">
+      <div class="gallery-item">
+        <img src="https://images.unsplash.com/photo-1629654297299-c8506221ca97?w=500&q=80&auto=format&fit=crop" alt="Dark coding setup" loading="lazy">
+        <div class="gallery-item-label">Code Lab — معمل البرمجة</div>
+      </div>
+      <div class="gallery-item">
+        <img src="https://images.unsplash.com/photo-1677442136019-21780ecad995?w=500&q=80&auto=format&fit=crop" alt="AI visualization" loading="lazy">
+        <div class="gallery-item-label">AI Tutor — الذكاء الاصطناعي المحلي</div>
+      </div>
+      <div class="gallery-item wide">
+        <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=900&q=80&auto=format&fit=crop" alt="Analytics dashboard" loading="lazy">
+        <div class="gallery-item-label">Control Center — لوحة مراقبة النظام</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LOTUS DIVIDER -->
+<div class="lotus-divider" style="background:var(--bg2)">
   <svg width="40" height="22" viewBox="0 0 80 40" fill="none"><path d="M40 38 Q30 20 20 25 Q15 10 40 5 Q65 10 60 25 Q50 20 40 38Z" fill="rgba(201,162,39,0.25)" stroke="#c9a227" stroke-width="1.2"/></svg>
 </div>
 
@@ -740,7 +849,7 @@ footer{background:var(--bg2);border-top:1px solid rgba(201,162,39,.15);padding:3
           <span style="background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.3);color:#818cf8;padding:.2rem .6rem;border-radius:2px;font-size:.72rem;font-weight:700">x86_64</span>
         </div>
       </div>
-      <a href="https://github.com/alaa00saber/horus-edu-os/releases/latest" target="_blank" class="btn-primary" style="flex-shrink:0" id="iso-dl-btn">
+      <a href="https://github.com/Alaa2134/horus-edu-os/releases/latest" target="_blank" class="btn-primary" style="flex-shrink:0" id="iso-dl-btn">
         ⬇ تحميل من GitHub
       </a>
     </div>
