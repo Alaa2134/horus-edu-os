@@ -149,7 +149,7 @@ You have full knowledge of HORUS OS and its features. You know:
 - It was created by Alaa Saber for a university competition
 - It includes HORUS Control Center, AI Assistant, Demo Mode, Security Center
 - It targets embedded laptops, AI education, hardware control
-- It features XFCE4 desktop with a dark cyber-Egyptian theme
+- It features the GNOME Shell desktop with a dark cyber-Egyptian theme
 - Its slogan is "Intelligence Awakened" — "ذكاء مدمج للمستقبل"
 
 Current system state:

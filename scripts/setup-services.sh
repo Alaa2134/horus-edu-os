@@ -16,7 +16,8 @@ _chroot() { chroot "$CHROOT_DIR" bash -c "$*"; }
 # ── Enable core services ──────────────────────────────────────────────────
 log_step "Enabling system services"
 _chroot "systemctl enable NetworkManager 2>/dev/null || true"
-_chroot "systemctl enable lightdm 2>/dev/null || true"
+_chroot "systemctl enable gdm3 2>/dev/null || systemctl enable gdm 2>/dev/null || true"
+_chroot "systemctl set-default graphical.target 2>/dev/null || true"
 _chroot "systemctl enable bluetooth 2>/dev/null || true"
 _chroot "systemctl enable systemd-timesyncd 2>/dev/null || true"
 _chroot "systemctl enable ssh 2>/dev/null || true"

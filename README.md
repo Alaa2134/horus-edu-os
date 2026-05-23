@@ -38,7 +38,7 @@ HORUS OS is a **custom Linux-based operating system** built for embedded laptops
 > **Purpose:** University Competition — Embedded Systems & Student Innovation
 > **Positioning:** Custom Linux-based OS for embedded intelligence
 
-HORUS OS is built on Ubuntu 22.04 LTS minimal with XFCE4 as the desktop foundation, transformed through comprehensive theming, custom applications, and a unified brand identity rooted in Ancient Egyptian heritage and futuristic embedded intelligence.
+HORUS OS is built on Ubuntu 22.04 LTS minimal with GNOME Shell (on Mutter) as the desktop foundation, transformed through comprehensive theming, custom applications, and a unified brand identity rooted in Ancient Egyptian heritage and futuristic embedded intelligence.
 
 ---
 
@@ -64,8 +64,8 @@ HORUS OS is built on Ubuntu 22.04 LTS minimal with XFCE4 as the desktop foundati
 ```
 HORUS OS
 ├── APPLICATION LAYER   HORUS Control Center · AI Assistant · Demo Mode · Security Center
-├── DESKTOP LAYER       XFCE4 + Horus Dark GTK Theme + Picom compositor
-├── DISPLAY LAYER       LightDM + Horus GTK Greeter
+├── DESKTOP LAYER       GNOME Shell (Mutter) + Yaru-Dark + Horus dock + pyramid wallpaper
+├── DISPLAY LAYER       GDM3 (dark greeter, Wayland)
 ├── BOOT LAYER          GRUB2 (Horus theme) + Plymouth (Horus script animation)
 └── SYSTEM LAYER        Ubuntu 22.04 LTS minimal + Linux 5.15+ + systemd
 ```
@@ -222,15 +222,14 @@ horus-os/
 │   ├── wallpapers/                 Desktop, login, lock screen
 │   ├── plymouth/                  Boot splash theme
 │   ├── grub-theme/                GRUB2 visual theme
-│   ├── icons/                     Custom app icons
+│   ├── wallpapers/                Desktop wallpapers (pyramids SVG)
 │   ├── palette/                   colors.json — full color system
 │   └── prompts/                   Image generation prompts for all visuals
 ├── configs/
 │   ├── os-release                 OS identity file
 │   ├── fastfetch/                 fastfetch config
 │   ├── terminal-welcome.sh        Terminal welcome banner
-│   ├── lightdm/                   Display manager configuration
-│   ├── xfce/                      Desktop environment config
+│   ├── gnome/                     GNOME dconf system defaults
 │   └── systemd/                   Service unit files
 ├── presentation/
 │   ├── pitch-script.md            30s / 2min / 5min pitches (AR + EN)
@@ -260,7 +259,7 @@ Build time: approximately 45–90 minutes depending on internet speed and hardwa
 |---|---|
 | v1.0 | Custom boot, desktop, Control Center, Demo Mode, Security Center |
 | v1.1 | HORUS AI with local Ollama inference |
-| v1.2 | Custom Flutter desktop shell replacing XFCE4 |
+| v1.2 | Custom GNOME Shell extension suite — Horus launcher, panel, workspace effects |
 | v1.3 | Full first-boot OEM setup wizard |
 | v2.0 | Custom kernel configuration, signed packages, HORUS APT repository |
 
@@ -272,7 +271,7 @@ Build time: approximately 45–90 minutes depending on internet speed and hardwa
 
 University Competition Project — Embedded Systems & Student Innovation
 
-Built with: Ubuntu, XFCE4, Python, FastAPI, React, Tailwind CSS, Tauri, Plymouth, GRUB2, Ollama
+Built with: Ubuntu, GNOME Shell, Yaru, Python, FastAPI, React, Tailwind CSS, Tauri, Plymouth, GRUB2, Ollama
 
 ---
 

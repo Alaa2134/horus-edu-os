@@ -26,6 +26,16 @@ _apt() {
   return 0
 }
 
+# Like _apt but keeps recommended packages — GNOME needs them to be usable
+_apt_rec() {
+  if [[ "$CHROOT_DIR" == "/" ]]; then
+    DEBIAN_FRONTEND=noninteractive apt-get install -y "$@" || log_warn "Some packages failed (non-fatal)"
+  else
+    chroot "$CHROOT_DIR" env DEBIAN_FRONTEND=noninteractive apt-get install -y "$@" || log_warn "Some packages failed (non-fatal)"
+  fi
+  return 0
+}
+
 _apt_chroot() {
   chroot "$CHROOT_DIR" bash -c "DEBIAN_FRONTEND=noninteractive $*" 2>&1 || true
 }
@@ -50,28 +60,51 @@ _apt \
   ca-certificates \
   udev || log_warn "Some core packages failed"
 
-# ── 2. Desktop Environment (XFCE4) ─────────────────────────────────────
-log_pkg "XFCE4 desktop environment"
+# ── 2. Live Boot System (casper) ────────────────────────────────────────
+# Required for the live ISO to boot the squashfs root (boot=casper).
+log_pkg "Live boot system (casper)"
 _apt \
-  xorg x11-xserver-utils \
-  xfce4 xfce4-goodies \
-  xfce4-terminal \
-  xfwm4 xfdesktop4 xfce4-panel \
-  xfce4-settings xfce4-session \
-  xfce4-appfinder \
-  thunar thunar-volman thunar-archive-plugin \
-  xarchiver \
-  mousepad \
-  ristretto \
-  picom \
+  casper \
+  discover \
+  laptop-detect \
+  os-prober || log_warn "casper stack partially failed"
+
+# ── 3. Desktop Environment (GNOME) ───────────────────────────────────────
+# GNOME Shell on Mutter with GDM3 — installed WITH recommends so the desktop
+# is fully functional out of the box. Yaru-dark provides the polished dark
+# base that HORUS branding (wallpaper, dock, logo) is layered on top of.
+log_pkg "GNOME desktop environment (this is large — be patient)"
+_apt_rec \
+  ubuntu-desktop-minimal \
+  gnome-shell \
+  gnome-session \
+  gdm3 \
+  gnome-terminal \
+  nautilus \
+  gnome-control-center \
+  gnome-tweaks \
+  gnome-shell-extension-manager \
+  gnome-shell-extensions \
+  gnome-system-monitor \
+  gnome-disk-utility \
+  gnome-calculator \
+  gnome-text-editor \
+  eog \
+  evince \
+  file-roller \
+  xdg-desktop-portal \
+  xdg-desktop-portal-gnome \
   gvfs gvfs-backends udisks2
 
-# ── 3. Display Manager ──────────────────────────────────────────────────
-log_pkg "LightDM display manager"
-_apt \
-  lightdm \
-  lightdm-gtk-greeter \
-  lightdm-gtk-greeter-settings
+# Themes: Yaru (dark) for GTK + shell + icons, plus extras for full coverage
+log_pkg "Yaru theme (dark base for HORUS branding)"
+_apt_rec \
+  yaru-theme-gtk \
+  yaru-theme-icon \
+  yaru-theme-gnome-shell \
+  yaru-theme-sound \
+  gnome-themes-extra \
+  adwaita-icon-theme || log_warn "Some theme packages failed"
 
 # ── 4. Fonts ─────────────────────────────────────────────────────────────
 log_pkg "Fonts"
@@ -289,14 +322,17 @@ log_pkg "Ubiquity installer"
 _apt ubiquity ubiquity-frontend-gtk 2>/dev/null || \
   log_warn "Ubiquity not available — users can install with debootstrap manually"
 
-# ── 20. GTK Theme Dependencies ───────────────────────────────────────────
-log_pkg "GTK theme dependencies"
+# ── 20. Theme + dconf tooling ─────────────────────────────────────────────
+log_pkg "Theme and dconf tooling"
 _apt \
   papirus-icon-theme \
   gtk2-engines-murrine \
   gtk2-engines-pixbuf \
   libglib2.0-bin \
+  dconf-cli \
+  dconf-gsettings-backend \
   sassc \
+  librsvg2-bin \
   libglib2.0-dev || true
 
 # ── Final: Clean up APT cache ────────────────────────────────────────────
