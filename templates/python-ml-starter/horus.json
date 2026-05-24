@@ -1,0 +1,6 @@
+{
+  "name": "Python ML Starter",
+  "description": "Train a Random Forest on the Iris dataset and evaluate it — clean intro to ML.",
+  "tags": ["python", "ml", "scikit-learn"],
+  "run": "pip install -r requirements.txt && python3 train.py"
+}

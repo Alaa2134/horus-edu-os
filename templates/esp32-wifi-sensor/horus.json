@@ -1,0 +1,7 @@
+{
+  "name": "ESP32 Wi-Fi Sensor",
+  "description": "ESP32 joins Wi-Fi and serves live sensor readings as JSON over HTTP.",
+  "tags": ["esp32", "wifi", "iot", "sensor"],
+  "board": "esp32:esp32:esp32",
+  "run": "arduino-cli compile --fqbn esp32:esp32:esp32 . && arduino-cli upload --fqbn esp32:esp32:esp32 -p /dev/ttyUSB0 ."
+}

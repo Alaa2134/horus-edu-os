@@ -1,0 +1,6 @@
+{
+  "name": "ROS 2 Node",
+  "description": "Minimal rclpy publisher node — your entry point into ROS 2 robotics.",
+  "tags": ["ros2", "robotics", "python"],
+  "run": "source /opt/ros/humble/setup.bash && python3 talker.py"
+}

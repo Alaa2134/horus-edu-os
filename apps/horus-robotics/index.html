@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HORUS Robotics</title>
+<style>
+  :root{--gold:#c9a227;--gold-l:#f5d060;--cyan:#00d4ff;--blue:#1a73e8;
+    --bg:#0a0a0f;--surface:#12121a;--surface2:#1a1a27;--text:#e8e8f0;
+    --muted:#aaaacc;--border:rgba(201,162,39,.22);--ok:#00e676;--off:#666688}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Ubuntu','Inter',system-ui,sans-serif;color:var(--text);
+    background:radial-gradient(900px 500px at 80% -10%,rgba(26,115,232,.14),transparent 60%),
+      linear-gradient(180deg,#070b1c,#0a0a0f 60%);min-height:100vh;padding:28px}
+  header{display:flex;align-items:center;gap:14px;margin-bottom:24px}
+  header .logo{width:44px;height:44px;filter:drop-shadow(0 0 12px rgba(201,162,39,.5))}
+  header h1{font-family:'Cinzel',serif;font-size:24px;letter-spacing:4px;color:var(--gold-l)}
+  header .sub{color:var(--muted);font-size:12px;letter-spacing:2px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:18px;max-width:1200px;margin:0 auto}
+  .card{background:rgba(18,18,26,.7);border:1px solid var(--border);border-radius:18px;
+    padding:20px;backdrop-filter:blur(14px);box-shadow:0 10px 30px rgba(0,0,0,.35)}
+  .card h2{font-size:15px;letter-spacing:1px;color:var(--gold);margin-bottom:14px;
+    display:flex;align-items:center;gap:8px}
+  .row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;
+    border-bottom:1px solid rgba(255,255,255,.05);font-size:14px}
+  .row:last-child{border-bottom:none}
+  .pill{font-size:11px;padding:3px 10px;border-radius:9999px;font-weight:600}
+  .pill.on{background:rgba(0,230,118,.14);color:var(--ok)}
+  .pill.no{background:rgba(102,102,136,.16);color:var(--off)}
+  .muted{color:var(--muted)} .mono{font-family:'JetBrains Mono',monospace}
+  button{background:linear-gradient(135deg,#c9a227,#a07820);color:#0a0a0f;border:none;
+    padding:8px 14px;border-radius:9999px;font-weight:700;cursor:pointer;font-size:13px}
+  button.ghost{background:transparent;color:var(--gold);border:1px solid var(--border)}
+  button:hover{filter:brightness(1.08)}
+  select,input{background:#0a0a0f;color:var(--text);border:1px solid var(--border);
+    border-radius:10px;padding:8px 10px;font-size:13px;width:100%}
+  .tmpl{padding:12px;border:1px solid rgba(255,255,255,.06);border-radius:12px;margin-bottom:10px}
+  .tmpl .nm{color:var(--gold-l);font-weight:600}
+  .tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+  .tag{font-size:10px;color:var(--cyan);border:1px solid rgba(0,212,255,.3);border-radius:6px;padding:2px 6px}
+  .empty{color:var(--off);font-size:13px;padding:8px 0}
+  .wire code{display:block;color:var(--muted);font-size:12px;padding:2px 0}
+  .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1a27;
+    border:1px solid var(--border);color:var(--text);padding:12px 20px;border-radius:12px;
+    opacity:0;transition:.3s;pointer-events:none}
+  .toast.show{opacity:1}
+</style>
+</head>
+<body>
+  <header>
+    <svg class="logo" viewBox="0 0 100 100" fill="none" stroke="#f3d28a" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M8 52 C26 26 74 26 92 50"/><path d="M10 56 C30 84 70 84 92 50"/>
+      <circle cx="50" cy="52" r="14" stroke-width="6"/><circle cx="50" cy="52" r="4" fill="#f3d28a" stroke="none"/>
+      <path d="M10 56 C2 64 1 76 6 86"/><path d="M62 66 C60 80 58 88 58 96"/>
+    </svg>
+    <div><h1>HORUS ROBOTICS</h1><div class="sub">Arduino · ESP32 · Raspberry Pi · ROS 2 — for makers &amp; students</div></div>
+  </header>
+
+  <div class="grid">
+    <div class="card">
+      <h2>🔌 Connected Boards <button class="ghost" style="margin-left:auto" onclick="loadBoards()">Rescan</button></h2>
+      <div id="boards"><div class="empty">Scanning…</div></div>
+    </div>
+
+    <div class="card">
+      <h2>🚀 New Project</h2>
+      <div id="tmplPicker">
+        <select id="tmplSel"></select>
+        <input id="projName" placeholder="Project name" style="margin-top:10px">
+        <button style="margin-top:12px;width:100%" onclick="createProject()">Create from template</button>
+        <div class="muted mono" style="font-size:11px;margin-top:8px" id="projDir"></div>
+      </div>
+      <div id="tmplList" style="margin-top:14px"></div>
+    </div>
+
+    <div class="card">
+      <h2>🔧 Wiring Helper</h2>
+      <select id="wireSel" onchange="showWiring()"></select>
+      <div id="wireOut" class="wire" style="margin-top:12px"></div>
+    </div>
+
+    <div class="card">
+      <h2>🩺 Environment — Fix My Setup</h2>
+      <div id="toolchain"><div class="empty">Checking…</div></div>
+      <div class="muted" style="font-size:12px;margin-top:10px">
+        Missing a tool? Run <code class="mono">horus-setup &lt;name&gt;</code> in the terminal,
+        or <code class="mono">horus-doctor</code> to auto-fix common issues.
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+<script>
+const $ = s => document.querySelector(s);
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2600)}
+async function jget(u){const r=await fetch(u);return r.json()}
+
+async function loadBoards(){
+  $('#boards').innerHTML='<div class="empty">Scanning…</div>';
+  try{
+    const d=await jget('/api/boards');
+    if(!d.boards.length){
+      $('#boards').innerHTML='<div class="empty">No boards detected. Plug in an Arduino/ESP32 via USB and press Rescan.'
+        +(d.arduino_cli?'':' <br>(arduino-cli not installed — using basic serial scan)')+'</div>';
+      return;
+    }
+    $('#boards').innerHTML=d.boards.map(b=>`<div class="row">
+      <div><div>${b.name}</div><div class="muted mono" style="font-size:11px">${b.port} · ${b.protocol}</div></div>
+      <span class="pill on">detected</span></div>`).join('');
+  }catch(e){$('#boards').innerHTML='<div class="empty">Backend offline.</div>'}
+}
+
+async function loadTemplates(){
+  try{
+    const d=await jget('/api/templates');
+    $('#projDir').textContent='Saved to: '+d.projects_dir;
+    const sel=$('#tmplSel');
+    sel.innerHTML=d.templates.map(t=>`<option value="${t.id}">${t.name}</option>`).join('')
+      || '<option disabled>No templates installed</option>';
+    $('#tmplList').innerHTML=d.templates.map(t=>`<div class="tmpl"><div class="nm">${t.name}</div>
+      <div class="muted" style="font-size:12px">${t.description||''}</div>
+      <div class="tags">${(t.tags||[]).map(x=>`<span class="tag">${x}</span>`).join('')}</div></div>`).join('');
+  }catch(e){}
+}
+
+async function createProject(){
+  const template=$('#tmplSel').value, name=$('#projName').value.trim();
+  if(!name){toast('Enter a project name');return}
+  try{
+    const r=await fetch('/api/new-project',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({template,name})});
+    const d=await r.json();
+    if(r.ok){toast('Created: '+d.created);$('#projName').value=''}
+    else toast(d.detail||'Could not create project');
+  }catch(e){toast('Backend offline')}
+}
+
+let WIRING={};
+async function loadWiring(){
+  try{
+    WIRING=await jget('/api/wiring');
+    const comps=WIRING.components||{};
+    $('#wireSel').innerHTML=Object.keys(comps).map(k=>`<option value="${k}">${comps[k].name}</option>`).join('');
+    showWiring();
+  }catch(e){}
+}
+function showWiring(){
+  const k=$('#wireSel').value, c=(WIRING.components||{})[k]; if(!c)return;
+  let h=`<div class="row"><b>${c.name}</b></div>`;
+  if(c.arduino_uno){h+='<div class="muted" style="margin:8px 0 4px;color:var(--cyan)">Arduino UNO</div>';
+    h+=c.arduino_uno.map(p=>`<code>${p[0]} ${p[1]}</code>`).join('')}
+  if(c.esp32){h+='<div class="muted" style="margin:8px 0 4px;color:var(--cyan)">ESP32</div>';
+    h+=c.esp32.map(p=>`<code>${p[0]} ${p[1]}</code>`).join('')}
+  if(c.tip)h+=`<div style="margin-top:8px;color:var(--gold-l);font-size:12px">💡 ${c.tip}</div>`;
+  $('#wireOut').innerHTML=h;
+}
+
+async function loadToolchain(){
+  try{
+    const d=await jget('/api/toolchain');
+    $('#toolchain').innerHTML=Object.entries(d).map(([k,v])=>`<div class="row">
+      <span class="mono">${k}</span>
+      <span class="pill ${v?'on':'no'}">${v?'installed':'missing'}</span></div>`).join('');
+  }catch(e){$('#toolchain').innerHTML='<div class="empty">Backend offline.</div>'}
+}
+
+loadBoards();loadTemplates();loadWiring();loadToolchain();
+setInterval(loadBoards, 8000);
+</script>
+</body>
+</html>
