@@ -38,6 +38,19 @@ _chroot "
 "
 log_info "User ${USERNAME} created with password: ${PASSWORD}"
 
+# ── casper live-session config ────────────────────────────────────────────
+# casper sets up the live session (and its autologin) for the user named here.
+# It MUST match the baked user, otherwise casper logs
+# "Adding live session user... user 'horus' does not exist" and
+# "chown: invalid user 'horus.horus'", and live autologin breaks.
+cat > "${CHROOT_DIR}/etc/casper.conf" << EOF
+export USERNAME="${USERNAME}"
+export USERFULLNAME="HORUS User"
+export HOST="horus-os"
+export BUILD_SYSTEM="HORUS"
+EOF
+log_info "casper.conf set (live user: ${USERNAME})"
+
 # ── Apply HORUS config to user home ──────────────────────────────────────
 log_step "Applying HORUS configuration to user home"
 HOME_DIR="${CHROOT_DIR}/home/${USERNAME}"
