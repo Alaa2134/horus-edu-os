@@ -364,6 +364,32 @@ Categories=Development;Electronics;Education;
 Keywords=horus;robotics;arduino;esp32;ros;maker;
 StartupNotify=true
 EOF
+
+  cat > "${CHROOT_DIR}/usr/share/applications/horus-welcome.desktop" << 'EOF'
+[Desktop Entry]
+Name=Welcome to HORUS OS
+Name[ar]=أهلًا بك في حورس
+Comment=First-run tour and getting started
+Comment[ar]=جولة البداية وكيفية الانطلاق
+Exec=/opt/horus/horus-welcome/launch.sh
+Icon=/opt/horus/horus-welcome/icon.png
+Terminal=false
+Type=Application
+Categories=Education;Utility;
+Keywords=horus;welcome;start;help;
+StartupNotify=true
+EOF
+
+  # Run the welcome app once on first login (per user)
+  mkdir -p "${CHROOT_DIR}/etc/skel/.config/autostart"
+  cat > "${CHROOT_DIR}/etc/skel/.config/autostart/horus-welcome.desktop" << 'EOF'
+[Desktop Entry]
+Type=Application
+Name=HORUS Welcome
+Exec=/opt/horus/horus-welcome/launch.sh --first-run
+X-GNOME-Autostart-enabled=true
+NoDisplay=true
+EOF
 }
 
 _create_launch_scripts() {
@@ -431,6 +457,16 @@ if command -v horus-browser &>/dev/null; then horus-browser --app=http://127.0.0
 else xdg-open http://127.0.0.1:8423; fi
 EOF
 
+  cat > "${CHROOT_DIR}/opt/horus/horus-welcome/launch.sh" << 'EOF'
+#!/bin/bash
+FLAG="$HOME/.config/horus-welcome-shown"
+[[ "${1:-}" == "--first-run" && -f "$FLAG" ]] && exit 0
+mkdir -p "$HOME/.config"; touch "$FLAG"
+URL="file:///opt/horus/horus-welcome/index.html"
+if command -v horus-browser &>/dev/null; then horus-browser --app="$URL" --title="Welcome to HORUS OS"
+else xdg-open "$URL"; fi
+EOF
+
   # Make all launch scripts executable
   chmod +x "${CHROOT_DIR}/opt/horus/"*/launch.sh 2>/dev/null || true
 
@@ -458,6 +494,10 @@ EOF
   cat > "${CHROOT_DIR}/usr/local/bin/horus-browser" << 'EOF'
 #!/bin/bash
 exec python3 /opt/horus/horus-browser/horus-browser.py "$@"
+EOF
+  cat > "${CHROOT_DIR}/usr/local/bin/horus-welcome" << 'EOF'
+#!/bin/bash
+/opt/horus/horus-welcome/launch.sh
 EOF
   cat > "${CHROOT_DIR}/usr/local/bin/horus-help" << 'HELPEOF'
 #!/bin/bash

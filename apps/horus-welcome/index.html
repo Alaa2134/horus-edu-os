@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Welcome to HORUS OS</title>
+<style>
+  :root{--gold:#c9a227;--gold-l:#f5d060;--cyan:#00d4ff;--blue:#1a73e8;
+    --bg:#0a0a0f;--surface:#12121a;--surface2:#1a1a27;--text:#e8e8f0;
+    --muted:#aaaacc;--border:rgba(201,162,39,.22)}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Ubuntu','Inter',system-ui,sans-serif;color:var(--text);
+    background:radial-gradient(900px 500px at 50% -10%,rgba(26,115,232,.15),transparent 60%),
+      linear-gradient(180deg,#070b1c,#0a0a0f 60%);min-height:100vh;padding:40px 24px}
+  .wrap{max-width:920px;margin:0 auto}
+  .top{display:flex;align-items:center;gap:16px;margin-bottom:8px}
+  .eye{width:60px;height:60px;filter:drop-shadow(0 0 16px rgba(201,162,39,.5))}
+  h1{font-family:'Cinzel',serif;font-size:34px;letter-spacing:6px;color:var(--gold-l)}
+  .sub{color:var(--muted);letter-spacing:2px;margin-bottom:28px}
+  .lang{margin-left:auto;display:flex;gap:8px}
+  .lang button{background:transparent;border:1px solid var(--border);color:var(--gold);
+    padding:6px 14px;border-radius:9999px;cursor:pointer}
+  .lang button.active{background:var(--gold);color:#0a0a0f;font-weight:700}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin-top:10px}
+  .card{background:rgba(18,18,26,.7);border:1px solid var(--border);border-radius:18px;
+    padding:20px;backdrop-filter:blur(14px)}
+  .card h3{color:var(--gold);font-size:16px;margin-bottom:8px;display:flex;gap:8px;align-items:center}
+  .card p{color:var(--muted);font-size:14px;line-height:1.6}
+  .card code{display:block;background:#0a0a0f;border:1px solid var(--border);border-radius:10px;
+    padding:8px 12px;margin-top:10px;color:var(--cyan);font-family:'JetBrains Mono',monospace;font-size:13px}
+  .steps{margin-top:28px}
+  .steps h2{color:var(--gold-l);font-size:18px;letter-spacing:1px;margin-bottom:14px}
+  .foot{margin-top:30px;color:#555577;font-size:13px;text-align:center}
+  [dir=rtl]{text-align:right}
+</style>
+</head>
+<body>
+<div class="wrap" id="root" dir="ltr">
+  <div class="top">
+    <svg class="eye" viewBox="0 0 100 100" fill="none" stroke="#f3d28a" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M8 52 C26 26 74 26 92 50"/><path d="M10 56 C30 84 70 84 92 50"/>
+      <circle cx="50" cy="52" r="14" stroke-width="6"/><circle cx="50" cy="52" r="4" fill="#f3d28a" stroke="none"/>
+      <path d="M10 56 C2 64 1 76 6 86"/><path d="M62 66 C60 80 58 88 58 96"/>
+    </svg>
+    <div>
+      <h1 id="t-title">WELCOME TO HORUS OS</h1>
+    </div>
+    <div class="lang">
+      <button id="b-en" class="active" onclick="setLang('en')">EN</button>
+      <button id="b-ar" onclick="setLang('ar')">عربي</button>
+    </div>
+  </div>
+  <div class="sub" id="t-sub">The Egyptian AI &amp; Robotics Linux Distribution · by Alaa Saber</div>
+
+  <div class="grid">
+    <div class="card"><h3>🤖 <span id="t-rob-h">Robotics</span></h3>
+      <p id="t-rob-p">Plug in an Arduino or ESP32 — it's detected instantly. Scaffold a project and learn the wiring.</p>
+      <code>horus-robotics</code></div>
+    <div class="card"><h3>🧠 <span id="t-ai-h">AI Assistant</span></h3>
+      <p id="t-ai-p">A local, OS-aware assistant that explains errors in Arabic or English.</p>
+      <code>horus-ai</code></div>
+    <div class="card"><h3>📊 <span id="t-ce-h">System Center</span></h3>
+      <p id="t-ce-p">Live CPU, memory, disk, network and a full system report.</p>
+      <code>horus-control</code></div>
+  </div>
+
+  <div class="steps">
+    <h2 id="t-start">Get started in 3 steps</h2>
+    <div class="grid">
+      <div class="card"><h3 id="t-s1-h">1 · Install a toolchain</h3>
+        <p id="t-s1-p">One command installs everything you need.</p>
+        <code>horus-setup arduino esp32 python-ai</code></div>
+      <div class="card"><h3 id="t-s2-h">2 · Check your setup</h3>
+        <p id="t-s2-p">Fix serial permissions and missing tools automatically.</p>
+        <code>horus-doctor --fix</code></div>
+      <div class="card"><h3 id="t-s3-h">3 · Build a project</h3>
+        <p id="t-s3-p">Open Horus Robotics and create a project from a template.</p>
+        <code>horus-robotics</code></div>
+    </div>
+  </div>
+
+  <div class="foot">HORUS OS · Intelligence Awakened — <span id="t-foot">type <b>horus-help</b> any time</span></div>
+</div>
+
+<script>
+const STR={
+  en:{title:"WELCOME TO HORUS OS",sub:"The Egyptian AI & Robotics Linux Distribution · by Alaa Saber",
+    rob_h:"Robotics",rob_p:"Plug in an Arduino or ESP32 — it's detected instantly. Scaffold a project and learn the wiring.",
+    ai_h:"AI Assistant",ai_p:"A local, OS-aware assistant that explains errors in Arabic or English.",
+    ce_h:"System Center",ce_p:"Live CPU, memory, disk, network and a full system report.",
+    start:"Get started in 3 steps",
+    s1_h:"1 · Install a toolchain",s1_p:"One command installs everything you need.",
+    s2_h:"2 · Check your setup",s2_p:"Fix serial permissions and missing tools automatically.",
+    s3_h:"3 · Build a project",s3_p:"Open Horus Robotics and create a project from a template.",
+    foot:"type <b>horus-help</b> any time"},
+  ar:{title:"أهلًا بك في نظام حورس",sub:"توزيعة لينكس المصرية للذكاء الاصطناعي والروبوتيكس · بقلم علاء صابر",
+    rob_h:"روبوتيكس",rob_p:"وصّل Arduino أو ESP32 — بيتكشف فورًا. أنشئ مشروع واتعلّم التوصيل.",
+    ai_h:"المساعد الذكي",ai_p:"مساعد محلي واعٍ بالنظام يشرح أخطاءك بالعربي أو الإنجليزي.",
+    ce_h:"مركز النظام",ce_p:"مراقبة حيّة للمعالج والذاكرة والقرص والشبكة وتقرير كامل.",
+    start:"ابدأ في 3 خطوات",
+    s1_h:"١ · ثبّت أدوات",s1_p:"أمر واحد بيثبّت كل اللي محتاجه.",
+    s2_h:"٢ · افحص بيئتك",s2_p:"إصلاح صلاحيات السيريال والأدوات الناقصة تلقائيًا.",
+    s3_h:"٣ · ابنِ مشروع",s3_p:"افتح حورس روبوتيكس وأنشئ مشروع من قالب.",
+    foot:"اكتب <b>horus-help</b> في أي وقت"}
+};
+function setLang(l){
+  const s=STR[l];const root=document.getElementById('root');
+  root.dir = l==='ar'?'rtl':'ltr';
+  document.getElementById('b-en').classList.toggle('active',l==='en');
+  document.getElementById('b-ar').classList.toggle('active',l==='ar');
+  for(const k in s){const el=document.getElementById('t-'+k.replace('_','-'));if(el)el.innerHTML=s[k];}
+}
+</script>
+</body>
+</html>
