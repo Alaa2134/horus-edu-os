@@ -137,7 +137,7 @@ jobs:
             ```
 
             ### بيانات الدخول
-            - Username: `horus-student`
+            - Username: `horus-user`
             - Password: `horus2024`
 
             ### المتطلبات
@@ -149,3 +149,72 @@ jobs:
           prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  smoke-test-boot:
+    name: Smoke test — boot the ISO in QEMU
+    needs: build-iso
+    runs-on: ubuntu-22.04
+    timeout-minutes: 35
+    steps:
+      - name: Download ISO artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: horus-edu-os-iso
+          path: iso
+
+      - name: Install QEMU
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y qemu-system-x86 qemu-utils
+
+      - name: Extract kernel and initrd from the ISO
+        run: |
+          ISO=$(ls iso/*.iso | head -1)
+          echo "ISO=$ISO" >> "$GITHUB_ENV"
+          echo "Testing: $ISO ($(du -h "$ISO" | cut -f1))"
+          mkdir -p mnt
+          sudo mount -o loop,ro "$ISO" mnt
+          cp mnt/casper/vmlinuz vmlinuz
+          cp mnt/casper/initrd  initrd
+          sudo umount mnt
+          ls -lh vmlinuz initrd
+
+      - name: Boot headless in QEMU and capture serial console
+        run: |
+          # No KVM on the runner → TCG emulation (slow). We don't wait for GNOME;
+          # reaching systemd userspace proves kernel + initrd + casper + squashfs.
+          qemu-system-x86_64 \
+            -m 4096 -smp 2 -no-reboot \
+            -kernel vmlinuz -initrd initrd \
+            -append "boot=casper console=ttyS0,115200 ---" \
+            -cdrom "$ISO" \
+            -display none -serial file:boot.log -monitor none &
+          QPID=$!
+
+          ok=0
+          for i in $(seq 1 150); do
+            sleep 10
+            if grep -Eaq "Reached target|systemd\[1\]:|/sbin/init|login:|Welcome to|HORUS" boot.log 2>/dev/null; then
+              ok=1; break
+            fi
+            kill -0 "$QPID" 2>/dev/null || { echo "QEMU exited early"; break; }
+          done
+          kill "$QPID" 2>/dev/null || true
+
+          echo "================ boot.log (last 80 lines) ================"
+          tail -80 boot.log 2>/dev/null || echo "(no serial output captured)"
+          echo "=========================================================="
+          if [ "$ok" -eq 1 ]; then
+            echo "✅ Boot smoke test PASSED — the ISO reaches userspace."
+          else
+            echo "❌ Boot smoke test FAILED — no userspace markers within the timeout."
+            exit 1
+          fi
+
+      - name: Upload boot log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: boot-log
+          path: boot.log
+          retention-days: 14
