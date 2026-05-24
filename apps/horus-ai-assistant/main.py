@@ -149,7 +149,7 @@ You have full knowledge of HORUS OS and its features. You know:
 - It was created by Alaa Saber for a university competition
 - It includes HORUS Control Center, AI Assistant, Demo Mode, Security Center
 - It targets embedded laptops, AI education, hardware control
-- It features XFCE4 desktop with a dark cyber-Egyptian theme
+- It features the GNOME Shell desktop with a dark cyber-Egyptian theme
 - Its slogan is "Intelligence Awakened" — "ذكاء مدمج للمستقبل"
 
 Current system state:
@@ -335,6 +335,104 @@ async def get_modes():
             {"id": "demo",     "name": "Competition Demo", "description": "Impressive, engaging, audience-ready responses"},
         ]
     }
+
+
+# ── Error Explainer ────────────────────────────────────────────────────
+
+class ExplainRequest(BaseModel):
+    error: str
+    context: Optional[str] = None  # arduino | python | flutter | linux | general
+    lang: Optional[str] = None     # "ar" | "en" (auto if omitted)
+
+
+_ERROR_HINTS: list[tuple[tuple[str, ...], str]] = [
+    (("permission denied", "/dev/tty", "ser_open", "can't open device"),
+     "Serial port permission problem. Your user isn't allowed to use the port.\n"
+     "Fix: `sudo usermod -aG dialout $USER` then log out and back in. "
+     "Or run `horus-doctor --fix`."),
+    (("command not found",),
+     "The command isn't installed or not on PATH. Install the toolchain with "
+     "`horus-setup <name>` (e.g. arduino, esp32, node), then re-open the terminal."),
+    (("modulenotfounderror", "no module named"),
+     "A Python package is missing. Install it: `pip3 install <package>` "
+     "(or `pip3 install -r requirements.txt`)."),
+    (("port not found", "no device found", "no boards found"),
+     "No board detected. Check the USB cable, press the board's reset, and run "
+     "`arduino-cli board list`. Open Horus Robotics to auto-detect it."),
+    (("avrdude", "programmer is not responding", "stk500"),
+     "Upload failed. Pick the correct port and board (FQBN), press reset just "
+     "before uploading, and make sure no Serial Monitor is holding the port."),
+    (("address already in use",),
+     "Something is already using that port. Find it with `ss -tulpn | grep <port>` "
+     "and stop it, or use a different port."),
+    (("flutter", "sdk", "dart"),
+     "Flutter/Dart setup issue. Run `flutter doctor` to see what's missing; "
+     "install Flutter with `horus-setup flutter`."),
+]
+
+
+def _offline_error_hint(error: str) -> str:
+    low = error.lower()
+    for keys, hint in _ERROR_HINTS:
+        if any(k in low for k in keys):
+            return hint
+    return ("I couldn't match this to a known pattern offline. Start a local AI "
+            "model (`horus-setup` then `ollama pull mistral`) or connect to the "
+            "internet for a detailed explanation.")
+
+
+@app.post("/api/explain-error")
+async def explain_error(req: ExplainRequest):
+    ctx = req.context or "general"
+    ask_lang = "Answer in Arabic." if req.lang == "ar" else \
+        "Answer in the same language the user used." if not req.lang else "Answer in English."
+    prompt = (
+        f"You are HORUS AI helping a student debug a {ctx} error. {ask_lang}\n"
+        f"Explain in plain language: (1) what it means, (2) the most likely cause, "
+        f"(3) a concrete step-by-step fix, with commands where useful.\n\n"
+        f"Error:\n{req.error}"
+    )
+    reply, backend, tokens = await chat_ai([{"role": "user", "content": prompt}], "debug")
+    if backend == "offline":
+        reply = _offline_error_hint(req.error)
+    return {"explanation": reply, "backend": backend, "context": ctx}
+
+
+# ── Local Model Manager (Ollama) ─────────────────────────────────────────
+
+@app.get("/api/models")
+async def list_models():
+    try:
+        async with httpx.AsyncClient(timeout=4.0) as client:
+            r = await client.get(f"{OLLAMA_URL}/api/tags")
+            r.raise_for_status()
+            models = [
+                {"name": m.get("name"), "size": m.get("size")}
+                for m in r.json().get("models", [])
+            ]
+            return {"available": True, "url": OLLAMA_URL, "models": models}
+    except Exception:
+        return {"available": False, "url": OLLAMA_URL, "models": [],
+                "hint": "Ollama not running. Install: horus-setup, then `ollama serve`."}
+
+
+class PullRequest(BaseModel):
+    name: str
+
+
+@app.post("/api/models/pull")
+async def pull_model(req: PullRequest):
+    """Kick off `ollama pull <name>` in the background (non-blocking)."""
+    name = req.name.strip()
+    if not name or any(c in name for c in " ;&|"):
+        raise HTTPException(400, "Invalid model name")
+    try:
+        subprocess.Popen(["ollama", "pull", name],
+                         stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        return {"started": True, "model": name,
+                "message": f"Pulling '{name}' in the background. Check /api/models."}
+    except FileNotFoundError:
+        raise HTTPException(503, "Ollama is not installed. Run horus-setup first.")
 
 
 if __name__ == "__main__":

@@ -1,0 +1,6 @@
+{
+  "name": "Python AI Vision",
+  "description": "Real-time webcam face detection with OpenCV — your first computer-vision app.",
+  "tags": ["python", "ai", "opencv", "vision"],
+  "run": "pip install -r requirements.txt && python3 main.py"
+}

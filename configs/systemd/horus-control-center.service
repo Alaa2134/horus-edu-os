@@ -6,8 +6,8 @@ Wants=network-online.target
 
 [Service]
 Type=simple
-User=horus-user
-Group=horus-user
+User=horus
+Group=horus
 WorkingDirectory=/opt/horus/horus-control-center/backend
 ExecStart=/usr/bin/python3 -m uvicorn main:app --host 0.0.0.0 --port 8420 --workers 1
 Restart=on-failure

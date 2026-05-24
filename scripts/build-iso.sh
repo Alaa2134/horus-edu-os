@@ -27,7 +27,7 @@ BASE_SUITE="jammy"
 ARCH="${ARCH:-amd64}"
 UBUNTU_MIRROR="http://archive.ubuntu.com/ubuntu/"
 SKIP_PACKAGES="${SKIP_PACKAGES:-false}"
-LIVE_USER="horus-user"
+LIVE_USER="horus"
 LIVE_PASS="horus2024"
 
 # ── Parse Arguments ────────────────────────────────────────────────────
@@ -100,7 +100,7 @@ check_prerequisites() {
     apt-get update -qq
     DEBIAN_FRONTEND=noninteractive apt-get install -y \
       debootstrap squashfs-tools xorriso isolinux \
-      grub-pc-bin grub-efi-amd64-bin mtools dosfstools \
+      grub-common grub-pc-bin grub-efi-amd64-bin mtools dosfstools \
       syslinux-utils wget curl git 2>/dev/null
     log_info "Build tools installed"
   fi
@@ -185,32 +185,102 @@ apply_branding() {
 }
 
 # ── Custom Apps ────────────────────────────────────────────────────────
+# Build the React frontends on the HOST (Node only needed at build time).
+# Falls back to each app's self-contained demo.html so the UI always works.
+_build_frontends() {
+  local node_major=0
+  command -v node &>/dev/null && node_major=$(node -v 2>/dev/null | sed 's/v\([0-9]*\).*/\1/')
+
+  for app in horus-control-center horus-ai-assistant horus-security-center; do
+    local fe="${REPO_DIR}/apps/${app}/frontend"
+    [[ -d "$fe" ]] || continue
+    if command -v npm &>/dev/null && [[ "${node_major:-0}" -ge 18 ]]; then
+      step_start "Building ${app} frontend (npm)"
+      ( cd "$fe" && npm ci --no-audit --no-fund 2>/dev/null && npm run build 2>/dev/null ) \
+        && log_info "${app}: React frontend built" \
+        || log_warn "${app}: npm build failed — using demo.html"
+    fi
+    if [[ ! -f "${fe}/dist/index.html" && -f "${REPO_DIR}/apps/${app}/demo.html" ]]; then
+      mkdir -p "${fe}/dist"
+      cp "${REPO_DIR}/apps/${app}/demo.html" "${fe}/dist/index.html"
+      log_info "${app}: using bundled demo.html as UI"
+    fi
+  done
+
+  # Demo Mode ships as a standalone page
+  local dm="${REPO_DIR}/apps/horus-demo-mode"
+  if [[ -f "${dm}/index.html" ]]; then
+    mkdir -p "${dm}/dist"; cp "${dm}/index.html" "${dm}/dist/index.html" 2>/dev/null || true
+  fi
+}
+
 install_horus_apps() {
   log_step "Installing HORUS Custom Applications"
 
   local apps_dir="${REPO_DIR}/apps"
   local target_dir="${CHROOT_DIR}/opt/horus"
 
+  _build_frontends
+
   mkdir -p "$target_dir"
   cp -r "${apps_dir}/." "${target_dir}/"
 
-  # Install Python dependencies for Control Center
+  # Drop dev-only files from the deployed copy (keep built dist/)
+  find "$target_dir" -type d -name node_modules -prune -exec rm -rf {} + 2>/dev/null || true
+  for d in "$target_dir"/*/frontend; do
+    [[ -d "$d" ]] || continue
+    rm -rf "$d/src" 2>/dev/null || true
+    rm -f "$d"/*.config.* "$d"/package*.json "$d"/tsconfig*.json 2>/dev/null || true
+  done
+
+  # Project templates → /opt/horus/templates (used by Horus Robotics)
+  if [[ -d "${REPO_DIR}/templates" ]]; then
+    mkdir -p "${target_dir}/templates"
+    cp -r "${REPO_DIR}/templates/." "${target_dir}/templates/"
+    log_info "Project templates installed"
+  fi
+
+  # Calamares installer config + branding
+  if [[ -d "${REPO_DIR}/configs/calamares" ]]; then
+    mkdir -p "${CHROOT_DIR}/etc/calamares"
+    cp -r "${REPO_DIR}/configs/calamares/." "${CHROOT_DIR}/etc/calamares/"
+    local cbrand="${CHROOT_DIR}/etc/calamares/branding/horus"
+    if command -v rsvg-convert &>/dev/null; then
+      rsvg-convert -w 96  -h 96  "${REPO_DIR}/branding/logo/horus-logo.svg" -o "${cbrand}/logo.png" 2>/dev/null || true
+      rsvg-convert -w 220 -h 220 "${REPO_DIR}/branding/logo/horus-logo.svg" -o "${cbrand}/welcome.png" 2>/dev/null || true
+    fi
+    log_info "Calamares installer configured"
+  fi
+
+  # Maker helper CLIs
+  cp "${SCRIPT_DIR}/horus-setup.sh"  "${CHROOT_DIR}/usr/local/bin/horus-setup"  2>/dev/null || true
+  cp "${SCRIPT_DIR}/horus-doctor.sh" "${CHROOT_DIR}/usr/local/bin/horus-doctor" 2>/dev/null || true
+  cp "${SCRIPT_DIR}/horus-backup.sh" "${CHROOT_DIR}/usr/local/bin/horus-backup" 2>/dev/null || true
+  cp "${SCRIPT_DIR}/horus-update.sh" "${CHROOT_DIR}/usr/local/bin/horus-update" 2>/dev/null || true
+  chmod +x "${CHROOT_DIR}/usr/local/bin/horus-setup" "${CHROOT_DIR}/usr/local/bin/horus-doctor" \
+           "${CHROOT_DIR}/usr/local/bin/horus-backup" "${CHROOT_DIR}/usr/local/bin/horus-update" 2>/dev/null || true
+
+  # Python dependencies for the app backends
   step_start "Installing Python dependencies"
   chroot "$CHROOT_DIR" pip3 install --quiet \
-    fastapi "uvicorn[standard]" psutil aiofiles python-multipart httpx 2>/dev/null \
+    fastapi "uvicorn[standard]" psutil aiofiles python-multipart httpx pyserial 2>/dev/null \
     || log_warn "Some Python packages failed; continuing"
-
-  # Install Python dependencies for AI Assistant
-  chroot "$CHROOT_DIR" pip3 install --quiet \
-    ollama openai 2>/dev/null \
+  chroot "$CHROOT_DIR" pip3 install --quiet ollama openai 2>/dev/null \
     || log_warn "AI packages failed; continuing (AI requires manual setup)"
 
-  # Create desktop entries
+  # Desktop entries + launch scripts
   mkdir -p "${CHROOT_DIR}/usr/share/applications"
   _create_desktop_entries
-
-  # Create launch scripts
   _create_launch_scripts
+
+  # Rebrand bundled third-party apps under the HORUS name
+  _rebrand_apps
+
+  # Make HORUS Browser the default web browser
+  chroot "$CHROOT_DIR" bash -c "
+    update-alternatives --install /usr/bin/x-www-browser x-www-browser /usr/local/bin/horus-browser 200 2>/dev/null || true
+    update-alternatives --set x-www-browser /usr/local/bin/horus-browser 2>/dev/null || true
+  " 2>/dev/null || true
 
   # Copy systemd services
   if [[ -d "${REPO_DIR}/configs/systemd" ]]; then
@@ -281,6 +351,138 @@ Categories=System;Security;
 Keywords=horus;security;firewall;privacy;
 StartupNotify=true
 EOF
+
+  cat > "${CHROOT_DIR}/usr/share/applications/horus-browser.desktop" << 'EOF'
+[Desktop Entry]
+Name=HORUS Browser
+Name[ar]=متصفح حورس
+Comment=The native HORUS OS web browser
+Comment[ar]=متصفح الويب الأصلي لنظام حورس
+Exec=/usr/local/bin/horus-browser %U
+Icon=web-browser
+Terminal=false
+Type=Application
+Categories=Network;WebBrowser;
+MimeType=text/html;x-scheme-handler/http;x-scheme-handler/https;
+Keywords=horus;browser;web;internet;
+StartupNotify=true
+EOF
+
+  cat > "${CHROOT_DIR}/usr/share/applications/horus-robotics.desktop" << 'EOF'
+[Desktop Entry]
+Name=HORUS Robotics
+Name[ar]=حورس روبوتيكس
+Comment=Arduino/ESP32 tools, project templates and wiring helper
+Comment[ar]=أدوات أردوينو وESP32 وقوالب المشاريع ومساعد التوصيل
+Exec=/opt/horus/horus-robotics/launch.sh
+Icon=/opt/horus/horus-robotics/icon.png
+Terminal=false
+Type=Application
+Categories=Development;Electronics;Education;
+Keywords=horus;robotics;arduino;esp32;ros;maker;
+StartupNotify=true
+EOF
+
+  cat > "${CHROOT_DIR}/usr/share/applications/horus-install.desktop" << 'EOF'
+[Desktop Entry]
+Name=Install HORUS OS
+Name[ar]=تثبيت نظام حورس
+Comment=Install HORUS OS to your hard disk
+Comment[ar]=ثبّت نظام حورس على القرص الصلب
+Exec=pkexec calamares
+Icon=/opt/horus/horus-about/icon.png
+Terminal=false
+Type=Application
+Categories=System;
+Keywords=install;installer;calamares;horus;
+StartupNotify=true
+EOF
+
+  cat > "${CHROOT_DIR}/usr/share/applications/horus-welcome.desktop" << 'EOF'
+[Desktop Entry]
+Name=Welcome to HORUS OS
+Name[ar]=أهلًا بك في حورس
+Comment=First-run tour and getting started
+Comment[ar]=جولة البداية وكيفية الانطلاق
+Exec=/opt/horus/horus-welcome/launch.sh
+Icon=/opt/horus/horus-welcome/icon.png
+Terminal=false
+Type=Application
+Categories=Education;Utility;
+Keywords=horus;welcome;start;help;
+StartupNotify=true
+EOF
+
+  cat > "${CHROOT_DIR}/usr/share/applications/horus-docs.desktop" << 'EOF'
+[Desktop Entry]
+Name=HORUS Docs
+Name[ar]=توثيق حورس
+Comment=Offline bilingual documentation and cheat-sheets
+Comment[ar]=توثيق ومراجع سريعة بدون إنترنت (عربي/إنجليزي)
+Exec=/opt/horus/horus-docs/launch.sh
+Icon=/opt/horus/horus-docs/icon.png
+Terminal=false
+Type=Application
+Categories=Education;Documentation;
+Keywords=horus;docs;help;tutorial;reference;
+StartupNotify=true
+EOF
+
+  cat > "${CHROOT_DIR}/usr/share/applications/horus-store.desktop" << 'EOF'
+[Desktop Entry]
+Name=HORUS Store
+Name[ar]=متجر حورس
+Comment=Install toolchains and start projects from templates
+Comment[ar]=ثبّت الأدوات وابدأ مشاريع من القوالب
+Exec=/opt/horus/horus-store/launch.sh
+Icon=/opt/horus/horus-store/icon.png
+Terminal=false
+Type=Application
+Categories=System;PackageManager;Education;
+Keywords=horus;store;install;templates;toolchains;
+StartupNotify=true
+EOF
+
+  cat > "${CHROOT_DIR}/usr/share/applications/horus-update.desktop" << 'EOF'
+[Desktop Entry]
+Name=HORUS Update
+Name[ar]=تحديث حورس
+Comment=Update HORUS OS system packages
+Comment[ar]=تحديث حزم نظام حورس
+Exec=gnome-terminal -- bash -c "horus-update; echo; read -p 'Press Enter to close…'"
+Icon=system-software-update
+Terminal=false
+Type=Application
+Categories=System;
+Keywords=horus;update;upgrade;apt;
+StartupNotify=true
+EOF
+
+  cat > "${CHROOT_DIR}/usr/share/applications/horus-backup.desktop" << 'EOF'
+[Desktop Entry]
+Name=HORUS Backup
+Name[ar]=نسخ حورس الاحتياطي
+Comment=Back up your HORUS projects
+Comment[ar]=نسخ مشاريعك احتياطيًا
+Exec=gnome-terminal -- bash -c "horus-backup create; echo; horus-backup list; echo; read -p 'Press Enter to close…'"
+Icon=drive-harddisk
+Terminal=false
+Type=Application
+Categories=System;Utility;
+Keywords=horus;backup;projects;archive;
+StartupNotify=true
+EOF
+
+  # Run the welcome app once on first login (per user)
+  mkdir -p "${CHROOT_DIR}/etc/skel/.config/autostart"
+  cat > "${CHROOT_DIR}/etc/skel/.config/autostart/horus-welcome.desktop" << 'EOF'
+[Desktop Entry]
+Type=Application
+Name=HORUS Welcome
+Exec=/opt/horus/horus-welcome/launch.sh --first-run
+X-GNOME-Autostart-enabled=true
+NoDisplay=true
+EOF
 }
 
 _create_launch_scripts() {
@@ -294,11 +496,11 @@ if ! curl -s http://127.0.0.1:8420/ &>/dev/null; then
   sleep 2
 fi
 # Open frontend
-if command -v chromium-browser &>/dev/null; then
+if command -v horus-browser &>/dev/null; then
+  horus-browser --app=http://127.0.0.1:8420 --title="HORUS Control Center"
+elif command -v chromium-browser &>/dev/null; then
   chromium-browser --app=http://127.0.0.1:8420 --window-size=1200,800 \
     --window-position=60,60 --disable-background-mode
-elif command -v firefox &>/dev/null; then
-  firefox http://127.0.0.1:8420
 else
   xdg-open http://127.0.0.1:8420
 fi
@@ -311,7 +513,8 @@ if ! curl -s http://127.0.0.1:8421/ &>/dev/null; then
   python3 main.py &
   sleep 2
 fi
-xdg-open http://127.0.0.1:8421 || chromium-browser http://127.0.0.1:8421
+if command -v horus-browser &>/dev/null; then horus-browser --app=http://127.0.0.1:8421 --title="HORUS AI Assistant"
+else xdg-open http://127.0.0.1:8421; fi
 EOF
 
   cat > "${CHROOT_DIR}/opt/horus/horus-demo-mode/launch.sh" << 'EOF'
@@ -332,7 +535,45 @@ if ! curl -s http://127.0.0.1:8422/ &>/dev/null; then
   python3 main.py &
   sleep 2
 fi
-xdg-open http://127.0.0.1:8422
+if command -v horus-browser &>/dev/null; then horus-browser --app=http://127.0.0.1:8422 --title="HORUS Security Center"
+else xdg-open http://127.0.0.1:8422; fi
+EOF
+
+  cat > "${CHROOT_DIR}/opt/horus/horus-robotics/launch.sh" << 'EOF'
+#!/bin/bash
+cd /opt/horus/horus-robotics
+if ! curl -s http://127.0.0.1:8423/ &>/dev/null; then
+  python3 main.py &
+  sleep 2
+fi
+if command -v horus-browser &>/dev/null; then horus-browser --app=http://127.0.0.1:8423 --title="HORUS Robotics"
+else xdg-open http://127.0.0.1:8423; fi
+EOF
+
+  cat > "${CHROOT_DIR}/opt/horus/horus-docs/launch.sh" << 'EOF'
+#!/bin/bash
+URL="file:///opt/horus/horus-docs/index.html"
+if command -v horus-browser &>/dev/null; then horus-browser --app="$URL" --title="HORUS Docs"
+else xdg-open "$URL"; fi
+EOF
+
+  cat > "${CHROOT_DIR}/opt/horus/horus-store/launch.sh" << 'EOF'
+#!/bin/bash
+# Ensure the Robotics backend is up so the Store can list templates
+curl -s http://127.0.0.1:8423/ >/dev/null 2>&1 || { ( cd /opt/horus/horus-robotics && python3 main.py >/dev/null 2>&1 & ); sleep 2; }
+URL="file:///opt/horus/horus-store/index.html"
+if command -v horus-browser &>/dev/null; then horus-browser --app="$URL" --title="HORUS Store"
+else xdg-open "$URL"; fi
+EOF
+
+  cat > "${CHROOT_DIR}/opt/horus/horus-welcome/launch.sh" << 'EOF'
+#!/bin/bash
+FLAG="$HOME/.config/horus-welcome-shown"
+[[ "${1:-}" == "--first-run" && -f "$FLAG" ]] && exit 0
+mkdir -p "$HOME/.config"; touch "$FLAG"
+URL="file:///opt/horus/horus-welcome/index.html"
+if command -v horus-browser &>/dev/null; then horus-browser --app="$URL" --title="Welcome to HORUS OS"
+else xdg-open "$URL"; fi
 EOF
 
   # Make all launch scripts executable
@@ -355,20 +596,125 @@ EOF
 #!/bin/bash
 /opt/horus/horus-security-center/launch.sh
 EOF
+  cat > "${CHROOT_DIR}/usr/local/bin/horus-robotics" << 'EOF'
+#!/bin/bash
+/opt/horus/horus-robotics/launch.sh
+EOF
+  cat > "${CHROOT_DIR}/usr/local/bin/horus-browser" << 'EOF'
+#!/bin/bash
+exec python3 /opt/horus/horus-browser/horus-browser.py "$@"
+EOF
+  cat > "${CHROOT_DIR}/usr/local/bin/horus-welcome" << 'EOF'
+#!/bin/bash
+/opt/horus/horus-welcome/launch.sh
+EOF
+  cat > "${CHROOT_DIR}/usr/local/bin/horus-docs" << 'EOF'
+#!/bin/bash
+/opt/horus/horus-docs/launch.sh
+EOF
+  cat > "${CHROOT_DIR}/usr/local/bin/horus-store" << 'EOF'
+#!/bin/bash
+/opt/horus/horus-store/launch.sh
+EOF
+  cat > "${CHROOT_DIR}/usr/local/bin/horus-install" << 'EOF'
+#!/bin/bash
+# Install HORUS OS to disk (Calamares)
+if command -v calamares &>/dev/null; then exec pkexec calamares
+else echo "Installer not available in this build."; exit 1; fi
+EOF
+  cat > "${CHROOT_DIR}/usr/local/bin/horus-explain" << 'EOF'
+#!/bin/bash
+# Explain an error with HORUS AI.  Usage: horus-explain "<error>"  | or pipe output in
+ERR="$*"
+[[ -z "$ERR" && ! -t 0 ]] && ERR="$(cat)"
+[[ -z "$ERR" ]] && { echo "Usage: horus-explain \"<error text>\"   (or: some-cmd 2>&1 | horus-explain)"; exit 1; }
+curl -s http://127.0.0.1:8421/ >/dev/null 2>&1 || { ( cd /opt/horus/horus-ai-assistant && python3 main.py >/dev/null 2>&1 & ); sleep 2; }
+PAYLOAD=$(python3 -c 'import json,sys; print(json.dumps({"error": sys.argv[1], "context": "general"}))' "$ERR")
+curl -s -X POST http://127.0.0.1:8421/api/explain-error -H 'Content-Type: application/json' -d "$PAYLOAD" \
+  | python3 -c 'import json,sys; d=json.load(sys.stdin); print("\n"+d.get("explanation","(no answer)")+"\n  — HORUS AI ["+d.get("backend","?")+"]\n")' \
+  2>/dev/null || echo "HORUS AI is unavailable. Try: horus-ai"
+EOF
+  cat > "${CHROOT_DIR}/usr/local/bin/horus-models" << 'EOF'
+#!/bin/bash
+# Manage local AI models.  Usage: horus-models [list] | horus-models pull <name>
+curl -s http://127.0.0.1:8421/ >/dev/null 2>&1 || { ( cd /opt/horus/horus-ai-assistant && python3 main.py >/dev/null 2>&1 & ); sleep 2; }
+case "${1:-list}" in
+  pull)
+    [[ -z "${2:-}" ]] && { echo "Usage: horus-models pull <name>"; exit 1; }
+    P=$(python3 -c 'import json,sys; print(json.dumps({"name": sys.argv[1]}))' "$2")
+    curl -s -X POST http://127.0.0.1:8421/api/models/pull -H 'Content-Type: application/json' -d "$P" \
+      | python3 -c 'import json,sys; print(json.load(sys.stdin).get("message","started"))' ;;
+  *)
+    curl -s http://127.0.0.1:8421/api/models \
+      | python3 -c 'import json,sys; d=json.load(sys.stdin); print("Ollama:", "online" if d.get("available") else d.get("hint","offline")); [print("  •", m["name"]) for m in d.get("models",[])]' ;;
+esac
+EOF
   cat > "${CHROOT_DIR}/usr/local/bin/horus-help" << 'HELPEOF'
 #!/bin/bash
 GOLD='\033[38;2;201;162;39m'
 CYAN='\033[38;2;0;212;255m'
 NC='\033[0m'
 echo -e "${GOLD}HORUS OS — Available Commands${NC}"
-echo -e "${CYAN}horus-control${NC}   Open HORUS Control Center"
-echo -e "${CYAN}horus-ai${NC}        Open HORUS AI Assistant"
-echo -e "${CYAN}horus-demo${NC}      Launch HORUS Demo Mode"
-echo -e "${CYAN}horus-security${NC}  Open HORUS Security Center"
-echo -e "${CYAN}horus-help${NC}      Show this help"
-echo -e "${CYAN}fastfetch${NC}       System information"
+echo -e "${CYAN}horus-control${NC}    Open HORUS Control Center"
+echo -e "${CYAN}horus-ai${NC}         Open HORUS AI Assistant"
+echo -e "${CYAN}horus-robotics${NC}   Open HORUS Robotics (boards, templates, wiring)"
+echo -e "${CYAN}horus-security${NC}   Open HORUS Security Center"
+echo -e "${CYAN}horus-demo${NC}       Launch HORUS Demo Mode"
+echo -e "${CYAN}horus-browser${NC}    Open HORUS Browser"
+echo -e "${CYAN}horus-setup${NC}      Install a toolchain (arduino, esp32, ros2, ...)"
+echo -e "${CYAN}horus-doctor${NC}     Diagnose & fix your dev environment"
+echo -e "${CYAN}horus-explain${NC}    Explain an error with HORUS AI"
+echo -e "${CYAN}horus-models${NC}     List / pull local AI models (Ollama)"
+echo -e "${CYAN}horus-docs${NC}       Offline docs & cheat-sheets"
+echo -e "${CYAN}horus-store${NC}      Install toolchains & start projects"
+echo -e "${CYAN}horus-backup${NC}     Back up your projects"
+echo -e "${CYAN}horus-update${NC}     Update HORUS OS"
+echo -e "${CYAN}horus-install${NC}    Install HORUS OS to disk"
+echo -e "${CYAN}horus-help${NC}       Show this help"
+echo -e "${CYAN}fastfetch${NC}        System information"
 HELPEOF
   chmod +x "${CHROOT_DIR}/usr/local/bin/horus-"* 2>/dev/null || true
+}
+
+# Rebrand bundled apps under the HORUS name via override .desktop files in
+# /usr/local/share/applications (higher XDG priority than /usr/share, and
+# survives package updates). Only the first Name= is changed; localized
+# Name[xx] lines are dropped for a consistent label.
+_rebrand_apps() {
+  local ovr="${CHROOT_DIR}/usr/local/share/applications"
+  mkdir -p "$ovr"
+
+  _rebrand() {
+    local id="$1" name="$2"
+    local src="${CHROOT_DIR}/usr/share/applications/${id}.desktop"
+    [[ -f "$src" ]] || return 0
+    awk -v n="$name" '
+      /^Name\[/ { next }
+      /^Name=/  { if (!d) { print "Name=" n; d=1; next } }
+      { print }
+    ' "$src" > "${ovr}/${id}.desktop"
+  }
+
+  _rebrand code                        "Horus VS Code"
+  _rebrand org.gnome.Terminal          "Horus Terminal"
+  _rebrand org.gnome.Nautilus          "Horus Files"
+  _rebrand org.gnome.TextEditor        "Horus Text Editor"
+  _rebrand gnome-system-monitor        "Horus System Monitor"
+  _rebrand org.gnome.SystemMonitor     "Horus System Monitor"
+  _rebrand org.gnome.Settings          "Horus Settings"
+  _rebrand gnome-control-center        "Horus Settings"
+  _rebrand org.gnome.Calculator        "Horus Calculator"
+  _rebrand org.gnome.DiskUtility       "Horus Disks"
+  _rebrand org.gnome.eog               "Horus Image Viewer"
+  _rebrand org.gnome.Loupe             "Horus Image Viewer"
+  _rebrand org.gnome.Evince            "Horus Document Viewer"
+  _rebrand org.gnome.FileRoller        "Horus Archive Manager"
+  _rebrand file-roller                 "Horus Archive Manager"
+  _rebrand org.gnome.tweaks            "Horus Tweaks"
+  _rebrand org.gnome.Software          "Horus Software"
+  _rebrand com.mattjakeman.ExtensionManager "Horus Extensions"
+
+  log_info "Bundled apps rebranded under the HORUS name"
 }
 
 # ── Services ───────────────────────────────────────────────────────────
@@ -422,9 +768,18 @@ build_iso() {
 
   # Squashfs filesystem
   step_start "Creating squashfs (this takes 15–30 minutes)"
+  # The virtual filesystems must exist as EMPTY directories in the squashfs so
+  # casper can mount /dev /proc /sys /run onto the new root. Excluding the
+  # directories themselves (old behaviour) left no mount points → init died →
+  # "Kernel panic: Attempted to kill init". Empty their contents but keep dirs.
+  for d in dev proc sys run tmp mnt media; do
+    rm -rf "${CHROOT_DIR:?}/${d}"/* 2>/dev/null || true
+    mkdir -p "${CHROOT_DIR}/${d}"
+  done
+  chmod 1777 "${CHROOT_DIR}/tmp"
   mksquashfs "$CHROOT_DIR" "${ISO_DIR}/casper/filesystem.squashfs" \
     -comp xz -Xbcj x86 -b 1M -noappend \
-    -e boot proc sys dev run tmp var/cache/apt var/lib/apt 2>&1 | tail -5
+    -e var/cache/apt var/lib/apt/lists 2>&1 | tail -5
 
   # Filesystem size for installer
   printf "$(du -sx --block-size=1 "$CHROOT_DIR" | cut -f1)" \
@@ -454,12 +809,12 @@ terminal_output gfxterm
 
 menuentry "HORUS OS ${HORUS_VERSION} — Start" --class horus --class os {
     set gfxpayload=keep
-    linux   /casper/vmlinuz boot=casper quiet splash ---
+    linux   /casper/vmlinuz boot=casper quiet splash console=tty0 console=ttyS0,115200 ---
     initrd  /casper/initrd
 }
 
 menuentry "HORUS OS — Safe Mode (nomodeset)" --class horus {
-    linux   /casper/vmlinuz boot=casper nomodeset quiet splash ---
+    linux   /casper/vmlinuz boot=casper nomodeset quiet splash console=tty0 console=ttyS0,115200 ---
     initrd  /casper/initrd
 }
 
@@ -493,105 +848,28 @@ EOF
   echo "HORUS OS ${HORUS_VERSION} (${HORUS_CODENAME})" > "${ISO_DIR}/.disk/info"
   touch "${ISO_DIR}/.disk/base_installable"
 
-  # ── BIOS El Torito boot image ──────────────────────────────────────────
-  # grub-mkstandalone embeds ALL modules into one core image and hits the
-  # 480 KB (0x78000) BIOS memory limit.  grub-mkimage builds a minimal core
-  # with only iso9660+normal; every other module (linux, gfxterm, …) is
-  # loaded at runtime from (cd)/boot/grub/i386-pc/ on the ISO itself.
-  step_start "Building GRUB BIOS El Torito boot image"
-
-  # Copy all i386-pc modules into the ISO so GRUB can load them after boot
-  mkdir -p "${ISO_DIR}/boot/grub/i386-pc"
-  cp /usr/lib/grub/i386-pc/*.mod "${ISO_DIR}/boot/grub/i386-pc/" 2>/dev/null || true
-  cp /usr/lib/grub/i386-pc/*.lst "${ISO_DIR}/boot/grub/i386-pc/" 2>/dev/null || true
-
-  # Build a minimal GRUB core image — only iso9660 and normal are needed;
-  # the prefix (cd)/boot/grub tells GRUB where to find the rest on the ISO
-  grub-mkimage \
-    -d /usr/lib/grub/i386-pc \
-    -o "${BUILD_DIR}/grub_core.img" \
-    -O i386-pc \
-    -p '(cd)/boot/grub' \
-    iso9660 normal
-
-  # Prepend the 512-byte El Torito CD-ROM bootstrap (cdboot.img) to make
-  # the image bootable from an El Torito-aware BIOS / VM
-  cat /usr/lib/grub/i386-pc/cdboot.img "${BUILD_DIR}/grub_core.img" \
-    > "${ISO_DIR}/boot/grub/bios.img"
-  log_info "BIOS boot  : bios.img ($(stat -c%s "${ISO_DIR}/boot/grub/bios.img") bytes)"
-
-  # ── EFI boot image ─────────────────────────────────────────────────────
-  # mtools (mmd/mcopy) fails on many CI runners — use loop mount instead.
-  step_start "Building EFI boot image"
-  grub-mkstandalone \
-    --format=x86_64-efi \
-    --output="${BUILD_DIR}/bootx64.efi" \
-    --locales="" --fonts="" \
-    "boot/grub/grub.cfg=${ISO_DIR}/boot/grub/grub.cfg" 2>/dev/null \
-    || log_warn "grub-mkstandalone EFI failed — skipping UEFI boot"
-
-  if [[ -f "${BUILD_DIR}/bootx64.efi" && -s "${BUILD_DIR}/bootx64.efi" ]]; then
-    dd if=/dev/zero of="${BUILD_DIR}/efi.img" bs=1M count=20 2>/dev/null
-    mkfs.fat -F 16 "${BUILD_DIR}/efi.img"
-    mkdir -p "${BUILD_DIR}/efi_mnt"
-    if mount -o loop "${BUILD_DIR}/efi.img" "${BUILD_DIR}/efi_mnt" 2>/dev/null; then
-      mkdir -p "${BUILD_DIR}/efi_mnt/EFI/boot"
-      cp "${BUILD_DIR}/bootx64.efi" "${BUILD_DIR}/efi_mnt/EFI/boot/"
-      umount "${BUILD_DIR}/efi_mnt"
-      cp "${BUILD_DIR}/efi.img" "${ISO_DIR}/EFI/boot/efi.img"
-      log_info "EFI image  : created (UEFI enabled)"
-    else
-      log_warn "Loop mount failed — skipping EFI image"
-    fi
-    rmdir "${BUILD_DIR}/efi_mnt" 2>/dev/null || true
-  else
-    log_warn "bootx64.efi not built — BIOS-only ISO"
-  fi
-
-  # ── xorriso ────────────────────────────────────────────────────────────
-  step_start "Running xorriso to create hybrid ISO"
+  # ── Build the bootable ISO with grub-mkrescue ──────────────────────────
+  # grub-mkrescue produces a hybrid BIOS+UEFI ISO whose GRUB reliably finds and
+  # loads /boot/grub/grub.cfg from the disc. The previous hand-built core image
+  # dropped to a `grub>` prompt because it could not locate its config; this is
+  # the canonical, well-tested tool for the job.
+  step_start "Building bootable ISO with grub-mkrescue (BIOS + UEFI)"
   mkdir -p "$OUTPUT_DIR"
   local iso_name="horus-os-${HORUS_VERSION}-${ARCH}.iso"
   # ISO 9660 volume IDs must not contain dots — replace with underscores
   local volid="HORUS_OS_$(echo "$HORUS_VERSION" | tr '.' '_')"
 
-  # Optional hybrid MBR — makes ISO USB-bootable (not just CD/VM)
-  local mbr_args=()
-  local grub_mbr="/usr/lib/grub/i386-pc/boot_hybrid.img"
-  if [[ -f "$grub_mbr" ]]; then
-    mbr_args=(--grub2-mbr "$grub_mbr")
-    log_info "Hybrid MBR : enabled"
-  else
-    log_warn "boot_hybrid.img not found — ISO not USB hybrid-bootable"
-  fi
+  command -v grub-mkrescue &>/dev/null \
+    || log_error "grub-mkrescue not found — install grub-common"
 
-  # Optional UEFI — only if efi.img was successfully created above
-  local efi_args=()
-  if [[ -f "${ISO_DIR}/EFI/boot/efi.img" && -s "${ISO_DIR}/EFI/boot/efi.img" ]]; then
-    efi_args=(
-      -eltorito-alt-boot
-      -e EFI/boot/efi.img
-      -no-emul-boot
-      -append_partition 2 0xef "${ISO_DIR}/EFI/boot/efi.img"
-    )
-    log_info "UEFI boot  : enabled"
-  else
-    log_warn "EFI image absent — BIOS-only ISO (VMs boot fine without it)"
-  fi
+  # grub.cfg is at ${ISO_DIR}/boot/grub/grub.cfg; grub-mkrescue embeds a GRUB
+  # that searches for the disc and runs it. Extra xorriso options after `--`.
+  grub-mkrescue \
+    --output="${OUTPUT_DIR}/${iso_name}" \
+    "${ISO_DIR}" \
+    -- -volid "$volid" 2>&1 | tail -25
 
-  # bios.img is now physically inside ISO_DIR — no graft points needed
-  xorriso -as mkisofs \
-    -iso-level 3 \
-    -full-iso9660-filenames \
-    -volid "$volid" \
-    -eltorito-boot boot/grub/bios.img \
-    -no-emul-boot -boot-load-size 4 -boot-info-table \
-    --eltorito-catalog boot/grub/boot.cat \
-    --grub2-boot-info \
-    "${mbr_args[@]}" \
-    "${efi_args[@]}" \
-    -output "${OUTPUT_DIR}/${iso_name}" \
-    "${ISO_DIR}"
+  [[ -f "${OUTPUT_DIR}/${iso_name}" ]] || log_error "grub-mkrescue did not produce an ISO"
 
   log_info "ISO created: ${OUTPUT_DIR}/${iso_name}"
 

@@ -1,0 +1,34 @@
+# HORUS OS — Calamares branding
+---
+componentName: horus
+
+welcomeStyleCalamares: true
+welcomeExpandingLogo: true
+
+windowExpanding: normal
+windowSize: 920px,560px
+windowPlacement: center
+
+strings:
+    productName:         HORUS OS
+    shortProductName:    HORUS
+    version:             1.0.0
+    shortVersion:        1.0
+    versionedName:       HORUS OS 1.0.0
+    shortVersionedName:  HORUS 1.0
+    bootloaderEntryName:  HORUS OS
+    productUrl:          https://github.com/alaa2134/horus-edu-os
+    supportUrl:          https://github.com/alaa2134/horus-edu-os/issues
+    knownIssuesUrl:      https://github.com/alaa2134/horus-edu-os/issues
+    releaseNotesUrl:     https://github.com/alaa2134/horus-edu-os/releases
+    productLogo:         logo.png
+    productIcon:         logo.png
+    productWelcome:      welcome.png
+
+slideshow: "show.qml"
+
+style:
+    sidebarBackground:    "#0a0a0f"
+    sidebarText:          "#e8e8f0"
+    sidebarTextSelect:    "#c9a227"
+    sidebarTextHighlight: "#c9a227"

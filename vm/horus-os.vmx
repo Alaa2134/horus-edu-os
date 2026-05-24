@@ -1,0 +1,51 @@
+.encoding = "UTF-8"
+config.version = "8"
+virtualHW.version = "19"
+displayName = "HORUS OS 1.0.0"
+annotation = "HORUS OS — The Egyptian AI & Robotics Linux Distribution"
+guestOS = "ubuntu-64"
+
+# Recommended specs for the GNOME desktop
+numvcpus = "4"
+cpuid.coresPerSocket = "2"
+memsize = "8192"
+
+# Boot from the HORUS OS ISO (place the .iso next to this .vmx)
+sata0.present = "TRUE"
+sata0:1.present = "TRUE"
+sata0:1.fileName = "horus-os-1.0.0-amd64.iso"
+sata0:1.deviceType = "cdrom-image"
+sata0:1.startConnected = "TRUE"
+
+# Virtual disk for installing HORUS OS (create via VMware: Add Hard Disk → 30 GB)
+# scsi0.present = "TRUE"
+# scsi0.virtualDev = "lsilogic"
+# scsi0:0.present = "TRUE"
+# scsi0:0.fileName = "horus-os.vmdk"
+
+ethernet0.present = "TRUE"
+ethernet0.connectionType = "nat"
+ethernet0.virtualDev = "vmxnet3"
+ethernet0.addressType = "generated"
+
+sound.present = "TRUE"
+sound.virtualDev = "hdaudio"
+sound.autodetect = "TRUE"
+
+# Generous video memory + 3D for smooth GNOME Shell
+svga.graphicsMemoryKB = "393216"
+mks.enable3d = "TRUE"
+
+# USB so Arduino/ESP32 boards pass through to HORUS Robotics
+usb.present = "TRUE"
+usb_xhci.present = "TRUE"
+ehci.present = "TRUE"
+
+firmware = "efi"
+uefi.secureBoot.enabled = "FALSE"
+bios.bootOrder = "cdrom,hdd"
+bios.bootDelay = "3000"
+floppy0.present = "FALSE"
+vmci0.present = "TRUE"
+hpet0.present = "TRUE"
+tools.syncTime = "TRUE"

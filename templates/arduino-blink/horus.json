@@ -1,0 +1,7 @@
+{
+  "name": "Arduino Blink",
+  "description": "The classic first project — blink the built-in LED. Zero wiring.",
+  "tags": ["arduino", "beginner", "led"],
+  "board": "arduino:avr:uno",
+  "run": "arduino-cli compile --fqbn arduino:avr:uno . && arduino-cli upload --fqbn arduino:avr:uno -p /dev/ttyACM0 ."
+}

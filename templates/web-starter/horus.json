@@ -1,0 +1,6 @@
+{
+  "name": "Web Starter",
+  "description": "Zero-dependency HTML/CSS/JS starter page in HORUS colours.",
+  "tags": ["web", "html", "beginner"],
+  "run": "xdg-open index.html  (or: python3 -m http.server 8080)"
+}

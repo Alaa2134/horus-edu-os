@@ -6,8 +6,8 @@ Requires=graphical-session.target
 
 [Service]
 Type=simple
-User=horus-user
-Group=horus-user
+User=horus
+Group=horus
 WorkingDirectory=/opt/horus/horus-demo-mode
 # Serve the built React app via Python's HTTP server as a simple static server
 ExecStart=/usr/bin/python3 -m http.server 8423 --directory /opt/horus/horus-demo-mode/dist

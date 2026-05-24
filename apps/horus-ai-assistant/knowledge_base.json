@@ -4,13 +4,13 @@
     "version": "1.0.0",
     "last_updated": "2026-05-13"
   },
-  "about_horus": "HORUS OS is a custom Linux-based operating system designed for embedded laptops, AI education, hardware control, and student innovation. It was created by Alaa Saber as a university competition project. Built on Ubuntu 22.04 LTS minimal with XFCE4 desktop, it features full custom branding, 5 purpose-built applications, an AI assistant, and a pre-configured embedded development environment.",
+  "about_horus": "HORUS OS is a custom Linux-based operating system designed for embedded laptops, AI education, hardware control, and student innovation. It was created by Alaa Saber as a university competition project. Built on Ubuntu 22.04 LTS minimal with the GNOME Shell desktop, it features full custom branding, 5 purpose-built applications, an AI assistant, and a pre-configured embedded development environment.",
   "creator": "Alaa Saber",
   "slogan_en": "Intelligence Awakened",
   "slogan_ar": "ذكاء مدمج للمستقبل",
   "version": "1.0.0",
   "base_os": "Ubuntu 22.04 LTS (Jammy Jellyfish)",
-  "desktop": "XFCE4 with Horus Dark GTK theme",
+  "desktop": "GNOME Shell (Mutter) with Yaru-Dark + Horus branding",
   "kernel": "Linux 5.15+ (Ubuntu generic)",
   "apps": [
     "HORUS Control Center — Real-time system monitoring (FastAPI + React)",

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HORUS Browser — Start</title>
+<style>
+  :root{
+    --gold:#c9a227; --gold-l:#f5d060; --cyan:#00d4ff; --blue:#1a73e8;
+    --bg:#0a0a0f; --surface:#12121a; --surface2:#1a1a27;
+    --text:#e8e8f0; --muted:#aaaacc; --border:rgba(201,162,39,.22);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family:'Ubuntu','Inter',system-ui,sans-serif; color:var(--text);
+    background:
+      radial-gradient(1200px 600px at 50% -10%, rgba(26,115,232,.16), transparent 60%),
+      radial-gradient(900px 500px at 50% 120%, rgba(201,162,39,.12), transparent 60%),
+      linear-gradient(180deg,#070b1c 0%, #0a0a0f 55%, #0a0a0f 100%);
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    min-height:100vh; gap:26px; padding:40px; overflow:hidden;
+  }
+  .glow{position:fixed; inset:0; pointer-events:none;
+    background:radial-gradient(600px 300px at 50% 38%, rgba(201,162,39,.08), transparent 70%)}
+  .clock{font-size:64px; font-weight:300; letter-spacing:2px; color:#fff; text-shadow:0 0 30px rgba(0,212,255,.25)}
+  .date{color:var(--muted); font-size:15px; letter-spacing:3px; text-transform:uppercase; margin-top:-6px}
+  .eye{width:84px;height:84px;filter:drop-shadow(0 0 18px rgba(201,162,39,.5))}
+  .brand{display:flex;flex-direction:column;align-items:center;gap:10px}
+  .brand h1{font-family:'Cinzel',Georgia,serif; font-size:30px; letter-spacing:10px; color:var(--gold-l); font-weight:700}
+  .brand p{color:var(--muted); font-size:12px; letter-spacing:5px; text-transform:uppercase}
+  form{width:min(620px,90vw); position:relative}
+  input{
+    width:100%; padding:16px 22px 16px 52px; font-size:16px; color:var(--text);
+    background:rgba(18,18,26,.75); border:1px solid var(--border); border-radius:9999px;
+    backdrop-filter:blur(14px); outline:none; transition:.2s;
+  }
+  input:focus{border-color:var(--gold); box-shadow:0 0 0 4px rgba(201,162,39,.12)}
+  .search-ico{position:absolute; left:20px; top:50%; transform:translateY(-50%); color:var(--gold); font-size:18px}
+  .links{display:grid; grid-template-columns:repeat(4,1fr); gap:14px; width:min(720px,92vw)}
+  @media(max-width:600px){.links{grid-template-columns:repeat(2,1fr)}}
+  .card{
+    display:flex; flex-direction:column; align-items:center; gap:8px; padding:18px 10px;
+    background:rgba(18,18,26,.6); border:1px solid rgba(255,255,255,.06); border-radius:16px;
+    backdrop-filter:blur(12px); color:var(--text); text-decoration:none; transition:.18s; cursor:pointer;
+  }
+  .card:hover{transform:translateY(-3px); border-color:var(--border); background:rgba(26,26,39,.85);
+    box-shadow:0 10px 30px rgba(0,0,0,.45)}
+  .card .ic{font-size:26px}
+  .card .nm{font-size:13px; color:var(--muted)}
+  .card:hover .nm{color:var(--gold-l)}
+  footer{position:fixed; bottom:18px; color:#555577; font-size:12px; letter-spacing:1px}
+  footer b{color:var(--gold)}
+</style>
+</head>
+<body>
+  <div class="glow"></div>
+
+  <div class="brand">
+    <svg class="eye" viewBox="0 0 100 100" fill="none" stroke="#f3d28a" stroke-width="5"
+         stroke-linecap="round" stroke-linejoin="round">
+      <path d="M8 52 C26 26 74 26 92 50"/>
+      <path d="M10 56 C30 84 70 84 92 50"/>
+      <circle cx="50" cy="52" r="14" stroke-width="6"/>
+      <circle cx="50" cy="52" r="4" fill="#f3d28a" stroke="none"/>
+      <path d="M10 56 C2 64 1 76 6 86"/>
+      <path d="M62 66 C60 80 58 88 58 96"/>
+    </svg>
+    <h1>HORUS</h1>
+    <p>Intelligence Awakened</p>
+  </div>
+
+  <div class="clock" id="clock">--:--</div>
+  <div class="date" id="date"></div>
+
+  <form onsubmit="go(event)">
+    <span class="search-ico">⌕</span>
+    <input id="q" autofocus autocomplete="off"
+      placeholder="Search the web, or enter an address…">
+  </form>
+
+  <div class="links">
+    <a class="card" href="http://127.0.0.1:8420"><span class="ic">📊</span><span class="nm">Horus Center</span></a>
+    <a class="card" href="http://127.0.0.1:8421"><span class="ic">🤖</span><span class="nm">Horus AI</span></a>
+    <a class="card" href="http://127.0.0.1:8423"><span class="ic">⚙️</span><span class="nm">Horus Robotics</span></a>
+    <a class="card" href="http://127.0.0.1:8422"><span class="ic">🛡️</span><span class="nm">Security</span></a>
+    <a class="card" href="https://github.com"><span class="ic">🐙</span><span class="nm">GitHub</span></a>
+    <a class="card" href="https://docs.arduino.cc"><span class="ic">📘</span><span class="nm">Arduino Docs</span></a>
+    <a class="card" href="https://docs.python.org/3/"><span class="ic">🐍</span><span class="nm">Python Docs</span></a>
+    <a class="card" href="https://duckduckgo.com"><span class="ic">🔎</span><span class="nm">DuckDuckGo</span></a>
+  </div>
+
+  <footer>HORUS OS · The Egyptian AI &amp; Robotics Linux Distribution · by <b>Alaa Saber</b></footer>
+
+<script>
+  function go(e){
+    e.preventDefault();
+    const v = document.getElementById('q').value.trim();
+    if(!v) return;
+    const isUrl = /^(https?:\/\/|file:\/\/)/.test(v) || (/^[^\s]+\.[^\s]{2,}$/.test(v));
+    location.href = isUrl ? (/^https?:\/\//.test(v)?v:'https://'+v)
+                          : 'https://duckduckgo.com/?q='+encodeURIComponent(v);
+  }
+  function tick(){
+    const d = new Date();
+    document.getElementById('clock').textContent =
+      d.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+    document.getElementById('date').textContent =
+      d.toLocaleDateString([], {weekday:'long', day:'numeric', month:'long', year:'numeric'});
+  }
+  tick(); setInterval(tick, 1000);
+</script>
+</body>
+</html>

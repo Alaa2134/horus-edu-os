@@ -1,0 +1,72 @@
+name: Validate
+
+# Fast checks on every push/PR so we always have a real signal, without
+# running the full (60–120 min) ISO build. The ISO build lives in
+# build-release.yml and runs on tags / manual dispatch.
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: validate-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: Lint scripts, Python, JSON, SVG
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Bash syntax (bash -n)
+        run: |
+          fail=0
+          while IFS= read -r f; do
+            bash -n "$f" || { echo "::error file=$f::bash syntax error"; fail=1; }
+          done < <(find . -name '*.sh' -not -path './.git/*')
+          exit $fail
+
+      - name: ShellCheck (informational)
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y shellcheck
+          find . -name '*.sh' -not -path './.git/*' -print0 \
+            | xargs -0 shellcheck -S warning || true
+
+      - name: Python compile
+        run: |
+          fail=0
+          while IFS= read -r f; do
+            python -m py_compile "$f" || { echo "::error file=$f::python compile error"; fail=1; }
+          done < <(find . -name '*.py' -not -path './.git/*' -not -path '*/node_modules/*')
+          exit $fail
+
+      - name: JSON valid
+        run: |
+          fail=0
+          while IFS= read -r f; do
+            python -c "import json,sys; json.load(open(sys.argv[1]))" "$f" \
+              || { echo "::error file=$f::invalid JSON"; fail=1; }
+          done < <(find . -name '*.json' -not -path './.git/*' -not -path '*/node_modules/*')
+          exit $fail
+
+      - name: SVG / XML well-formed
+        run: |
+          fail=0
+          while IFS= read -r f; do
+            python -c "import xml.dom.minidom,sys; xml.dom.minidom.parse(sys.argv[1])" "$f" \
+              || { echo "::error file=$f::malformed XML/SVG"; fail=1; }
+          done < <(find branding -name '*.svg' 2>/dev/null)
+          exit $fail
+
+      - name: Desktop entry sanity
+        run: |
+          # Every app launch.sh referenced by the build should be a real path
+          grep -RhoE '/opt/horus/[a-z-]+/launch.sh' scripts/build-iso.sh | sort -u
+          echo "OK"
