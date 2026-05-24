@@ -317,10 +317,10 @@ _apt chromium-browser 2>/dev/null || \
   _apt chromium 2>/dev/null || \
   log_warn "Chromium not available — HORUS apps will open in default browser"
 
-# ── 19. Ubiquity Installer (for 'Install HORUS OS' option) ──────────────
-log_pkg "Ubiquity installer"
-_apt ubiquity ubiquity-frontend-gtk 2>/dev/null || \
-  log_warn "Ubiquity not available — users can install with debootstrap manually"
+# ── 19. Installer (Calamares) ────────────────────────────────────────────
+log_pkg "Calamares installer"
+_apt_rec calamares 2>/dev/null || \
+  log_warn "Calamares not available — install-to-disk will fall back to manual"
 
 # ── 20. Theme + dconf tooling ─────────────────────────────────────────────
 log_pkg "Theme and dconf tooling"

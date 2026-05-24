@@ -240,6 +240,18 @@ install_horus_apps() {
     log_info "Project templates installed"
   fi
 
+  # Calamares installer config + branding
+  if [[ -d "${REPO_DIR}/configs/calamares" ]]; then
+    mkdir -p "${CHROOT_DIR}/etc/calamares"
+    cp -r "${REPO_DIR}/configs/calamares/." "${CHROOT_DIR}/etc/calamares/"
+    local cbrand="${CHROOT_DIR}/etc/calamares/branding/horus"
+    if command -v rsvg-convert &>/dev/null; then
+      rsvg-convert -w 96  -h 96  "${REPO_DIR}/branding/logo/horus-logo.svg" -o "${cbrand}/logo.png" 2>/dev/null || true
+      rsvg-convert -w 220 -h 220 "${REPO_DIR}/branding/logo/horus-logo.svg" -o "${cbrand}/welcome.png" 2>/dev/null || true
+    fi
+    log_info "Calamares installer configured"
+  fi
+
   # Maker helper CLIs
   cp "${SCRIPT_DIR}/horus-setup.sh"  "${CHROOT_DIR}/usr/local/bin/horus-setup"  2>/dev/null || true
   cp "${SCRIPT_DIR}/horus-doctor.sh" "${CHROOT_DIR}/usr/local/bin/horus-doctor" 2>/dev/null || true
@@ -362,6 +374,21 @@ Terminal=false
 Type=Application
 Categories=Development;Electronics;Education;
 Keywords=horus;robotics;arduino;esp32;ros;maker;
+StartupNotify=true
+EOF
+
+  cat > "${CHROOT_DIR}/usr/share/applications/horus-install.desktop" << 'EOF'
+[Desktop Entry]
+Name=Install HORUS OS
+Name[ar]=تثبيت نظام حورس
+Comment=Install HORUS OS to your hard disk
+Comment[ar]=ثبّت نظام حورس على القرص الصلب
+Exec=pkexec calamares
+Icon=/opt/horus/horus-about/icon.png
+Terminal=false
+Type=Application
+Categories=System;
+Keywords=install;installer;calamares;horus;
 StartupNotify=true
 EOF
 
@@ -498,6 +525,12 @@ EOF
   cat > "${CHROOT_DIR}/usr/local/bin/horus-welcome" << 'EOF'
 #!/bin/bash
 /opt/horus/horus-welcome/launch.sh
+EOF
+  cat > "${CHROOT_DIR}/usr/local/bin/horus-install" << 'EOF'
+#!/bin/bash
+# Install HORUS OS to disk (Calamares)
+if command -v calamares &>/dev/null; then exec pkexec calamares
+else echo "Installer not available in this build."; exit 1; fi
 EOF
   cat > "${CHROOT_DIR}/usr/local/bin/horus-explain" << 'EOF'
 #!/bin/bash
