@@ -191,6 +191,7 @@ jobs:
 
       - name: Boot headless in QEMU and capture serial console
         run: |
+          set +e   # this is a polling loop; don't let a false test abort the step
           # No KVM on the runner → TCG emulation. We verify the ISO's boot chain
           # actually starts: kernel boots and the initramfs/casper stage runs.
           # (Reaching full GNOME under pure emulation is impractical; a real VM
@@ -200,7 +201,7 @@ jobs:
             -kernel vmlinuz -initrd initrd \
             -append "boot=casper console=ttyS0,115200" \
             -cdrom "$ISO" \
-            -display none -serial file:boot.log -monitor none &
+            -display none -serial file:boot.log -monitor none 2>qemu.err &
           QPID=$!
 
           BOOT_RE="Linux version|Booting|initramfs|Begin: Running|casper|Freeing|systemd\[1\]:|Reached target|login:|HORUS"
@@ -210,11 +211,13 @@ jobs:
             sleep 8
             if grep -Eaq "$BOOT_RE" boot.log 2>/dev/null; then boot=1; fi
             if grep -Eaq "$FULL_RE" boot.log 2>/dev/null; then full=1; break; fi
-            kill -0 "$QPID" 2>/dev/null || { echo "QEMU process exited"; break; }
-            [ "$boot" -eq 1 ] && [ "$i" -ge 45 ] && break
+            if ! kill -0 "$QPID" 2>/dev/null; then echo "QEMU process exited"; break; fi
+            if [ "$boot" -eq 1 ] && [ "$i" -ge 45 ]; then break; fi
           done
-          kill "$QPID" 2>/dev/null || true
+          kill "$QPID" 2>/dev/null
 
+          echo "================ qemu stderr ================"
+          cat qemu.err 2>/dev/null || true
           echo "================ boot.log (last 120 lines) ================"
           tail -120 boot.log 2>/dev/null || echo "(no serial output captured)"
           echo "==========================================================="
