@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HORUS Docs</title>
+<style>
+  :root{--gold:#c9a227;--gold-l:#f5d060;--cyan:#00d4ff;--bg:#0a0a0f;
+    --surface:#12121a;--surface2:#1a1a27;--text:#e8e8f0;--muted:#aaaacc;--border:rgba(201,162,39,.2)}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Ubuntu',system-ui,sans-serif;color:var(--text);
+    background:radial-gradient(800px 400px at 80% -10%,rgba(26,115,232,.12),transparent),
+      linear-gradient(180deg,#070b1c,#0a0a0f 55%);min-height:100vh;display:flex}
+  aside{width:230px;flex-shrink:0;background:rgba(12,12,20,.85);border-right:1px solid var(--border);
+    padding:22px 14px;position:sticky;top:0;height:100vh;overflow:auto}
+  aside h1{font-family:'Cinzel',serif;color:var(--gold-l);font-size:18px;letter-spacing:3px;margin-bottom:4px}
+  aside .sub{color:var(--muted);font-size:11px;margin-bottom:18px}
+  nav a{display:block;color:var(--muted);text-decoration:none;padding:9px 12px;border-radius:10px;
+    font-size:14px;margin-bottom:2px;cursor:pointer}
+  nav a:hover{background:var(--surface2);color:var(--text)}
+  nav a.active{background:rgba(201,162,39,.14);color:var(--gold-l)}
+  .lang{display:flex;gap:6px;margin-top:16px}
+  .lang button{flex:1;background:transparent;border:1px solid var(--border);color:var(--gold);
+    padding:6px;border-radius:9999px;cursor:pointer;font-size:12px}
+  .lang button.active{background:var(--gold);color:#0a0a0f;font-weight:700}
+  main{flex:1;padding:36px 44px;overflow:auto;height:100vh}
+  section{display:none;max-width:820px} section.active{display:block}
+  h2{color:var(--gold);font-size:24px;margin-bottom:14px}
+  h3{color:var(--gold-l);font-size:16px;margin:22px 0 8px}
+  p{color:var(--muted);line-height:1.7;margin-bottom:10px}
+  pre{background:#070709;border:1px solid var(--border);border-radius:12px;padding:14px 16px;
+    overflow:auto;margin:8px 0}
+  code{font-family:'JetBrains Mono',monospace;color:var(--cyan);font-size:13px}
+  pre code{color:var(--text)} .c{color:#6a6a88}
+  table{width:100%;border-collapse:collapse;margin:8px 0}
+  td,th{text-align:left;padding:8px 10px;border-bottom:1px solid rgba(255,255,255,.06);font-size:14px}
+  th{color:var(--gold)}
+  [dir=rtl]{direction:rtl}
+</style>
+</head>
+<body>
+<aside>
+  <h1>HORUS DOCS</h1>
+  <div class="sub" id="tagline">Offline reference · مرجع بدون إنترنت</div>
+  <nav id="nav"></nav>
+  <div class="lang">
+    <button id="L-en" class="active" onclick="setLang('en')">EN</button>
+    <button id="L-ar" onclick="setLang('ar')">عربي</button>
+  </div>
+</aside>
+<main id="main"></main>
+
+<script>
+const DOCS = {
+  start: { en:"Getting Started", ar:"البداية", body:`
+    <h2>Getting Started</h2>
+    <p>Welcome to HORUS OS. Open a terminal and type <code>horus-help</code> to see every command.</p>
+    <h3>The 3-step flow</h3>
+    <pre><code>horus-setup arduino esp32 python-ai  <span class="c"># 1. install toolchains</span>
+horus-doctor --fix                   <span class="c"># 2. fix your environment</span>
+horus-robotics                       <span class="c"># 3. detect boards, make a project</span></code></pre>
+    <p>Stuck on an error? Pipe it to the AI: <code>some-command 2>&1 | horus-explain</code></p>`},
+
+  horus: { en:"HORUS Commands", ar:"أوامر حورس", body:`
+    <h2>HORUS Commands</h2>
+    <table><tr><th>Command</th><th>Does</th></tr>
+    <tr><td><code>horus-robotics</code></td><td>Detect boards, templates, wiring</td></tr>
+    <tr><td><code>horus-ai</code></td><td>Local AI assistant</td></tr>
+    <tr><td><code>horus-control</code></td><td>System monitor</td></tr>
+    <tr><td><code>horus-setup &lt;tool&gt;</code></td><td>Install a toolchain</td></tr>
+    <tr><td><code>horus-doctor --fix</code></td><td>Diagnose & fix the environment</td></tr>
+    <tr><td><code>horus-explain "&lt;err&gt;"</code></td><td>Explain an error with AI</td></tr>
+    <tr><td><code>horus-models</code></td><td>List / pull local AI models</td></tr>
+    <tr><td><code>horus-browser</code></td><td>Open HORUS Browser</td></tr></table>`},
+
+  arduino: { en:"Arduino", ar:"أردوينو", body:`
+    <h2>Arduino</h2>
+    <pre><code>horus-setup arduino            <span class="c"># install CLI + AVR core</span>
+arduino-cli board list         <span class="c"># find your board + port</span>
+arduino-cli compile --fqbn arduino:avr:uno .
+arduino-cli upload  --fqbn arduino:avr:uno -p /dev/ttyACM0 .</code></pre>
+    <p>Can't upload? Run <code>horus-doctor --fix</code> to add yourself to the <code>dialout</code> group.</p>`},
+
+  esp32: { en:"ESP32", ar:"ESP32", body:`
+    <h2>ESP32</h2>
+    <pre><code>horus-setup esp32
+arduino-cli board list
+arduino-cli compile --fqbn esp32:esp32:esp32 .
+arduino-cli upload  --fqbn esp32:esp32:esp32 -p /dev/ttyUSB0 .</code></pre>
+    <p>ESP32 logic is 3.3V — divide 5V sensor outputs (e.g. HC-SR04 ECHO) before wiring.</p>`},
+
+  python: { en:"Python & AI", ar:"بايثون والذكاء", body:`
+    <h2>Python & AI</h2>
+    <pre><code>python3 -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
+horus-setup python-ai          <span class="c"># numpy, opencv, scikit-learn</span>
+horus-setup pytorch            <span class="c"># PyTorch (CPU)</span></code></pre>
+    <p>Local AI: <code>horus-models pull mistral</code> then ask in Horus AI — offline.</p>`},
+
+  linux: { en:"Linux Basics", ar:"أساسيات لينكس", body:`
+    <h2>Linux Basics</h2>
+    <table><tr><th>Command</th><th>Does</th></tr>
+    <tr><td><code>ls -alh</code></td><td>List files</td></tr>
+    <tr><td><code>cd path</code></td><td>Change directory</td></tr>
+    <tr><td><code>sudo apt install x</code></td><td>Install a package</td></tr>
+    <tr><td><code>ss -tuln</code></td><td>Open ports</td></tr>
+    <tr><td><code>journalctl -b</code></td><td>Boot logs</td></tr>
+    <tr><td><code>i2cdetect -y 1</code></td><td>Scan I2C devices</td></tr></table>`},
+
+  ros: { en:"ROS 2", ar:"ROS 2", body:`
+    <h2>ROS 2 (Humble)</h2>
+    <pre><code>horus-setup ros2
+source /opt/ros/humble/setup.bash
+ros2 run demo_nodes_cpp talker      <span class="c"># test it</span>
+ros2 topic list</code></pre>
+    <p>Start from the <b>ROS 2 Node</b> template in Horus Robotics.</p>`},
+};
+
+const ORDER = ["start","horus","arduino","esp32","python","linux","ros"];
+let lang = "en";
+
+function render(){
+  const nav = document.getElementById('nav');
+  nav.innerHTML = ORDER.map(k=>`<a id="n-${k}" onclick="go('${k}')">${DOCS[k][lang]}</a>`).join('');
+  const main = document.getElementById('main');
+  main.innerHTML = ORDER.map(k=>`<section id="s-${k}">${DOCS[k].body}</section>`).join('');
+  document.body.dir = lang==='ar' ? 'rtl' : 'ltr';
+  document.getElementById('tagline').textContent = lang==='ar' ? "مرجع بدون إنترنت" : "Offline reference";
+  go(current||"start");
+}
+let current="start";
+function go(k){
+  current=k;
+  document.querySelectorAll('nav a').forEach(a=>a.classList.remove('active'));
+  document.querySelectorAll('section').forEach(s=>s.classList.remove('active'));
+  document.getElementById('n-'+k)?.classList.add('active');
+  document.getElementById('s-'+k)?.classList.add('active');
+}
+function setLang(l){
+  lang=l;
+  document.getElementById('L-en').classList.toggle('active',l==='en');
+  document.getElementById('L-ar').classList.toggle('active',l==='ar');
+  render();
+}
+render();
+</script>
+</body>
+</html>

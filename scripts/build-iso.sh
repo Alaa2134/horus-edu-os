@@ -407,6 +407,21 @@ Keywords=horus;welcome;start;help;
 StartupNotify=true
 EOF
 
+  cat > "${CHROOT_DIR}/usr/share/applications/horus-docs.desktop" << 'EOF'
+[Desktop Entry]
+Name=HORUS Docs
+Name[ar]=توثيق حورس
+Comment=Offline bilingual documentation and cheat-sheets
+Comment[ar]=توثيق ومراجع سريعة بدون إنترنت (عربي/إنجليزي)
+Exec=/opt/horus/horus-docs/launch.sh
+Icon=/opt/horus/horus-docs/icon.png
+Terminal=false
+Type=Application
+Categories=Education;Documentation;
+Keywords=horus;docs;help;tutorial;reference;
+StartupNotify=true
+EOF
+
   # Run the welcome app once on first login (per user)
   mkdir -p "${CHROOT_DIR}/etc/skel/.config/autostart"
   cat > "${CHROOT_DIR}/etc/skel/.config/autostart/horus-welcome.desktop" << 'EOF'
@@ -484,6 +499,13 @@ if command -v horus-browser &>/dev/null; then horus-browser --app=http://127.0.0
 else xdg-open http://127.0.0.1:8423; fi
 EOF
 
+  cat > "${CHROOT_DIR}/opt/horus/horus-docs/launch.sh" << 'EOF'
+#!/bin/bash
+URL="file:///opt/horus/horus-docs/index.html"
+if command -v horus-browser &>/dev/null; then horus-browser --app="$URL" --title="HORUS Docs"
+else xdg-open "$URL"; fi
+EOF
+
   cat > "${CHROOT_DIR}/opt/horus/horus-welcome/launch.sh" << 'EOF'
 #!/bin/bash
 FLAG="$HOME/.config/horus-welcome-shown"
@@ -525,6 +547,10 @@ EOF
   cat > "${CHROOT_DIR}/usr/local/bin/horus-welcome" << 'EOF'
 #!/bin/bash
 /opt/horus/horus-welcome/launch.sh
+EOF
+  cat > "${CHROOT_DIR}/usr/local/bin/horus-docs" << 'EOF'
+#!/bin/bash
+/opt/horus/horus-docs/launch.sh
 EOF
   cat > "${CHROOT_DIR}/usr/local/bin/horus-install" << 'EOF'
 #!/bin/bash
@@ -575,6 +601,8 @@ echo -e "${CYAN}horus-setup${NC}      Install a toolchain (arduino, esp32, ros2,
 echo -e "${CYAN}horus-doctor${NC}     Diagnose & fix your dev environment"
 echo -e "${CYAN}horus-explain${NC}    Explain an error with HORUS AI"
 echo -e "${CYAN}horus-models${NC}     List / pull local AI models (Ollama)"
+echo -e "${CYAN}horus-docs${NC}       Offline docs & cheat-sheets"
+echo -e "${CYAN}horus-install${NC}    Install HORUS OS to disk"
 echo -e "${CYAN}horus-help${NC}       Show this help"
 echo -e "${CYAN}fastfetch${NC}        System information"
 HELPEOF

@@ -4,6 +4,17 @@ on:
   push:
     tags:
       - 'v*'
+  # Build (but don't release) on PRs that touch build-relevant files, so the
+  # ISO is verified end-to-end before merge. The release step stays tag-gated.
+  pull_request:
+    branches: [ master ]
+    paths:
+      - 'scripts/**'
+      - 'apps/**'
+      - 'configs/**'
+      - 'branding/**'
+      - 'templates/**'
+      - '.github/workflows/build-release.yml'
   workflow_dispatch:
     inputs:
       version:
