@@ -273,6 +273,9 @@ install_horus_apps() {
   _create_desktop_entries
   _create_launch_scripts
 
+  # Rebrand bundled third-party apps under the HORUS name
+  _rebrand_apps
+
   # Make HORUS Browser the default web browser
   chroot "$CHROOT_DIR" bash -c "
     update-alternatives --install /usr/bin/x-www-browser x-www-browser /usr/local/bin/horus-browser 200 2>/dev/null || true
@@ -671,6 +674,47 @@ echo -e "${CYAN}horus-help${NC}       Show this help"
 echo -e "${CYAN}fastfetch${NC}        System information"
 HELPEOF
   chmod +x "${CHROOT_DIR}/usr/local/bin/horus-"* 2>/dev/null || true
+}
+
+# Rebrand bundled apps under the HORUS name via override .desktop files in
+# /usr/local/share/applications (higher XDG priority than /usr/share, and
+# survives package updates). Only the first Name= is changed; localized
+# Name[xx] lines are dropped for a consistent label.
+_rebrand_apps() {
+  local ovr="${CHROOT_DIR}/usr/local/share/applications"
+  mkdir -p "$ovr"
+
+  _rebrand() {
+    local id="$1" name="$2"
+    local src="${CHROOT_DIR}/usr/share/applications/${id}.desktop"
+    [[ -f "$src" ]] || return 0
+    awk -v n="$name" '
+      /^Name\[/ { next }
+      /^Name=/  { if (!d) { print "Name=" n; d=1; next } }
+      { print }
+    ' "$src" > "${ovr}/${id}.desktop"
+  }
+
+  _rebrand code                        "Horus VS Code"
+  _rebrand org.gnome.Terminal          "Horus Terminal"
+  _rebrand org.gnome.Nautilus          "Horus Files"
+  _rebrand org.gnome.TextEditor        "Horus Text Editor"
+  _rebrand gnome-system-monitor        "Horus System Monitor"
+  _rebrand org.gnome.SystemMonitor     "Horus System Monitor"
+  _rebrand org.gnome.Settings          "Horus Settings"
+  _rebrand gnome-control-center        "Horus Settings"
+  _rebrand org.gnome.Calculator        "Horus Calculator"
+  _rebrand org.gnome.DiskUtility       "Horus Disks"
+  _rebrand org.gnome.eog               "Horus Image Viewer"
+  _rebrand org.gnome.Loupe             "Horus Image Viewer"
+  _rebrand org.gnome.Evince            "Horus Document Viewer"
+  _rebrand org.gnome.FileRoller        "Horus Archive Manager"
+  _rebrand file-roller                 "Horus Archive Manager"
+  _rebrand org.gnome.tweaks            "Horus Tweaks"
+  _rebrand org.gnome.Software          "Horus Software"
+  _rebrand com.mattjakeman.ExtensionManager "Horus Extensions"
+
+  log_info "Bundled apps rebranded under the HORUS name"
 }
 
 # ── Services ───────────────────────────────────────────────────────────
