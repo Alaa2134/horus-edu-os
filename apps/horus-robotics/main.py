@@ -167,6 +167,32 @@ async def toolchain():
     return {k: bool(shutil.which(v)) for k, v in checks.items()}
 
 
+@app.get("/api/serial/monitor")
+async def serial_monitor(port: str, baud: int = 115200, ms: int = 1500):
+    """Read from a serial port for `ms` milliseconds and return the lines.
+    Poll this from the UI to build a live serial monitor (read-only)."""
+    if not port.startswith("/dev/"):
+        raise HTTPException(400, "Port must be a /dev/ device")
+    ms = max(200, min(ms, 4000))
+    try:
+        import serial
+    except ImportError:
+        raise HTTPException(503, "pyserial not installed (pip install pyserial)")
+    import time
+    try:
+        with serial.Serial(port, baud, timeout=0.2) as ser:
+            end = time.time() + ms / 1000.0
+            buf = b""
+            while time.time() < end:
+                chunk = ser.read(512)
+                if chunk:
+                    buf += chunk
+        text = buf.decode("utf-8", errors="replace")
+        return {"port": port, "baud": baud, "lines": text.splitlines()[-200:]}
+    except Exception as e:
+        raise HTTPException(400, f"Could not read {port}: {e}")
+
+
 @app.get("/")
 async def root():
     return HTMLResponse((APP_DIR / "index.html").read_text(encoding="utf-8"))

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HORUS Store</title>
+<style>
+  :root{--gold:#c9a227;--gold-l:#f5d060;--cyan:#00d4ff;--bg:#0a0a0f;
+    --surface:#12121a;--surface2:#1a1a27;--text:#e8e8f0;--muted:#aaaacc;--border:rgba(201,162,39,.2)}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Ubuntu',system-ui,sans-serif;color:var(--text);
+    background:radial-gradient(900px 500px at 80% -10%,rgba(26,115,232,.13),transparent),
+      linear-gradient(180deg,#070b1c,#0a0a0f 55%);min-height:100vh;padding:28px}
+  header{display:flex;align-items:center;gap:14px;margin-bottom:6px;max-width:1100px;margin-inline:auto}
+  header .logo{width:42px;height:42px;filter:drop-shadow(0 0 12px rgba(201,162,39,.5))}
+  header h1{font-family:'Cinzel',serif;font-size:23px;letter-spacing:4px;color:var(--gold-l)}
+  .sub{color:var(--muted);font-size:12px;max-width:1100px;margin:0 auto 22px;padding-left:56px}
+  .wrap{max-width:1100px;margin:0 auto}
+  h2{color:var(--gold);font-size:15px;letter-spacing:1px;margin:24px 0 12px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+  .card{background:rgba(18,18,26,.7);border:1px solid var(--border);border-radius:16px;
+    padding:16px;backdrop-filter:blur(12px);display:flex;flex-direction:column;gap:8px}
+  .card .ic{font-size:22px}
+  .card .nm{color:var(--gold-l);font-weight:600}
+  .card .ds{color:var(--muted);font-size:13px;line-height:1.5;flex:1}
+  .card code{background:#070709;border:1px solid var(--border);border-radius:8px;padding:6px 9px;
+    color:var(--cyan);font-family:'JetBrains Mono',monospace;font-size:12px;display:flex;justify-content:space-between;align-items:center;gap:6px}
+  .copy{cursor:pointer;color:var(--gold);font-size:11px;white-space:nowrap}
+  .tags{display:flex;gap:5px;flex-wrap:wrap}
+  .tag{font-size:10px;color:var(--cyan);border:1px solid rgba(0,212,255,.3);border-radius:6px;padding:1px 6px}
+  .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1a27;
+    border:1px solid var(--border);color:var(--text);padding:11px 18px;border-radius:12px;opacity:0;transition:.3s;pointer-events:none}
+  .toast.show{opacity:1}
+  .empty{color:#666688;font-size:13px}
+</style>
+</head>
+<body>
+  <header>
+    <svg class="logo" viewBox="0 0 100 100" fill="none" stroke="#f3d28a" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M8 52 C26 26 74 26 92 50"/><path d="M10 56 C30 84 70 84 92 50"/>
+      <circle cx="50" cy="52" r="14" stroke-width="6"/><circle cx="50" cy="52" r="4" fill="#f3d28a" stroke="none"/>
+      <path d="M10 56 C2 64 1 76 6 86"/><path d="M62 66 C60 80 58 88 58 96"/>
+    </svg>
+    <div><h1>HORUS STORE</h1></div>
+  </header>
+  <div class="sub">Install toolchains and start projects. Copy a command into the terminal — or open Horus Robotics to scaffold a project.</div>
+
+  <div class="wrap">
+    <h2>⚙️ Toolchains</h2>
+    <div class="grid" id="tools"></div>
+
+    <h2>🚀 Project Templates</h2>
+    <div class="grid" id="templates"><div class="empty">Loading templates from Horus Robotics…</div></div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+<script>
+const TOOLS=[
+  {ic:"🔌",nm:"Arduino",ds:"Arduino CLI + AVR core for UNO, Nano, Mega.",cmd:"horus-setup arduino",tags:["arduino","embedded"]},
+  {ic:"📶",nm:"ESP32 / ESP8266",ds:"Wi-Fi & Bluetooth microcontroller toolchain.",cmd:"horus-setup esp32",tags:["esp32","iot"]},
+  {ic:"🐍",nm:"Python AI",ds:"numpy, pandas, OpenCV, scikit-learn, matplotlib.",cmd:"horus-setup python-ai",tags:["python","ai"]},
+  {ic:"🔥",nm:"PyTorch",ds:"Deep-learning framework (CPU build).",cmd:"horus-setup pytorch",tags:["ai","ml"]},
+  {ic:"🤖",nm:"ROS 2 Humble",ds:"Robot Operating System for real robotics.",cmd:"horus-setup ros2",tags:["robotics","ros"]},
+  {ic:"📱",nm:"Flutter",ds:"Cross-platform app SDK (mobile/desktop/web).",cmd:"horus-setup flutter",tags:["flutter","apps"]},
+  {ic:"🐳",nm:"Docker",ds:"Containers for reproducible environments.",cmd:"horus-setup docker",tags:["devops"]},
+  {ic:"🟢",nm:"Node.js + Web",ds:"Node 20 LTS and web tooling (Vite).",cmd:"horus-setup web",tags:["web","node"]},
+];
+const $=s=>document.querySelector(s);
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200)}
+function copy(txt){navigator.clipboard.writeText(txt).then(()=>toast('Copied: '+txt)).catch(()=>toast(txt))}
+
+$('#tools').innerHTML=TOOLS.map(t=>`<div class="card"><div class="ic">${t.ic}</div>
+  <div class="nm">${t.nm}</div><div class="ds">${t.ds}</div>
+  <div class="tags">${t.tags.map(x=>`<span class="tag">${x}</span>`).join('')}</div>
+  <code>${t.cmd}<span class="copy" onclick="copy('${t.cmd}')">copy</span></code></div>`).join('');
+
+fetch('http://127.0.0.1:8423/api/templates').then(r=>r.json()).then(d=>{
+  const el=$('#templates');
+  if(!d.templates||!d.templates.length){el.innerHTML='<div class="empty">Open Horus Robotics to load templates.</div>';return}
+  el.innerHTML=d.templates.map(t=>`<div class="card"><div class="ic">📦</div>
+    <div class="nm">${t.name}</div><div class="ds">${t.description||''}</div>
+    <div class="tags">${(t.tags||[]).map(x=>`<span class="tag">${x}</span>`).join('')}</div>
+    <code>horus-robotics<span class="copy" onclick="copy('horus-robotics')">open</span></code></div>`).join('');
+}).catch(()=>{$('#templates').innerHTML='<div class="empty">Start Horus Robotics (horus-robotics) to browse project templates.</div>'});
+</script>
+</body>
+</html>

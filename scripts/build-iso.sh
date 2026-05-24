@@ -255,7 +255,10 @@ install_horus_apps() {
   # Maker helper CLIs
   cp "${SCRIPT_DIR}/horus-setup.sh"  "${CHROOT_DIR}/usr/local/bin/horus-setup"  2>/dev/null || true
   cp "${SCRIPT_DIR}/horus-doctor.sh" "${CHROOT_DIR}/usr/local/bin/horus-doctor" 2>/dev/null || true
-  chmod +x "${CHROOT_DIR}/usr/local/bin/horus-setup" "${CHROOT_DIR}/usr/local/bin/horus-doctor" 2>/dev/null || true
+  cp "${SCRIPT_DIR}/horus-backup.sh" "${CHROOT_DIR}/usr/local/bin/horus-backup" 2>/dev/null || true
+  cp "${SCRIPT_DIR}/horus-update.sh" "${CHROOT_DIR}/usr/local/bin/horus-update" 2>/dev/null || true
+  chmod +x "${CHROOT_DIR}/usr/local/bin/horus-setup" "${CHROOT_DIR}/usr/local/bin/horus-doctor" \
+           "${CHROOT_DIR}/usr/local/bin/horus-backup" "${CHROOT_DIR}/usr/local/bin/horus-update" 2>/dev/null || true
 
   # Python dependencies for the app backends
   step_start "Installing Python dependencies"
@@ -422,6 +425,51 @@ Keywords=horus;docs;help;tutorial;reference;
 StartupNotify=true
 EOF
 
+  cat > "${CHROOT_DIR}/usr/share/applications/horus-store.desktop" << 'EOF'
+[Desktop Entry]
+Name=HORUS Store
+Name[ar]=متجر حورس
+Comment=Install toolchains and start projects from templates
+Comment[ar]=ثبّت الأدوات وابدأ مشاريع من القوالب
+Exec=/opt/horus/horus-store/launch.sh
+Icon=/opt/horus/horus-store/icon.png
+Terminal=false
+Type=Application
+Categories=System;PackageManager;Education;
+Keywords=horus;store;install;templates;toolchains;
+StartupNotify=true
+EOF
+
+  cat > "${CHROOT_DIR}/usr/share/applications/horus-update.desktop" << 'EOF'
+[Desktop Entry]
+Name=HORUS Update
+Name[ar]=تحديث حورس
+Comment=Update HORUS OS system packages
+Comment[ar]=تحديث حزم نظام حورس
+Exec=gnome-terminal -- bash -c "horus-update; echo; read -p 'Press Enter to close…'"
+Icon=system-software-update
+Terminal=false
+Type=Application
+Categories=System;
+Keywords=horus;update;upgrade;apt;
+StartupNotify=true
+EOF
+
+  cat > "${CHROOT_DIR}/usr/share/applications/horus-backup.desktop" << 'EOF'
+[Desktop Entry]
+Name=HORUS Backup
+Name[ar]=نسخ حورس الاحتياطي
+Comment=Back up your HORUS projects
+Comment[ar]=نسخ مشاريعك احتياطيًا
+Exec=gnome-terminal -- bash -c "horus-backup create; echo; horus-backup list; echo; read -p 'Press Enter to close…'"
+Icon=drive-harddisk
+Terminal=false
+Type=Application
+Categories=System;Utility;
+Keywords=horus;backup;projects;archive;
+StartupNotify=true
+EOF
+
   # Run the welcome app once on first login (per user)
   mkdir -p "${CHROOT_DIR}/etc/skel/.config/autostart"
   cat > "${CHROOT_DIR}/etc/skel/.config/autostart/horus-welcome.desktop" << 'EOF'
@@ -506,6 +554,15 @@ if command -v horus-browser &>/dev/null; then horus-browser --app="$URL" --title
 else xdg-open "$URL"; fi
 EOF
 
+  cat > "${CHROOT_DIR}/opt/horus/horus-store/launch.sh" << 'EOF'
+#!/bin/bash
+# Ensure the Robotics backend is up so the Store can list templates
+curl -s http://127.0.0.1:8423/ >/dev/null 2>&1 || { ( cd /opt/horus/horus-robotics && python3 main.py >/dev/null 2>&1 & ); sleep 2; }
+URL="file:///opt/horus/horus-store/index.html"
+if command -v horus-browser &>/dev/null; then horus-browser --app="$URL" --title="HORUS Store"
+else xdg-open "$URL"; fi
+EOF
+
   cat > "${CHROOT_DIR}/opt/horus/horus-welcome/launch.sh" << 'EOF'
 #!/bin/bash
 FLAG="$HOME/.config/horus-welcome-shown"
@@ -551,6 +608,10 @@ EOF
   cat > "${CHROOT_DIR}/usr/local/bin/horus-docs" << 'EOF'
 #!/bin/bash
 /opt/horus/horus-docs/launch.sh
+EOF
+  cat > "${CHROOT_DIR}/usr/local/bin/horus-store" << 'EOF'
+#!/bin/bash
+/opt/horus/horus-store/launch.sh
 EOF
   cat > "${CHROOT_DIR}/usr/local/bin/horus-install" << 'EOF'
 #!/bin/bash
@@ -602,6 +663,9 @@ echo -e "${CYAN}horus-doctor${NC}     Diagnose & fix your dev environment"
 echo -e "${CYAN}horus-explain${NC}    Explain an error with HORUS AI"
 echo -e "${CYAN}horus-models${NC}     List / pull local AI models (Ollama)"
 echo -e "${CYAN}horus-docs${NC}       Offline docs & cheat-sheets"
+echo -e "${CYAN}horus-store${NC}      Install toolchains & start projects"
+echo -e "${CYAN}horus-backup${NC}     Back up your projects"
+echo -e "${CYAN}horus-update${NC}     Update HORUS OS"
 echo -e "${CYAN}horus-install${NC}    Install HORUS OS to disk"
 echo -e "${CYAN}horus-help${NC}       Show this help"
 echo -e "${CYAN}fastfetch${NC}        System information"

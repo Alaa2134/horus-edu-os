@@ -87,6 +87,20 @@
         or <code class="mono">horus-doctor</code> to auto-fix common issues.
       </div>
     </div>
+
+    <div class="card" style="grid-column:1/-1">
+      <h2>📟 Serial Monitor</h2>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+        <select id="serPort" style="flex:1;min-width:180px"></select>
+        <select id="serBaud" style="width:130px">
+          <option>9600</option><option selected>115200</option>
+          <option>57600</option><option>250000</option>
+        </select>
+        <button onclick="serRead()">Read</button>
+        <button class="ghost" onclick="toggleSerLive()" id="serLiveBtn">Live</button>
+      </div>
+      <pre style="margin-top:12px;max-height:240px;overflow:auto;background:#070709;border:1px solid var(--border);border-radius:12px;padding:12px"><code id="serOut" class="mono" style="color:var(--text);font-size:12px">No data yet. Pick a port and press Read.</code></pre>
+    </div>
   </div>
 
   <div class="toast" id="toast"></div>
@@ -96,10 +110,19 @@ const $ = s => document.querySelector(s);
 function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2600)}
 async function jget(u){const r=await fetch(u);return r.json()}
 
+function fillPorts(boards){
+  const sel=$('#serPort'); const cur=sel.value;
+  const ports=boards.map(b=>b.port).filter(p=>p&&p.startsWith('/dev/'));
+  sel.innerHTML = ports.length
+    ? ports.map(p=>`<option ${p===cur?'selected':''}>${p}</option>`).join('')
+    : '<option disabled>No serial ports</option>';
+}
+
 async function loadBoards(){
   $('#boards').innerHTML='<div class="empty">Scanning…</div>';
   try{
     const d=await jget('/api/boards');
+    fillPorts(d.boards||[]);
     if(!d.boards.length){
       $('#boards').innerHTML='<div class="empty">No boards detected. Plug in an Arduino/ESP32 via USB and press Rescan.'
         +(d.arduino_cli?'':' <br>(arduino-cli not installed — using basic serial scan)')+'</div>';
@@ -109,6 +132,26 @@ async function loadBoards(){
       <div><div>${b.name}</div><div class="muted mono" style="font-size:11px">${b.port} · ${b.protocol}</div></div>
       <span class="pill on">detected</span></div>`).join('');
   }catch(e){$('#boards').innerHTML='<div class="empty">Backend offline.</div>'}
+}
+
+let serLive=null;
+async function serRead(){
+  const port=$('#serPort').value, baud=$('#serBaud').value;
+  if(!port||!port.startsWith('/dev/')){toast('Pick a serial port');return}
+  try{
+    const r=await fetch(`/api/serial/monitor?port=${encodeURIComponent(port)}&baud=${baud}&ms=1200`);
+    const d=await r.json();
+    if(r.ok){
+      const out=$('#serOut');
+      out.textContent=(d.lines||[]).join('\n')||'(no data — is the board printing to Serial?)';
+      out.parentElement.scrollTop=out.parentElement.scrollHeight;
+    } else toast(d.detail||'Read failed');
+  }catch(e){toast('Backend offline')}
+}
+function toggleSerLive(){
+  const btn=$('#serLiveBtn');
+  if(serLive){clearInterval(serLive);serLive=null;btn.classList.remove('on');btn.textContent='Live';}
+  else{serRead();serLive=setInterval(serRead,1500);btn.textContent='Stop';btn.style.color='#00e676';}
 }
 
 async function loadTemplates(){

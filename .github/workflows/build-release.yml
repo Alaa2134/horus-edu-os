@@ -22,6 +22,12 @@ on:
         required: false
         default: '1.0.0'
 
+# A new push to the same ref cancels an in-progress build (no wasted parallel
+# ISO builds). Tag builds keep their own group so releases aren't cancelled.
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build-iso:
     name: Build ISO on Ubuntu 22.04
