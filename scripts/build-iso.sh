@@ -499,6 +499,33 @@ EOF
 #!/bin/bash
 /opt/horus/horus-welcome/launch.sh
 EOF
+  cat > "${CHROOT_DIR}/usr/local/bin/horus-explain" << 'EOF'
+#!/bin/bash
+# Explain an error with HORUS AI.  Usage: horus-explain "<error>"  | or pipe output in
+ERR="$*"
+[[ -z "$ERR" && ! -t 0 ]] && ERR="$(cat)"
+[[ -z "$ERR" ]] && { echo "Usage: horus-explain \"<error text>\"   (or: some-cmd 2>&1 | horus-explain)"; exit 1; }
+curl -s http://127.0.0.1:8421/ >/dev/null 2>&1 || { ( cd /opt/horus/horus-ai-assistant && python3 main.py >/dev/null 2>&1 & ); sleep 2; }
+PAYLOAD=$(python3 -c 'import json,sys; print(json.dumps({"error": sys.argv[1], "context": "general"}))' "$ERR")
+curl -s -X POST http://127.0.0.1:8421/api/explain-error -H 'Content-Type: application/json' -d "$PAYLOAD" \
+  | python3 -c 'import json,sys; d=json.load(sys.stdin); print("\n"+d.get("explanation","(no answer)")+"\n  — HORUS AI ["+d.get("backend","?")+"]\n")' \
+  2>/dev/null || echo "HORUS AI is unavailable. Try: horus-ai"
+EOF
+  cat > "${CHROOT_DIR}/usr/local/bin/horus-models" << 'EOF'
+#!/bin/bash
+# Manage local AI models.  Usage: horus-models [list] | horus-models pull <name>
+curl -s http://127.0.0.1:8421/ >/dev/null 2>&1 || { ( cd /opt/horus/horus-ai-assistant && python3 main.py >/dev/null 2>&1 & ); sleep 2; }
+case "${1:-list}" in
+  pull)
+    [[ -z "${2:-}" ]] && { echo "Usage: horus-models pull <name>"; exit 1; }
+    P=$(python3 -c 'import json,sys; print(json.dumps({"name": sys.argv[1]}))' "$2")
+    curl -s -X POST http://127.0.0.1:8421/api/models/pull -H 'Content-Type: application/json' -d "$P" \
+      | python3 -c 'import json,sys; print(json.load(sys.stdin).get("message","started"))' ;;
+  *)
+    curl -s http://127.0.0.1:8421/api/models \
+      | python3 -c 'import json,sys; d=json.load(sys.stdin); print("Ollama:", "online" if d.get("available") else d.get("hint","offline")); [print("  •", m["name"]) for m in d.get("models",[])]' ;;
+esac
+EOF
   cat > "${CHROOT_DIR}/usr/local/bin/horus-help" << 'HELPEOF'
 #!/bin/bash
 GOLD='\033[38;2;201;162;39m'
@@ -513,6 +540,8 @@ echo -e "${CYAN}horus-demo${NC}       Launch HORUS Demo Mode"
 echo -e "${CYAN}horus-browser${NC}    Open HORUS Browser"
 echo -e "${CYAN}horus-setup${NC}      Install a toolchain (arduino, esp32, ros2, ...)"
 echo -e "${CYAN}horus-doctor${NC}     Diagnose & fix your dev environment"
+echo -e "${CYAN}horus-explain${NC}    Explain an error with HORUS AI"
+echo -e "${CYAN}horus-models${NC}     List / pull local AI models (Ollama)"
 echo -e "${CYAN}horus-help${NC}       Show this help"
 echo -e "${CYAN}fastfetch${NC}        System information"
 HELPEOF
