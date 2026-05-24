@@ -7,7 +7,7 @@
 set -euo pipefail
 
 CHROOT_DIR="${1:-/}"
-USERNAME="${2:-horus-user}"
+USERNAME="${2:-horus}"
 PASSWORD="${3:-horus2024}"
 REPO_DIR="${4:-$(dirname "$(dirname "$(realpath "$0")")")}"
 

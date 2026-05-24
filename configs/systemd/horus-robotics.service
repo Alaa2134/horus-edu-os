@@ -5,7 +5,7 @@ Wants=network.target
 
 [Service]
 Type=simple
-User=horus-user
+User=horus
 WorkingDirectory=/opt/horus/horus-robotics
 ExecStart=/usr/bin/python3 /opt/horus/horus-robotics/main.py
 Restart=on-failure

@@ -34,7 +34,7 @@ Wants=network.target
 
 [Service]
 Type=simple
-User=horus-user
+User=horus
 WorkingDirectory=/opt/horus/horus-control-center/backend
 ExecStart=/usr/bin/python3 /opt/horus/horus-control-center/backend/main.py
 Restart=on-failure
@@ -60,7 +60,7 @@ Requires=network.target
 
 [Service]
 Type=simple
-User=horus-user
+User=horus
 WorkingDirectory=/opt/horus/horus-ai-assistant
 ExecStart=/usr/bin/python3 /opt/horus/horus-ai-assistant/main.py
 Restart=on-failure

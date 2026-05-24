@@ -27,7 +27,7 @@ BASE_SUITE="jammy"
 ARCH="${ARCH:-amd64}"
 UBUNTU_MIRROR="http://archive.ubuntu.com/ubuntu/"
 SKIP_PACKAGES="${SKIP_PACKAGES:-false}"
-LIVE_USER="horus-user"
+LIVE_USER="horus"
 LIVE_PASS="horus2024"
 
 # ── Parse Arguments ────────────────────────────────────────────────────

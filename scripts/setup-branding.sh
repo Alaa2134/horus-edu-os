@@ -189,7 +189,7 @@ cat > "${CHROOT_DIR}/etc/gdm3/custom.conf" << EOF
 [daemon]
 WaylandEnable=true
 AutomaticLoginEnable=true
-AutomaticLogin=horus-user
+AutomaticLogin=horus
 
 [security]
 
@@ -230,7 +230,7 @@ fi
 mkdir -p "${CHROOT_DIR}/etc/skel/.config"
 touch "${CHROOT_DIR}/etc/skel/.config/gnome-initial-setup-done"
 
-log_info "GDM3 configured (Wayland, dark greeter, live autologin → horus-user)"
+log_info "GDM3 configured (Wayland, dark greeter, live autologin → horus)"
 
 # ── 7. Fastfetch + Terminal Welcome ──────────────────────────────────────
 log_step "Configuring terminal experience"
