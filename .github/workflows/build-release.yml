@@ -73,7 +73,7 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y \
             debootstrap squashfs-tools xorriso isolinux \
-            grub-pc-bin grub-efi-amd64-bin mtools dosfstools \
+            grub-common grub-pc-bin grub-efi-amd64-bin mtools dosfstools \
             syslinux-utils wget curl git python3-pip \
             software-properties-common apt-utils
 
@@ -176,38 +176,24 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y qemu-system-x86 qemu-utils
 
-      - name: Extract kernel and initrd from the ISO
+      - name: Locate the ISO
         run: |
-          set -x
           ls -R iso || true
           ISO=$(find iso -name '*.iso' | head -1)
           if [ -z "$ISO" ]; then echo "::error::No ISO found in artifact"; exit 1; fi
           echo "ISO=$ISO" >> "$GITHUB_ENV"
           echo "Testing: $ISO ($(du -h "$ISO" | cut -f1))"
-          mkdir -p mnt
-          sudo mount -o loop,ro "$ISO" mnt
-          echo "--- casper dir ---"; ls -lhR mnt/casper 2>/dev/null || ls -lhR mnt 2>/dev/null | head -40 || true
-          # Filenames may differ in case; find them robustly.
-          KER=$(find mnt -iname 'vmlinuz*' | head -1)
-          INI=$(find mnt -iname 'initrd*'  | head -1)
-          echo "kernel=$KER  initrd=$INI"
-          cp "$KER" vmlinuz
-          cp "$INI" initrd
-          sudo umount mnt
-          ls -lh vmlinuz initrd
 
-      - name: Boot headless in QEMU and capture serial console
+      - name: Boot the ISO through GRUB in QEMU and capture serial console
         run: |
           set +e   # this is a polling loop; don't let a false test abort the step
-          # No KVM on the runner → TCG emulation. We verify the ISO's boot chain
-          # actually starts: kernel boots and the initramfs/casper stage runs.
-          # (Reaching full GNOME under pure emulation is impractical; a real VM
-          #  with KVM is the place to verify the desktop — see vm/run-qemu.sh.)
+          # Boot the REAL disc via the BIOS/El-Torito → GRUB → kernel path (not a
+          # direct -kernel shortcut), so a broken GRUB (e.g. dropping to grub>)
+          # is caught. The menu's default entry sets console=ttyS0 for capture.
+          # No KVM on the runner → TCG; we look for kernel/initramfs/systemd.
           qemu-system-x86_64 \
             -m 4096 -smp 2 -no-reboot \
-            -kernel vmlinuz -initrd initrd \
-            -append "boot=casper console=ttyS0,115200" \
-            -cdrom "$ISO" \
+            -cdrom "$ISO" -boot d \
             -display none -serial file:boot.log -monitor none 2>qemu.err &
           QPID=$!
 

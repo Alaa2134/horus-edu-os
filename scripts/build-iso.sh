@@ -100,7 +100,7 @@ check_prerequisites() {
     apt-get update -qq
     DEBIAN_FRONTEND=noninteractive apt-get install -y \
       debootstrap squashfs-tools xorriso isolinux \
-      grub-pc-bin grub-efi-amd64-bin mtools dosfstools \
+      grub-common grub-pc-bin grub-efi-amd64-bin mtools dosfstools \
       syslinux-utils wget curl git 2>/dev/null
     log_info "Build tools installed"
   fi
@@ -809,12 +809,12 @@ terminal_output gfxterm
 
 menuentry "HORUS OS ${HORUS_VERSION} — Start" --class horus --class os {
     set gfxpayload=keep
-    linux   /casper/vmlinuz boot=casper quiet splash ---
+    linux   /casper/vmlinuz boot=casper quiet splash console=tty0 console=ttyS0,115200 ---
     initrd  /casper/initrd
 }
 
 menuentry "HORUS OS — Safe Mode (nomodeset)" --class horus {
-    linux   /casper/vmlinuz boot=casper nomodeset quiet splash ---
+    linux   /casper/vmlinuz boot=casper nomodeset quiet splash console=tty0 console=ttyS0,115200 ---
     initrd  /casper/initrd
 }
 
@@ -848,107 +848,28 @@ EOF
   echo "HORUS OS ${HORUS_VERSION} (${HORUS_CODENAME})" > "${ISO_DIR}/.disk/info"
   touch "${ISO_DIR}/.disk/base_installable"
 
-  # ── BIOS El Torito boot image ──────────────────────────────────────────
-  # grub-mkstandalone embeds ALL modules into one core image and hits the
-  # 480 KB (0x78000) BIOS memory limit.  grub-mkimage builds a minimal core
-  # with only iso9660+normal; every other module (linux, gfxterm, …) is
-  # loaded at runtime from (cd)/boot/grub/i386-pc/ on the ISO itself.
-  step_start "Building GRUB BIOS El Torito boot image"
-
-  # Copy all i386-pc modules into the ISO so GRUB can load them after boot
-  mkdir -p "${ISO_DIR}/boot/grub/i386-pc"
-  cp /usr/lib/grub/i386-pc/*.mod "${ISO_DIR}/boot/grub/i386-pc/" 2>/dev/null || true
-  cp /usr/lib/grub/i386-pc/*.lst "${ISO_DIR}/boot/grub/i386-pc/" 2>/dev/null || true
-
-  # Build a minimal GRUB core image — only iso9660 and normal are needed;
-  # the prefix (cd)/boot/grub tells GRUB where to find the rest on the ISO
-  grub-mkimage \
-    -d /usr/lib/grub/i386-pc \
-    -o "${BUILD_DIR}/grub_core.img" \
-    -O i386-pc \
-    -p '(cd)/boot/grub' \
-    iso9660 normal
-
-  # Prepend the 512-byte El Torito CD-ROM bootstrap (cdboot.img) to make
-  # the image bootable from an El Torito-aware BIOS / VM
-  cat /usr/lib/grub/i386-pc/cdboot.img "${BUILD_DIR}/grub_core.img" \
-    > "${ISO_DIR}/boot/grub/bios.img"
-  log_info "BIOS boot  : bios.img ($(stat -c%s "${ISO_DIR}/boot/grub/bios.img") bytes)"
-
-  # ── EFI boot image ─────────────────────────────────────────────────────
-  # mtools (mmd/mcopy) fails on many CI runners — use loop mount instead.
-  step_start "Building EFI boot image"
-  grub-mkstandalone \
-    --format=x86_64-efi \
-    --output="${BUILD_DIR}/bootx64.efi" \
-    --locales="" --fonts="" \
-    "boot/grub/grub.cfg=${ISO_DIR}/boot/grub/grub.cfg" 2>/dev/null \
-    || log_warn "grub-mkstandalone EFI failed — skipping UEFI boot"
-
-  if [[ -f "${BUILD_DIR}/bootx64.efi" && -s "${BUILD_DIR}/bootx64.efi" ]]; then
-    dd if=/dev/zero of="${BUILD_DIR}/efi.img" bs=1M count=20 2>/dev/null
-    mkfs.fat -F 16 "${BUILD_DIR}/efi.img"
-    mkdir -p "${BUILD_DIR}/efi_mnt"
-    if mount -o loop "${BUILD_DIR}/efi.img" "${BUILD_DIR}/efi_mnt" 2>/dev/null; then
-      mkdir -p "${BUILD_DIR}/efi_mnt/EFI/boot"
-      cp "${BUILD_DIR}/bootx64.efi" "${BUILD_DIR}/efi_mnt/EFI/boot/"
-      umount "${BUILD_DIR}/efi_mnt"
-      cp "${BUILD_DIR}/efi.img" "${ISO_DIR}/EFI/boot/efi.img"
-      log_info "EFI image  : created (UEFI enabled)"
-    else
-      log_warn "Loop mount failed — skipping EFI image"
-    fi
-    rmdir "${BUILD_DIR}/efi_mnt" 2>/dev/null || true
-  else
-    log_warn "bootx64.efi not built — BIOS-only ISO"
-  fi
-
-  # ── xorriso ────────────────────────────────────────────────────────────
-  step_start "Running xorriso to create hybrid ISO"
+  # ── Build the bootable ISO with grub-mkrescue ──────────────────────────
+  # grub-mkrescue produces a hybrid BIOS+UEFI ISO whose GRUB reliably finds and
+  # loads /boot/grub/grub.cfg from the disc. The previous hand-built core image
+  # dropped to a `grub>` prompt because it could not locate its config; this is
+  # the canonical, well-tested tool for the job.
+  step_start "Building bootable ISO with grub-mkrescue (BIOS + UEFI)"
   mkdir -p "$OUTPUT_DIR"
   local iso_name="horus-os-${HORUS_VERSION}-${ARCH}.iso"
   # ISO 9660 volume IDs must not contain dots — replace with underscores
   local volid="HORUS_OS_$(echo "$HORUS_VERSION" | tr '.' '_')"
 
-  # Optional hybrid MBR — makes ISO USB-bootable (not just CD/VM)
-  local mbr_args=()
-  local grub_mbr="/usr/lib/grub/i386-pc/boot_hybrid.img"
-  if [[ -f "$grub_mbr" ]]; then
-    mbr_args=(--grub2-mbr "$grub_mbr")
-    log_info "Hybrid MBR : enabled"
-  else
-    log_warn "boot_hybrid.img not found — ISO not USB hybrid-bootable"
-  fi
+  command -v grub-mkrescue &>/dev/null \
+    || log_error "grub-mkrescue not found — install grub-common"
 
-  # Optional UEFI — only if efi.img was successfully created above
-  local efi_args=()
-  if [[ -f "${ISO_DIR}/EFI/boot/efi.img" && -s "${ISO_DIR}/EFI/boot/efi.img" ]]; then
-    efi_args=(
-      -eltorito-alt-boot
-      -e EFI/boot/efi.img
-      -no-emul-boot
-      -append_partition 2 0xef "${ISO_DIR}/EFI/boot/efi.img"
-    )
-    log_info "UEFI boot  : enabled"
-  else
-    log_warn "EFI image absent — BIOS-only ISO (VMs boot fine without it)"
-  fi
+  # grub.cfg is at ${ISO_DIR}/boot/grub/grub.cfg; grub-mkrescue embeds a GRUB
+  # that searches for the disc and runs it. Extra xorriso options after `--`.
+  grub-mkrescue \
+    --output="${OUTPUT_DIR}/${iso_name}" \
+    "${ISO_DIR}" \
+    -- -volid "$volid" 2>&1 | tail -25
 
-  # bios.img is now physically inside ISO_DIR — no graft points needed
-  xorriso -as mkisofs \
-    -iso-level 3 \
-    -full-iso9660-filenames \
-    -rational-rock \
-    -joliet -joliet-long \
-    -volid "$volid" \
-    -eltorito-boot boot/grub/bios.img \
-    -no-emul-boot -boot-load-size 4 -boot-info-table \
-    --eltorito-catalog boot/grub/boot.cat \
-    --grub2-boot-info \
-    "${mbr_args[@]}" \
-    "${efi_args[@]}" \
-    -output "${OUTPUT_DIR}/${iso_name}" \
-    "${ISO_DIR}"
+  [[ -f "${OUTPUT_DIR}/${iso_name}" ]] || log_error "grub-mkrescue did not produce an ISO"
 
   log_info "ISO created: ${OUTPUT_DIR}/${iso_name}"
 
