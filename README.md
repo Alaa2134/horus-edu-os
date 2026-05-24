@@ -9,9 +9,11 @@
 ╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═╝ ╚═════╝ ╚══════╝     ╚═════╝ ╚══════╝
 ```
 
-**HORUS OS — Intelligence Awakened**
+**HORUS OS — The Egyptian AI & Robotics Linux Distribution**
 
-*نظام حورس — ذكاء مدمج للمستقبل*
+*نظام حورس — توزيعة لينكس المصرية للذكاء الاصطناعي والروبوتيكس*
+
+*Install once. Build robots, AI apps, and engineering projects — instantly.*
 
 [![Version](https://img.shields.io/badge/version-1.0.0-c9a227?style=flat-square&labelColor=0a0a0f)](.)
 [![Base](https://img.shields.io/badge/base-Ubuntu%2022.04%20LTS-E95420?style=flat-square&labelColor=0a0a0f)](.)
@@ -35,8 +37,13 @@ HORUS OS is a **custom Linux-based operating system** built for embedded laptops
 - Competition-grade documentation, pitch materials, and demo mode
 
 > **Creator:** Alaa Saber
-> **Purpose:** University Competition — Embedded Systems & Student Innovation
-> **Positioning:** Custom Linux-based OS for embedded intelligence
+> **Purpose:** AI, robotics & engineering education — and university competitions
+> **Positioning:** The Egyptian AI & Robotics Linux distribution — beginner-first
+
+**Product docs:** [Product Direction](docs/PRODUCT.md) ·
+[Design System](docs/DESIGN-SYSTEM.md) · [Roadmap](ROADMAP.md) ·
+[Pitch](docs/PITCH.md) · [Prompts](docs/PROMPTS.md) ·
+[Community & Landing Copy](docs/COMMUNITY.md) · [Run in a VM](vm/README.md)
 
 HORUS OS is built on Ubuntu 22.04 LTS minimal with GNOME Shell (on Mutter) as the desktop foundation, transformed through comprehensive theming, custom applications, and a unified brand identity rooted in Ancient Egyptian heritage and futuristic embedded intelligence.
 
@@ -144,6 +151,23 @@ Launch: `horus-demo` or set as startup application.
 Security dashboard: firewall (UFW) status, SSH configuration, disk encryption info, active network connections, system log viewer, security recommendations, and privacy dashboard.
 
 Launch: `horus-security` in terminal or via app menu.
+
+### HORUS Robotics
+The maker hub. Auto-detects connected Arduino/ESP32 boards (via `arduino-cli` or a serial scan), scaffolds runnable projects from templates, and includes a beginner wiring helper (pin maps for common sensors/modules on UNO and ESP32) plus a live toolchain status panel. Backend: Python FastAPI + pyserial on port 8423.
+
+Launch: `horus-robotics` in terminal or via app menu.
+
+### HORUS Browser
+The native web browser, built on GTK3 + WebKit2GTK and themed in the HORUS identity. Tabbed browsing, a branded start page with quick links to the HORUS apps, and an `--app` chromeless mode that doubles as the shell for the HORUS web apps.
+
+Launch: `horus-browser` in terminal or via the dock.
+
+### Maker & developer commands
+```bash
+horus-setup arduino esp32   # one-click toolchains (also: ros2, pytorch, flutter, docker, node, web)
+horus-doctor --fix          # diagnose & fix serial permissions, apt health, missing tools
+horus-help                  # list all HORUS commands
+```
 
 ### HORUS About
 System information page showing OS version, hardware specs, installed tools, kernel, uptime, and credits. The "system identity card" of HORUS OS.
