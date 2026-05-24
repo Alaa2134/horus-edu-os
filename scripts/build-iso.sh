@@ -768,9 +768,18 @@ build_iso() {
 
   # Squashfs filesystem
   step_start "Creating squashfs (this takes 15–30 minutes)"
+  # The virtual filesystems must exist as EMPTY directories in the squashfs so
+  # casper can mount /dev /proc /sys /run onto the new root. Excluding the
+  # directories themselves (old behaviour) left no mount points → init died →
+  # "Kernel panic: Attempted to kill init". Empty their contents but keep dirs.
+  for d in dev proc sys run tmp mnt media; do
+    rm -rf "${CHROOT_DIR:?}/${d}"/* 2>/dev/null || true
+    mkdir -p "${CHROOT_DIR}/${d}"
+  done
+  chmod 1777 "${CHROOT_DIR}/tmp"
   mksquashfs "$CHROOT_DIR" "${ISO_DIR}/casper/filesystem.squashfs" \
     -comp xz -Xbcj x86 -b 1M -noappend \
-    -e boot proc sys dev run tmp var/cache/apt var/lib/apt 2>&1 | tail -5
+    -e var/cache/apt var/lib/apt/lists 2>&1 | tail -5
 
   # Filesystem size for installer
   printf "$(du -sx --block-size=1 "$CHROOT_DIR" | cut -f1)" \

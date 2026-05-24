@@ -213,9 +213,11 @@ jobs:
 
           BOOT_RE="Linux version|Booting|initramfs|Begin: Running|casper|Freeing|systemd\[1\]:|Reached target|login:|HORUS"
           FULL_RE="systemd\[1\]:|Reached target|login:"
-          boot=0; full=0
+          PANIC_RE="Kernel panic|Attempted to kill init|Unable to mount root|No working init"
+          boot=0; full=0; panic=0
           for i in $(seq 1 90); do
             sleep 8
+            if grep -Eaq "$PANIC_RE" boot.log 2>/dev/null; then panic=1; break; fi
             if grep -Eaq "$BOOT_RE" boot.log 2>/dev/null; then boot=1; fi
             if grep -Eaq "$FULL_RE" boot.log 2>/dev/null; then full=1; break; fi
             if ! kill -0 "$QPID" 2>/dev/null; then echo "QEMU process exited"; break; fi
@@ -228,8 +230,11 @@ jobs:
           echo "================ boot.log (last 120 lines) ================"
           tail -120 boot.log 2>/dev/null || echo "(no serial output captured)"
           echo "==========================================================="
-          echo "boot=$boot full=$full" > result.env
-          if [ "$full" -eq 1 ]; then
+          echo "boot=$boot full=$full panic=$panic" > result.env
+          if [ "$panic" -eq 1 ]; then
+            echo "::error::Boot FAILED — kernel panic / init died (see boot.log)."
+            exit 1
+          elif [ "$full" -eq 1 ]; then
             echo "✅ PASSED — kernel + initramfs booted and reached systemd userspace."
           elif [ "$boot" -eq 1 ]; then
             echo "✅ PASSED — kernel + initramfs boot chain verified."
