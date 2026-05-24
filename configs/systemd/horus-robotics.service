@@ -1,0 +1,19 @@
+[Unit]
+Description=HORUS Robotics API (Arduino/ESP32 tools, templates, wiring)
+After=network.target
+Wants=network.target
+
+[Service]
+Type=simple
+User=horus-user
+WorkingDirectory=/opt/horus/horus-robotics
+ExecStart=/usr/bin/python3 /opt/horus/horus-robotics/main.py
+Restart=on-failure
+RestartSec=8
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=horus-robotics
+Environment=PYTHONUNBUFFERED=1
+
+[Install]
+WantedBy=multi-user.target

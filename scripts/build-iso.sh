@@ -185,32 +185,84 @@ apply_branding() {
 }
 
 # ── Custom Apps ────────────────────────────────────────────────────────
+# Build the React frontends on the HOST (Node only needed at build time).
+# Falls back to each app's self-contained demo.html so the UI always works.
+_build_frontends() {
+  local node_major=0
+  command -v node &>/dev/null && node_major=$(node -v 2>/dev/null | sed 's/v\([0-9]*\).*/\1/')
+
+  for app in horus-control-center horus-ai-assistant horus-security-center; do
+    local fe="${REPO_DIR}/apps/${app}/frontend"
+    [[ -d "$fe" ]] || continue
+    if command -v npm &>/dev/null && [[ "${node_major:-0}" -ge 18 ]]; then
+      step_start "Building ${app} frontend (npm)"
+      ( cd "$fe" && npm ci --no-audit --no-fund 2>/dev/null && npm run build 2>/dev/null ) \
+        && log_info "${app}: React frontend built" \
+        || log_warn "${app}: npm build failed — using demo.html"
+    fi
+    if [[ ! -f "${fe}/dist/index.html" && -f "${REPO_DIR}/apps/${app}/demo.html" ]]; then
+      mkdir -p "${fe}/dist"
+      cp "${REPO_DIR}/apps/${app}/demo.html" "${fe}/dist/index.html"
+      log_info "${app}: using bundled demo.html as UI"
+    fi
+  done
+
+  # Demo Mode ships as a standalone page
+  local dm="${REPO_DIR}/apps/horus-demo-mode"
+  if [[ -f "${dm}/index.html" ]]; then
+    mkdir -p "${dm}/dist"; cp "${dm}/index.html" "${dm}/dist/index.html" 2>/dev/null || true
+  fi
+}
+
 install_horus_apps() {
   log_step "Installing HORUS Custom Applications"
 
   local apps_dir="${REPO_DIR}/apps"
   local target_dir="${CHROOT_DIR}/opt/horus"
 
+  _build_frontends
+
   mkdir -p "$target_dir"
   cp -r "${apps_dir}/." "${target_dir}/"
 
-  # Install Python dependencies for Control Center
+  # Drop dev-only files from the deployed copy (keep built dist/)
+  find "$target_dir" -type d -name node_modules -prune -exec rm -rf {} + 2>/dev/null || true
+  for d in "$target_dir"/*/frontend; do
+    [[ -d "$d" ]] || continue
+    rm -rf "$d/src" 2>/dev/null || true
+    rm -f "$d"/*.config.* "$d"/package*.json "$d"/tsconfig*.json 2>/dev/null || true
+  done
+
+  # Project templates → /opt/horus/templates (used by Horus Robotics)
+  if [[ -d "${REPO_DIR}/templates" ]]; then
+    mkdir -p "${target_dir}/templates"
+    cp -r "${REPO_DIR}/templates/." "${target_dir}/templates/"
+    log_info "Project templates installed"
+  fi
+
+  # Maker helper CLIs
+  cp "${SCRIPT_DIR}/horus-setup.sh"  "${CHROOT_DIR}/usr/local/bin/horus-setup"  2>/dev/null || true
+  cp "${SCRIPT_DIR}/horus-doctor.sh" "${CHROOT_DIR}/usr/local/bin/horus-doctor" 2>/dev/null || true
+  chmod +x "${CHROOT_DIR}/usr/local/bin/horus-setup" "${CHROOT_DIR}/usr/local/bin/horus-doctor" 2>/dev/null || true
+
+  # Python dependencies for the app backends
   step_start "Installing Python dependencies"
   chroot "$CHROOT_DIR" pip3 install --quiet \
-    fastapi "uvicorn[standard]" psutil aiofiles python-multipart httpx 2>/dev/null \
+    fastapi "uvicorn[standard]" psutil aiofiles python-multipart httpx pyserial 2>/dev/null \
     || log_warn "Some Python packages failed; continuing"
-
-  # Install Python dependencies for AI Assistant
-  chroot "$CHROOT_DIR" pip3 install --quiet \
-    ollama openai 2>/dev/null \
+  chroot "$CHROOT_DIR" pip3 install --quiet ollama openai 2>/dev/null \
     || log_warn "AI packages failed; continuing (AI requires manual setup)"
 
-  # Create desktop entries
+  # Desktop entries + launch scripts
   mkdir -p "${CHROOT_DIR}/usr/share/applications"
   _create_desktop_entries
-
-  # Create launch scripts
   _create_launch_scripts
+
+  # Make HORUS Browser the default web browser
+  chroot "$CHROOT_DIR" bash -c "
+    update-alternatives --install /usr/bin/x-www-browser x-www-browser /usr/local/bin/horus-browser 200 2>/dev/null || true
+    update-alternatives --set x-www-browser /usr/local/bin/horus-browser 2>/dev/null || true
+  " 2>/dev/null || true
 
   # Copy systemd services
   if [[ -d "${REPO_DIR}/configs/systemd" ]]; then
@@ -281,6 +333,37 @@ Categories=System;Security;
 Keywords=horus;security;firewall;privacy;
 StartupNotify=true
 EOF
+
+  cat > "${CHROOT_DIR}/usr/share/applications/horus-browser.desktop" << 'EOF'
+[Desktop Entry]
+Name=HORUS Browser
+Name[ar]=متصفح حورس
+Comment=The native HORUS OS web browser
+Comment[ar]=متصفح الويب الأصلي لنظام حورس
+Exec=/usr/local/bin/horus-browser %U
+Icon=web-browser
+Terminal=false
+Type=Application
+Categories=Network;WebBrowser;
+MimeType=text/html;x-scheme-handler/http;x-scheme-handler/https;
+Keywords=horus;browser;web;internet;
+StartupNotify=true
+EOF
+
+  cat > "${CHROOT_DIR}/usr/share/applications/horus-robotics.desktop" << 'EOF'
+[Desktop Entry]
+Name=HORUS Robotics
+Name[ar]=حورس روبوتيكس
+Comment=Arduino/ESP32 tools, project templates and wiring helper
+Comment[ar]=أدوات أردوينو وESP32 وقوالب المشاريع ومساعد التوصيل
+Exec=/opt/horus/horus-robotics/launch.sh
+Icon=/opt/horus/horus-robotics/icon.png
+Terminal=false
+Type=Application
+Categories=Development;Electronics;Education;
+Keywords=horus;robotics;arduino;esp32;ros;maker;
+StartupNotify=true
+EOF
 }
 
 _create_launch_scripts() {
@@ -294,11 +377,11 @@ if ! curl -s http://127.0.0.1:8420/ &>/dev/null; then
   sleep 2
 fi
 # Open frontend
-if command -v chromium-browser &>/dev/null; then
+if command -v horus-browser &>/dev/null; then
+  horus-browser --app=http://127.0.0.1:8420 --title="HORUS Control Center"
+elif command -v chromium-browser &>/dev/null; then
   chromium-browser --app=http://127.0.0.1:8420 --window-size=1200,800 \
     --window-position=60,60 --disable-background-mode
-elif command -v firefox &>/dev/null; then
-  firefox http://127.0.0.1:8420
 else
   xdg-open http://127.0.0.1:8420
 fi
@@ -311,7 +394,8 @@ if ! curl -s http://127.0.0.1:8421/ &>/dev/null; then
   python3 main.py &
   sleep 2
 fi
-xdg-open http://127.0.0.1:8421 || chromium-browser http://127.0.0.1:8421
+if command -v horus-browser &>/dev/null; then horus-browser --app=http://127.0.0.1:8421 --title="HORUS AI Assistant"
+else xdg-open http://127.0.0.1:8421; fi
 EOF
 
   cat > "${CHROOT_DIR}/opt/horus/horus-demo-mode/launch.sh" << 'EOF'
@@ -332,7 +416,19 @@ if ! curl -s http://127.0.0.1:8422/ &>/dev/null; then
   python3 main.py &
   sleep 2
 fi
-xdg-open http://127.0.0.1:8422
+if command -v horus-browser &>/dev/null; then horus-browser --app=http://127.0.0.1:8422 --title="HORUS Security Center"
+else xdg-open http://127.0.0.1:8422; fi
+EOF
+
+  cat > "${CHROOT_DIR}/opt/horus/horus-robotics/launch.sh" << 'EOF'
+#!/bin/bash
+cd /opt/horus/horus-robotics
+if ! curl -s http://127.0.0.1:8423/ &>/dev/null; then
+  python3 main.py &
+  sleep 2
+fi
+if command -v horus-browser &>/dev/null; then horus-browser --app=http://127.0.0.1:8423 --title="HORUS Robotics"
+else xdg-open http://127.0.0.1:8423; fi
 EOF
 
   # Make all launch scripts executable
@@ -355,18 +451,30 @@ EOF
 #!/bin/bash
 /opt/horus/horus-security-center/launch.sh
 EOF
+  cat > "${CHROOT_DIR}/usr/local/bin/horus-robotics" << 'EOF'
+#!/bin/bash
+/opt/horus/horus-robotics/launch.sh
+EOF
+  cat > "${CHROOT_DIR}/usr/local/bin/horus-browser" << 'EOF'
+#!/bin/bash
+exec python3 /opt/horus/horus-browser/horus-browser.py "$@"
+EOF
   cat > "${CHROOT_DIR}/usr/local/bin/horus-help" << 'HELPEOF'
 #!/bin/bash
 GOLD='\033[38;2;201;162;39m'
 CYAN='\033[38;2;0;212;255m'
 NC='\033[0m'
 echo -e "${GOLD}HORUS OS — Available Commands${NC}"
-echo -e "${CYAN}horus-control${NC}   Open HORUS Control Center"
-echo -e "${CYAN}horus-ai${NC}        Open HORUS AI Assistant"
-echo -e "${CYAN}horus-demo${NC}      Launch HORUS Demo Mode"
-echo -e "${CYAN}horus-security${NC}  Open HORUS Security Center"
-echo -e "${CYAN}horus-help${NC}      Show this help"
-echo -e "${CYAN}fastfetch${NC}       System information"
+echo -e "${CYAN}horus-control${NC}    Open HORUS Control Center"
+echo -e "${CYAN}horus-ai${NC}         Open HORUS AI Assistant"
+echo -e "${CYAN}horus-robotics${NC}   Open HORUS Robotics (boards, templates, wiring)"
+echo -e "${CYAN}horus-security${NC}   Open HORUS Security Center"
+echo -e "${CYAN}horus-demo${NC}       Launch HORUS Demo Mode"
+echo -e "${CYAN}horus-browser${NC}    Open HORUS Browser"
+echo -e "${CYAN}horus-setup${NC}      Install a toolchain (arduino, esp32, ros2, ...)"
+echo -e "${CYAN}horus-doctor${NC}     Diagnose & fix your dev environment"
+echo -e "${CYAN}horus-help${NC}       Show this help"
+echo -e "${CYAN}fastfetch${NC}        System information"
 HELPEOF
   chmod +x "${CHROOT_DIR}/usr/local/bin/horus-"* 2>/dev/null || true
 }
