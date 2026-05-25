@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>علاء صابر — مطوّر لغات برمجة | Alaa Saber — Programming Language Developer</title>
+  <meta name="description" content="علاء صابر — مطوّر لغات برمجة، صانع masrylang ولغة البرمجة بالعربي. Alaa Saber — programming language developer, creator of masrylang and the Arabic programming language." />
+  <meta name="author" content="Alaa Saber" />
+  <meta name="theme-color" content="#0a0a12" />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Alaa Saber — Programming Language Developer" />
+  <meta property="og:description" content="Creator of masrylang and the Arabic programming language." />
+  <meta property="og:url" content="https://3laa.site" />
+  <meta property="og:image" content="https://3laa.site/assets/profile.jpg" />
+  <meta name="twitter:card" content="summary_large_image" />
+
+  <link rel="canonical" href="https://3laa.site" />
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <!-- Animated background -->
+  <div class="bg-grid" aria-hidden="true"></div>
+  <div class="bg-glow bg-glow--1" aria-hidden="true"></div>
+  <div class="bg-glow bg-glow--2" aria-hidden="true"></div>
+
+  <!-- Navbar -->
+  <header class="nav" id="nav">
+    <div class="container nav__inner">
+      <a href="#home" class="nav__brand">
+        <span class="nav__logo">&lt;/&gt;</span>
+        <span data-ar="علاء صابر" data-en="Alaa Saber">علاء صابر</span>
+      </a>
+
+      <nav class="nav__links" id="navLinks" aria-label="Main">
+        <a href="#about" data-ar="نبذة" data-en="About">نبذة</a>
+        <a href="#languages" data-ar="لغاتي" data-en="Languages">لغاتي</a>
+        <a href="#skills" data-ar="مهارات" data-en="Skills">مهارات</a>
+        <a href="#contact" data-ar="تواصل" data-en="Contact">تواصل</a>
+      </nav>
+
+      <div class="nav__actions">
+        <button class="lang-toggle" id="langToggle" type="button" aria-label="Switch language">
+          <span class="lang-toggle__current">EN</span>
+        </button>
+        <button class="nav__burger" id="navBurger" type="button" aria-label="Menu" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- Hero -->
+    <section class="hero" id="home">
+      <div class="container hero__inner">
+        <div class="hero__text">
+          <p class="hero__eyebrow">
+            <span class="dot"></span>
+            <span data-ar="متاح لمشاريع جديدة" data-en="Available for new projects">متاح لمشاريع جديدة</span>
+          </p>
+          <h1 class="hero__title">
+            <span data-ar="أهلاً، أنا" data-en="Hi, I'm">أهلاً، أنا</span>
+            <span class="grad" data-ar="علاء صابر" data-en="Alaa Saber">علاء صابر</span>
+          </h1>
+          <p class="hero__role">
+            <span class="type-static" data-ar="مطوّر لغات برمجة" data-en="Programming Language Developer">مطوّر لغات برمجة</span>
+          </p>
+          <p class="hero__desc" data-ar="بصمّم وأبني لغات برمجة من الصفر — من الـ lexer والـ parser لحد الـ runtime. صانع masrylang ولغة البرمجة بالعربي، عشان البرمجة تبقى أقرب للناس بلغتهم." data-en="I design and build programming languages from scratch — from the lexer and parser all the way to the runtime. Creator of masrylang and the Arabic programming language, making code closer to people in their own tongue.">
+            بصمّم وأبني لغات برمجة من الصفر — من الـ lexer والـ parser لحد الـ runtime. صانع masrylang ولغة البرمجة بالعربي، عشان البرمجة تبقى أقرب للناس بلغتهم.
+          </p>
+
+          <div class="hero__cta">
+            <a href="#languages" class="btn btn--primary" data-ar="شوف لغاتي" data-en="See my languages">شوف لغاتي</a>
+            <a href="#contact" class="btn btn--ghost" data-ar="تواصل معايا" data-en="Get in touch">تواصل معايا</a>
+          </div>
+
+          <div class="hero__stats">
+            <div class="stat">
+              <span class="stat__num">2+</span>
+              <span class="stat__label" data-ar="لغات برمجة" data-en="Languages built">لغات برمجة</span>
+            </div>
+            <div class="stat">
+              <span class="stat__num">∞</span>
+              <span class="stat__label" data-ar="أسطر كود" data-en="Lines of code">أسطر كود</span>
+            </div>
+            <div class="stat">
+              <span class="stat__num">100%</span>
+              <span class="stat__label" data-ar="شغف" data-en="Passion">شغف</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="hero__visual">
+          <div class="avatar">
+            <img src="assets/profile.jpg" alt="Alaa Saber" id="profileImg" />
+            <div class="avatar__fallback" id="avatarFallback">AS</div>
+            <span class="avatar__ring"></span>
+          </div>
+          <div class="code-chip code-chip--1">
+            <code>اطبع("أهلاً يا عالم")</code>
+          </div>
+          <div class="code-chip code-chip--2">
+            <code>fn main() { run() }</code>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- About -->
+    <section class="section" id="about">
+      <div class="container">
+        <div class="section__head">
+          <span class="section__index">01</span>
+          <h2 class="section__title" data-ar="نبذة عني" data-en="About me">نبذة عني</h2>
+        </div>
+        <div class="about">
+          <div class="about__main">
+            <p data-ar="أنا علاء صابر، مطوّر شغوف ببناء لغات البرمجة والأدوات اللي بتخليها ممكنة. بدأت رحلتي بسؤال بسيط: ليه البرمجة لازم تكون بالإنجليزي بس؟ من السؤال ده اتولدت لغة البرمجة بالعربي و masrylang." data-en="I'm Alaa Saber, a developer passionate about building programming languages and the tools that make them possible. My journey started with a simple question: why does code have to be in English only? From that question, the Arabic programming language and masrylang were born.">
+              أنا علاء صابر، مطوّر شغوف ببناء لغات البرمجة والأدوات اللي بتخليها ممكنة. بدأت رحلتي بسؤال بسيط: ليه البرمجة لازم تكون بالإنجليزي بس؟ من السؤال ده اتولدت لغة البرمجة بالعربي و masrylang.
+            </p>
+            <p data-ar="بشتغل على كل طبقات بناء اللغة: الـ tokenizer، الـ parser، شجرة الـ AST، والـ interpreter/compiler. هدفي إن البرمجة توصل لكل عربي بلغته الأم من غير حاجز اللغة." data-en="I work across every layer of language design: the tokenizer, the parser, the AST, and the interpreter/compiler. My goal is to bring coding to every Arabic speaker in their mother tongue, without the language barrier.">
+              بشتغل على كل طبقات بناء اللغة: الـ tokenizer، الـ parser، شجرة الـ AST، والـ interpreter/compiler. هدفي إن البرمجة توصل لكل عربي بلغته الأم من غير حاجز اللغة.
+            </p>
+          </div>
+          <ul class="about__facts">
+            <li>
+              <span class="about__facts-k" data-ar="التخصص" data-en="Focus">التخصص</span>
+              <span class="about__facts-v" data-ar="تصميم اللغات والمترجمات" data-en="Language & compiler design">تصميم اللغات والمترجمات</span>
+            </li>
+            <li>
+              <span class="about__facts-k" data-ar="المنطقة" data-en="Based in">المنطقة</span>
+              <span class="about__facts-v" data-ar="مصر 🇪🇬" data-en="Egypt 🇪🇬">مصر 🇪🇬</span>
+            </li>
+            <li>
+              <span class="about__facts-k" data-ar="بحب" data-en="I love">بحب</span>
+              <span class="about__facts-v" data-ar="Open Source والتعليم" data-en="Open source & teaching">Open Source والتعليم</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Languages / Projects -->
+    <section class="section" id="languages">
+      <div class="container">
+        <div class="section__head">
+          <span class="section__index">02</span>
+          <h2 class="section__title" data-ar="لغات البرمجة بتاعتي" data-en="My programming languages">لغات البرمجة بتاعتي</h2>
+        </div>
+
+        <div class="cards">
+          <!-- masrylang -->
+          <article class="card card--feature">
+            <div class="card__glow"></div>
+            <header class="card__head">
+              <div class="card__icon">𓂀</div>
+              <div>
+                <h3 class="card__title">masrylang</h3>
+                <p class="card__sub" data-ar="لغة برمجة باللهجة المصرية" data-en="A programming language in Egyptian Arabic">لغة برمجة باللهجة المصرية</p>
+              </div>
+            </header>
+            <p class="card__desc" data-ar="لغة برمجة بتخليك تكتب كود باللهجة المصرية العامية. كلمات مفتاحية سهلة وقريبة من الكلام اليومي، عشان أي حد يقدر يبدأ برمجة من غير ما يتعلم إنجليزي الأول." data-en="A programming language that lets you write code in everyday Egyptian Arabic. Friendly keywords close to daily speech, so anyone can start coding without learning English first.">
+              لغة برمجة بتخليك تكتب كود باللهجة المصرية العامية. كلمات مفتاحية سهلة وقريبة من الكلام اليومي، عشان أي حد يقدر يبدأ برمجة من غير ما يتعلم إنجليزي الأول.
+            </p>
+            <div class="card__code">
+              <pre><code><span class="c-kw">لو</span> العدد &gt; ١٠ <span class="c-kw">يبقى</span>
+    <span class="c-fn">اطبع</span>(<span class="c-str">"رقم كبير"</span>)
+<span class="c-kw">غير كده</span>
+    <span class="c-fn">اطبع</span>(<span class="c-str">"رقم صغير"</span>)</code></pre>
+            </div>
+            <div class="card__tags">
+              <span>Lexer</span><span>Parser</span><span>Interpreter</span><span>Arabic</span>
+            </div>
+            <div class="card__links">
+              <a href="https://github.com/alaa2134" target="_blank" rel="noopener" class="card__link" data-ar="الكود على GitHub" data-en="View on GitHub">الكود على GitHub →</a>
+            </div>
+          </article>
+
+          <!-- Arabic programming language -->
+          <article class="card card--feature">
+            <div class="card__glow"></div>
+            <header class="card__head">
+              <div class="card__icon">ع</div>
+              <div>
+                <h3 class="card__title" data-ar="لغة البرمجة بالعربي" data-en="Arabic Programming Language">لغة البرمجة بالعربي</h3>
+                <p class="card__sub" data-ar="برمجة بالفصحى لكل العرب" data-en="Code in standard Arabic for the Arab world">برمجة بالفصحى لكل العرب</p>
+              </div>
+            </header>
+            <p class="card__desc" data-ar="لغة برمجة كاملة بالعربية الفصحى، موجّهة لكل المتحدثين بالعربية. هدفها كسر حاجز اللغة في تعليم البرمجة وفتح الباب لجيل جديد من المبرمجين العرب." data-en="A full programming language in Modern Standard Arabic, aimed at every Arabic speaker. It breaks the language barrier in coding education and opens the door for a new generation of Arab programmers.">
+              لغة برمجة كاملة بالعربية الفصحى، موجّهة لكل المتحدثين بالعربية. هدفها كسر حاجز اللغة في تعليم البرمجة وفتح الباب لجيل جديد من المبرمجين العرب.
+            </p>
+            <div class="card__code">
+              <pre><code><span class="c-kw">دالة</span> <span class="c-fn">جمع</span>(أ، ب) {
+    <span class="c-kw">أرجع</span> أ + ب
+}
+<span class="c-fn">اطبع</span>(<span class="c-fn">جمع</span>(٢، ٣))</code></pre>
+            </div>
+            <div class="card__tags">
+              <span>Compiler</span><span>AST</span><span>RTL</span><span>Education</span>
+            </div>
+            <div class="card__links">
+              <a href="https://github.com/alaa2134" target="_blank" rel="noopener" class="card__link" data-ar="الكود على GitHub" data-en="View on GitHub">الكود على GitHub →</a>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Skills -->
+    <section class="section" id="skills">
+      <div class="container">
+        <div class="section__head">
+          <span class="section__index">03</span>
+          <h2 class="section__title" data-ar="المهارات والأدوات" data-en="Skills & tools">المهارات والأدوات</h2>
+        </div>
+        <div class="skills">
+          <div class="skill-group">
+            <h3 class="skill-group__title" data-ar="بناء اللغات" data-en="Language building">بناء اللغات</h3>
+            <div class="chips">
+              <span class="chip">Lexers</span>
+              <span class="chip">Parsers</span>
+              <span class="chip">AST</span>
+              <span class="chip">Interpreters</span>
+              <span class="chip">Compilers</span>
+            </div>
+          </div>
+          <div class="skill-group">
+            <h3 class="skill-group__title" data-ar="لغات ومنصّات" data-en="Languages & platforms">لغات ومنصّات</h3>
+            <div class="chips">
+              <span class="chip">Python</span>
+              <span class="chip">JavaScript</span>
+              <span class="chip">C / C++</span>
+              <span class="chip">Rust</span>
+              <span class="chip">Node.js</span>
+            </div>
+          </div>
+          <div class="skill-group">
+            <h3 class="skill-group__title" data-ar="أدوات" data-en="Tooling">أدوات</h3>
+            <div class="chips">
+              <span class="chip">Git</span>
+              <span class="chip">Linux</span>
+              <span class="chip">Docker</span>
+              <span class="chip">VS Code</span>
+              <span class="chip">CLI tools</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contact -->
+    <section class="section section--contact" id="contact">
+      <div class="container">
+        <div class="section__head">
+          <span class="section__index">04</span>
+          <h2 class="section__title" data-ar="تواصل معايا" data-en="Get in touch">تواصل معايا</h2>
+        </div>
+
+        <div class="contact">
+          <div class="contact__intro">
+            <p data-ar="عندك فكرة، سؤال، أو عايز تشتغل معايا على لغة برمجة؟ ابعتلي رسالة وهرد عليك في أقرب وقت." data-en="Got an idea, a question, or want to build a language together? Drop me a message and I'll get back to you soon.">
+              عندك فكرة، سؤال، أو عايز تشتغل معايا على لغة برمجة؟ ابعتلي رسالة وهرد عليك في أقرب وقت.
+            </p>
+            <div class="contact__socials">
+              <a href="https://github.com/alaa2134" target="_blank" rel="noopener" class="social" aria-label="GitHub">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.7.5.5 5.7.5 12c0 5.1 3.3 9.4 7.9 10.9.6.1.8-.2.8-.6v-2c-3.2.7-3.9-1.4-3.9-1.4-.5-1.3-1.3-1.7-1.3-1.7-1.1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.7 1.3 3.4 1 .1-.8.4-1.3.8-1.6-2.6-.3-5.3-1.3-5.3-5.8 0-1.3.5-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.1 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0C17.3 4.7 18.3 5 18.3 5c.6 1.6.2 2.8.1 3.1.8.8 1.2 1.8 1.2 3.1 0 4.5-2.7 5.5-5.3 5.8.4.4.8 1.1.8 2.2v3.3c0 .4.2.7.8.6 4.6-1.5 7.9-5.8 7.9-10.9C23.5 5.7 18.3.5 12 .5z"/></svg>
+                <span>GitHub</span>
+              </a>
+              <a href="mailto:alaa00saber@gmail.com" class="social" aria-label="Email">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 6 10 7L22 6"/></svg>
+                <span>Email</span>
+              </a>
+              <a href="https://www.linkedin.com/in/alaa-saber" target="_blank" rel="noopener" class="social" aria-label="LinkedIn">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.34V9h3.42v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13zM7.12 20.45H3.55V9h3.57v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.22.79 24 1.77 24h20.45c.98 0 1.78-.78 1.78-1.73V1.73C24 .77 23.2 0 22.22 0z"/></svg>
+                <span>LinkedIn</span>
+              </a>
+            </div>
+          </div>
+
+          <form class="contact__form" id="contactForm" action="https://formspree.io/f/your-id" method="POST" novalidate>
+            <div class="field">
+              <label for="name" data-ar="الاسم" data-en="Name">الاسم</label>
+              <input type="text" id="name" name="name" required data-ar-ph="اكتب اسمك" data-en-ph="Your name" placeholder="اكتب اسمك" />
+            </div>
+            <div class="field">
+              <label for="email" data-ar="الإيميل" data-en="Email">الإيميل</label>
+              <input type="email" id="email" name="email" required data-ar-ph="your@email.com" data-en-ph="your@email.com" placeholder="your@email.com" />
+            </div>
+            <div class="field">
+              <label for="message" data-ar="الرسالة" data-en="Message">الرسالة</label>
+              <textarea id="message" name="message" rows="5" required data-ar-ph="اكتب رسالتك هنا..." data-en-ph="Write your message here..." placeholder="اكتب رسالتك هنا..."></textarea>
+            </div>
+            <button type="submit" class="btn btn--primary btn--block" id="submitBtn" data-ar="ابعت الرسالة" data-en="Send message">ابعت الرسالة</button>
+            <p class="form-note" id="formNote" hidden></p>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer__inner">
+      <p class="footer__brand">
+        <span class="nav__logo">&lt;/&gt;</span>
+        <span data-ar="علاء صابر" data-en="Alaa Saber">علاء صابر</span>
+      </p>
+      <p class="footer__copy">
+        <span data-ar="صُنع بشغف" data-en="Built with passion">صُنع بشغف</span> ·
+        <span id="year"></span> · 3laa.site
+      </p>
+    </div>
+  </footer>
+
+  <a href="#home" class="to-top" id="toTop" aria-label="Back to top">↑</a>
+
+  <script src="js/script.js"></script>
+</body>
+</html>
