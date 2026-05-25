@@ -1,0 +1,129 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background-color: #050816;
+  color: #e2e8f0;
+  font-family: "Inter", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* Ambient command-center backdrop */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(circle at 12% 8%, rgba(0, 229, 255, 0.12), transparent 42%),
+    radial-gradient(circle at 88% 0%, rgba(255, 59, 59, 0.1), transparent 40%),
+    radial-gradient(circle at 50% 100%, rgba(59, 130, 246, 0.1), transparent 55%);
+}
+
+@layer components {
+  .glass {
+    @apply rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur-xl;
+    box-shadow:
+      0 8px 32px rgba(0, 0, 0, 0.45),
+      inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  }
+
+  .glass-strong {
+    @apply rounded-2xl border border-white/15 bg-white/[0.07] backdrop-blur-2xl;
+    box-shadow:
+      0 12px 48px rgba(0, 0, 0, 0.55),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  }
+
+  .panel-title {
+    @apply text-xs font-semibold uppercase tracking-[0.18em] text-slate-400;
+  }
+
+  .stat-value {
+    @apply text-3xl font-extrabold tracking-tight text-white;
+  }
+
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold;
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all duration-150 active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-40;
+  }
+
+  .btn-primary {
+    @apply btn bg-ai text-bg-900 shadow-glow hover:bg-cyan-300;
+  }
+
+  .btn-danger {
+    @apply btn bg-danger text-white hover:bg-red-500;
+    box-shadow: 0 0 24px -6px rgba(255, 59, 59, 0.6);
+  }
+
+  .btn-critical {
+    @apply btn bg-critical text-bg-900 hover:bg-orange-400;
+    box-shadow: 0 0 24px -6px rgba(255, 138, 0, 0.6);
+  }
+
+  .btn-ghost {
+    @apply btn border border-white/15 bg-white/5 text-slate-100 hover:border-white/30 hover:bg-white/10;
+  }
+
+  .btn-success {
+    @apply btn bg-ok text-bg-900 hover:bg-green-400;
+  }
+
+  .nav-link {
+    @apply flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-400 transition-colors hover:bg-white/5 hover:text-white;
+  }
+
+  .nav-link-active {
+    @apply bg-ai/10 text-white shadow-[inset_0_0_0_1px_rgba(0,229,255,0.35)];
+  }
+
+  .input-field {
+    @apply w-full rounded-xl border border-white/10 bg-bg-800/80 px-3.5 py-2.5 text-sm text-white outline-none transition-colors placeholder:text-slate-500 focus:border-ai/60 focus:ring-2 focus:ring-ai/20;
+  }
+}
+
+/* Slim scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+/* Reusable scanning grid overlay for camera/hero */
+.scan-grid {
+  background-image:
+    linear-gradient(rgba(0, 229, 255, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 229, 255, 0.08) 1px, transparent 1px);
+  background-size: 28px 28px;
+}

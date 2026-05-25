@@ -1,0 +1,17 @@
+{
+  "name": "Horus Rescue AI",
+  "short_name": "Horus Rescue",
+  "description": "AI-Powered Emergency Prioritization System",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#050816",
+  "theme_color": "#050816",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
